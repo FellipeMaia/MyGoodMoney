@@ -28,13 +28,13 @@ import javax.swing.JLabel;
  */
 public class JIntegerField extends JTextField
 {
-  private Integer valor;
+  private int valor;
   
   public JIntegerField()
   {
     super( "0" );
     setHorizontalAlignment( JLabel.RIGHT );
-    this.valor = new Integer( 0 );
+    this.valor = 0;
     this.addFocusListener(
       new FocusListener()
       {
@@ -84,32 +84,32 @@ public class JIntegerField extends JTextField
         valor = valor.replaceAll( "\\.", "" );
       }
       
-      Integer valorValido = Integer.parseInt( valor );
+      int valorValido = Integer.parseInt( valor );
       
       return( true );
     }
     catch( NumberFormatException e )
     {
-      System.out.println( "O valor " + valor + " nao eh um Integer valido." );
+      System.out.println( "O valor " + valor + " nao eh um int valido." );
       return( false );
     }
   }
   
-  public Integer getValue()
+  public int getValue()
   {
     return( this.valor );
   }
   
-  public void setValue( Integer valorParam )
+  public void setValue( int valorParam )
   {
     this.valor = valorParam;
-    if( valorParam.equals( 0 ) )
+    if( valorParam == 0 )
     {
       setText( "" );
     }
     else
     {
-      setText( valorParam.toString() );
+      setText( valorParam + "" );
     }
   }
 }

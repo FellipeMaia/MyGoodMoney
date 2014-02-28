@@ -82,7 +82,6 @@ public class JDoubleField extends JTextField
     }
     catch( NumberFormatException e )
     {
-      System.out.println( "O valor " + valor + " nao eh um Double valido." );
       return( false );
     }
   }
@@ -98,11 +97,12 @@ public class JDoubleField extends JTextField
     
     if( valorParam.equals( Double.NaN ) )
     {
-      setText( "" );
+      setText( "0,00" );
     }
     else
     {
-      setText( valorParam.toString() );
+      setText( ValueTools.format( valorParam ).replace( "R$","" ) );
+      //setText( valorParam.toString() );
     }
   }
 }

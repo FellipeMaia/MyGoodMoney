@@ -17,32 +17,50 @@
 
 package wealcash;
 
-import java.util.Date;
-
 /**
  *
  * @author Ricardo
  */
 public class Lancamento
 {
-  private Date      dataEmissao;
+  private int       codLancamento;
+  private int       dataEmissao;
+  private int       dataVencimento;
+  private int       dataQuitacao;
   private String    descricao;
   private Double    valor;
-  private Integer   codConta;
-  private Integer   codCaixa;
+  private int       codConta;
+  private int       codCaixa;
+  private Character tipo;
   
   public Lancamento()
   {
-    this.dataEmissao = null;
-    this.descricao = null;
-    this.valor = null;
-    this.codConta = null;
-    this.codCaixa = null;
+    this.codLancamento = 0;
+    this.dataEmissao = 0;
+    this.dataVencimento = 0;
+    this.dataQuitacao = 0;
+    this.descricao = "";
+    this.valor = Double.NaN;
+    this.codConta = 0;
+    this.codCaixa = 0;
+    this.tipo = ' ';
   }
   
-  public Date getDataEmissao()
+  public int getCodLancamento()
+  {
+    return( this.codLancamento );
+  }
+  public int getDataEmissao()
   {
     return( this.dataEmissao );
+  }
+  public int getDataVencimento()
+  {
+    return( this.dataVencimento );
+  }
+  public int getDataQuitacao()
+  {
+    return( this.dataQuitacao );
   }
   public String getDescricao()
   {
@@ -52,9 +70,25 @@ public class Lancamento
   {
     return( this.valor );
   }
-  public void setDataEmissao( Date dataParam )
+  public Character getTipo()
+  {
+    return( this.tipo );
+  }
+  public void setCodLancamento( int codParam )
+  {
+    this.codLancamento = codParam;
+  }
+  public void setDataEmissao( int dataParam )
   {
     this.dataEmissao = dataParam;
+  }
+  public void setDataVencimento( int pData )
+  {
+    this.dataVencimento = pData;
+  }
+  public void setDataQuitacao( int pData )
+  {
+    this.dataQuitacao = pData;
   }
   public void setDescricao( String descricaoParam )
   {
@@ -64,32 +98,36 @@ public class Lancamento
   {
     this.valor = valorParam;
   }
+  public void setTipo( char pTipo )
+  {
+    this.tipo = pTipo;
+  }
   /**
    * @return the cod_conta
    */
-  public Integer getCodConta()
+  public int getCodConta()
   {
     return codConta;
   }
   /**
    * @return the cod_caixa
    */
-  public Integer getCodCaixa()
+  public int getCodCaixa()
   {
     return codCaixa;
   }
   /**
-   * @param cod_conta the cod_conta to set
+   * @param codConta the codConta to set
    */
-  public void setCod_conta(Integer cod_conta)
+  public void setCodConta(int codConta)
   {
-    this.codConta = cod_conta;
+    this.codConta = codConta;
   }
   /**
-   * @param cod_caixa the cod_caixa to set
+   * @param codCaixa the codCaixa to set
    */
-  public void setCod_caixa(Integer cod_caixa)
+  public void setCodCaixa(int codCaixa)
   {
-    this.codCaixa=cod_caixa;
+    this.codCaixa=codCaixa;
   }
 }

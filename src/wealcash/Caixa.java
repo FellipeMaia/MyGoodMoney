@@ -16,30 +16,29 @@
  */
 
 package wealcash;
-import java.math.BigDecimal;
 /**
  *
  * @author Ricardo
  */
 public class Caixa
 {
-  Integer cod_caixa;
+  int     codCaixa;
   String  nome;
-  BigDecimal saldo;
+  Double  saldo;
   
   public Caixa()
   {
-    this.cod_caixa = 0;
+    this.codCaixa = 0;
     this.nome = "";
-    this.saldo = BigDecimal.ZERO;
+    this.saldo = Double.NaN;
   }
   
   /**
-   * @return the cod_caixa
+   * @return the codCaixa
    */
-  public Integer getCod_caixa()
+  public int getCodCaixa()
   {
-    return cod_caixa;
+    return codCaixa;
   }
   /**
    * @return the nome
@@ -51,16 +50,16 @@ public class Caixa
   /**
    * @return the saldo
    */
-  public BigDecimal getSaldo()
+  public Double getSaldo()
   {
     return saldo;
   }
   /**
-   * @param cod_caixa the cod_caixa to set
+   * @param codCaixa the codCaixa to set
    */
-  public void setCod_caixa(Integer cod_caixa)
+  public void setCodCaixa(int codCaixa)
   {
-    this.cod_caixa=cod_caixa;
+    this.codCaixa=codCaixa;
   }
   /**
    * @param nome the nome to set
@@ -72,7 +71,7 @@ public class Caixa
   /**
    * @param saldo the saldo to set
    */
-  public void setSaldo(BigDecimal saldo)
+  public void setSaldo(Double saldo)
   {
     this.saldo=saldo;
   }

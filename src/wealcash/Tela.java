@@ -21,9 +21,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.lang.reflect.InvocationTargetException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -33,32 +32,40 @@ import javax.swing.table.DefaultTableModel;
 public class Tela extends JFrame
 {
   private String comando;
-  private String OS;
-  private String camIconePrograma;
-  private String camIconeAdd;
-  private String camIconeEditar;
-  private String camIconeExcluir;
-  private String camIconeCancelar;
-  private String camIconeLupa;
   
   private JPanel pnlSuperior;
   private JTabbedPane tbpPainelAbas;
      private JPanel     pnlHome;
-        private JPanel     pnlPeriodo;
+        private JPanel     pnlResumoCaixa;
            private JLabel       lblPeriodo;
+           private JButton      btnMenosPeriodo;
+           private JButton      btnMaisPeriodo;
            private JDateChooser dtcPeriodoIni;
            private JLabel       lblPeriodoA;
            private JDateChooser dtcPeriodoFim;
-        private JPanel     pnlResumoCaixa;
            private JLabel     lblResumoCaixa;
            private JLabel     lblResNomeCaixa;
            private JComboBox  cbxResCaixa;
+           private JButton    btnResCaixa;
            private JLabel     lblResSaldoCaixa;
            private JLabel     lblResValorSaldoCaixa;
            private JLabel     lblResTotEntrCaixa;
            private JLabel     lblResValTotEntrCaixa;
            private JLabel     lblResTotSaidaCaixa;
            private JLabel     lblResValTotSaidaCaixa;
+           private JPanel     pnlGrafico;
+        private JPanel     pnlResumoConta;
+           private JLabel     lblResumoConta;
+           private JLabel     lblResNomeConta;
+           private JComboBox  cbxResConta;
+           private JButton    btnResConta;
+           private JCheckBox  ckbResumoConta;
+           private JLabel     lblResMovContaPc;
+           private JLabel     lblResValorMovContaPc;
+           private JLabel     lblResMovContaRs;
+           private JLabel     lblResValorMovContaRs;
+           private JLabel     lblResMovContaAno;
+           private JLabel     lblResValorMovContaAno;
      private JPanel     pnlMovimento;
         private JPanel     pnlCadastroMov;
            private JLabel     lblMovDescricao;
@@ -88,6 +95,18 @@ public class Tela extends JFrame
         private JPanel     pnlLancamentoMov;
            private JTable     movimentoTable;
            private DefaultTableModel movimentoModel;
+     private JPanel     pnlExtratos;
+        private JPanel     pnlExtrato;
+           private JLabel     lblExtratoConta;
+           private JComboBox  cbxExtratoConta;
+           private JLabel     lblExtratoPeriodo;
+           private JDateChooser dtcExtratoIni;
+           private JLabel     lblExtratoHifen;
+           private JDateChooser dtcExtratoFim;
+           private JButton    btnExtrato;
+           private JCheckBox  ckbExtratoProvisao;
+           private JTextPane  txtExtrato;
+           private JScrollPane scbExtratoConta;
      private JPanel     pnlCadastros;
         private JPanel     pnlCadConta;
            private JLabel     lblAddConta;
@@ -107,7 +126,7 @@ public class Tela extends JFrame
            private JLabel     lblNomeCaixa;
            private JTextField txfNomeCaixa;
            private JLabel     lblSaldoInicial;
-           private JDoubleField dbfSaldoInicialConta;
+           private JDoubleField dbfSaldoInicialCaixa;
            private JButton    btnAddCaixa;
            private JButton    btnEditarCaixa;
            private JButton    btnExcluirCaixa;
@@ -130,11 +149,17 @@ public class Tela extends JFrame
            private JButton    btnExcluirBD;
            private JButton    btnExportarBD;
            private JButton    btnImportarBD;
+     private JPanel     pnlSobre;
+        private JPanel     pnlAutor;
+           private JLabel     lblNomeAutor;
+           private JLabel     lblEmailAutor;
+           private JLabel     lblContatoAutor;
+        private JPanel     pnlTexto;
+           private JLabel     lblTexto;
   
   public Tela( String nomeParam )
   {
     super( nomeParam );
-    obterCaminhoIcones( "LINUX" );
 
     try
     {
@@ -159,42 +184,14 @@ public class Tela extends JFrame
     habilitarRecorrencia( false );
   }
   
-  private void obterCaminhoIcones(String ambiente )
-  {
-    this.OS = ambiente;
-
-    switch( ambiente )
-    {
-      case "WINDOWS":
-      {
-        this.camIconePrograma = "K:\\Ricardo\\Projetos NetBeans\\WealCash\\icons\\money.png";
-        this.camIconeAdd      = "K:\\Ricardo\\Projetos NetBeans\\WealCash\\icons\\add.png";
-        this.camIconeEditar   = "K:\\Ricardo\\Projetos NetBeans\\WealCash\\icons\\edit.png";
-        this.camIconeExcluir  = "K:\\Ricardo\\Projetos NetBeans\\WealCash\\icons\\delete.png";
-        this.camIconeCancelar = "K:\\Ricardo\\Projetos NetBeans\\WealCash\\icons\\cancel.png";
-        this.camIconeLupa     = "K:\\Ricardo\\Projetos NetBeans\\WealCash\\icons\\lupa.png";
-        break;
-      }
-      case "LINUX":
-      {
-        this.camIconePrograma = "/home/ricardo/java/WealCash/icons/money.png";
-        this.camIconeAdd      = "/home/ricardo/java/WealCash/icons/add.png";
-        this.camIconeEditar   = "/home/ricardo/java/WealCash/icons/edit.png";
-        this.camIconeExcluir  = "/home/ricardo/java/WealCash/icons/delete.png";
-        this.camIconeCancelar = "/home/ricardo/java/WealCash/icons/cancel.png";
-        this.camIconeLupa     = "/home/ricardo/java/WealCash/icons/lupa.png";
-      }
-    }
-  }
   private void obterImagemPrograma()
   {
     try
     {
-      setIconImage( new ImageIcon( this.camIconePrograma ).getImage() );
+      setIconImage( new ImageIcon( Tela.class.getResource( "money.png" ) ).getImage() );
     }
     catch( Exception ex )
     {
-      System.out.println( "Exception ao setar imagem " + this.camIconePrograma );
       ex.printStackTrace();
     }
   }
@@ -240,18 +237,27 @@ public class Tela extends JFrame
     pnlHome.setBorder( BorderFactory.createEtchedBorder() );
     pnlHome.setFont( new Font( "Verdana", 0, 12 ) );
     
-    pnlPeriodo = new JPanel();
-    pnlPeriodo.setLayout( null );
-    pnlPeriodo.setBounds( 10, 10, 610, 70 );
-    pnlPeriodo.setBorder( BorderFactory.createEtchedBorder() );
-    
-    lblPeriodo = new JLabel( "Período" );
-    lblPeriodo.setBounds( 280, 5, 50, 21 );
-    lblPeriodo.setHorizontalAlignment( JLabel.CENTER );
+    lblPeriodo = new JLabel( "Período:" );
+    lblPeriodo.setBounds( 160, 20, 60, 21 );
+    lblPeriodo.setHorizontalAlignment( JLabel.RIGHT );
     lblPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
     
+    btnMenosPeriodo = new JButton( "-" );
+    btnMenosPeriodo.setBounds( 225, 20, 45, 21 );
+    btnMenosPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
+    btnMenosPeriodo.addActionListener(
+      new ActionListener()
+      {
+        @Override
+        public void actionPerformed( ActionEvent e )
+        {
+          AOCLICARbtnMenosPeriodo();
+        }
+      }
+    );
+    
     dtcPeriodoIni = new JDateChooser();
-    dtcPeriodoIni.setBounds( 140, 31, 130, 21 );
+    dtcPeriodoIni.setBounds( 280, 20, 130, 21 );
     dtcPeriodoIni.setFont( new Font( "Verdana", 0, 12 ) );
     dtcPeriodoIni.addActionListener
     (
@@ -266,12 +272,12 @@ public class Tela extends JFrame
     );
     
     lblPeriodoA = new JLabel( "à" );
-    lblPeriodoA.setBounds( 295, 31, 15, 21 );
+    lblPeriodoA.setBounds( 420, 20, 15, 21 );
     lblPeriodoA.setFont( new Font( "Verdana", 0, 12 ) );
     lblPeriodoA.setHorizontalAlignment( JLabel.CENTER );
     
     dtcPeriodoFim = new JDateChooser();
-    dtcPeriodoFim.setBounds( 330, 31, 130, 21 );
+    dtcPeriodoFim.setBounds( 445, 20, 130, 21 );
     dtcPeriodoFim.setFont( new Font( "Verdana", 0, 12 ) );
     dtcPeriodoFim.addActionListener
     (
@@ -285,121 +291,229 @@ public class Tela extends JFrame
       }
     );
     
+    btnMaisPeriodo = new JButton( "+" );
+    btnMaisPeriodo.setBounds( 580, 20, 45, 21 );
+    btnMaisPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
+    btnMaisPeriodo.addActionListener(
+      new ActionListener()
+      {
+        @Override
+        public void actionPerformed( ActionEvent e )
+        {
+          AOCLICARbtnMaisPeriodo();
+        }
+      }
+    );
+    
     pnlResumoCaixa = new JPanel();
     pnlResumoCaixa.setLayout( null );
-    pnlResumoCaixa.setBounds( 10, 90, 610, 120 );
+    pnlResumoCaixa.setBounds( 10, 10, 610, 210 );
     pnlResumoCaixa.setBorder( BorderFactory.createEtchedBorder() );
     
-    lblResumoCaixa = new JLabel( "Caixas" );
-    lblResumoCaixa.setBounds( 280, 5, 50, 21 );
+    lblResumoCaixa = new JLabel( "Resumo Caixa (no Período)" );
+    lblResumoCaixa.setBounds( 215, 5, 180, 21 );
     lblResumoCaixa.setHorizontalAlignment( JLabel.CENTER );
     lblResumoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     
-    lblResNomeCaixa = new JLabel( "Escolha um caixa:" );
-    lblResNomeCaixa.setBounds( 10, 45, 120, 21 );
+    lblResNomeCaixa = new JLabel( "Caixa:" );
+    lblResNomeCaixa.setBounds( 10, 35, 120, 21 );
     lblResNomeCaixa.setHorizontalAlignment( JLabel.RIGHT );
     lblResNomeCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     
     cbxResCaixa = new JComboBox();
-    cbxResCaixa.setBounds( 135, 45, 120, 21 );
+    cbxResCaixa.setBounds( 135, 35, 120, 21 );
     cbxResCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    btnResCaixa = new JButton( new ImageIcon( Tela.class.getResource( "confirm.png" ) ) );
+    btnResCaixa.setBounds( 260, 35, 21, 21 );
+    btnResCaixa.addActionListener(
+      new ActionListener()
+      {
+        @Override
+        public void actionPerformed( ActionEvent e )
+        {
+          AOCLICARbtnResCaixa();
+        }
+      }
+    );
 
     lblResSaldoCaixa = new JLabel( "Saldo: " );
-    lblResSaldoCaixa.setBounds( 400, 15, 50, 21 ); // x = 450
+    lblResSaldoCaixa.setBounds( 80, 66, 50, 21 ); // x = 130
     lblResSaldoCaixa.setHorizontalAlignment( JLabel.RIGHT );
     lblResSaldoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     
     lblResValorSaldoCaixa = new JLabel( "R$ 0,00" );
-    lblResValorSaldoCaixa.setBounds( 455, 15, 100, 21 );
+    lblResValorSaldoCaixa.setBounds( 145, 66, 100, 21 );
     lblResValorSaldoCaixa.setHorizontalAlignment( JLabel.RIGHT );
     lblResValorSaldoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     
     lblResTotEntrCaixa = new JLabel( "Total de Entradas: " );
-    lblResTotEntrCaixa.setBounds( 320, 45, 130, 21 ); // x = 450
+    lblResTotEntrCaixa.setBounds( 0, 97, 130, 21 ); // x = 130
     lblResTotEntrCaixa.setHorizontalAlignment( JLabel.RIGHT );
     lblResTotEntrCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     
     lblResValTotEntrCaixa = new JLabel( "R$ 0,00" );
-    lblResValTotEntrCaixa.setBounds( 455, 45, 100, 21 );
+    lblResValTotEntrCaixa.setBounds( 145, 97, 100, 21 );
     lblResValTotEntrCaixa.setHorizontalAlignment( JLabel.RIGHT );
     lblResValTotEntrCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     
     lblResTotSaidaCaixa = new JLabel( "Total de Saídas: " );
-    lblResTotSaidaCaixa.setBounds( 330, 80, 120, 21 ); // x = 450
+    lblResTotSaidaCaixa.setBounds( 10, 128, 120, 21 ); // x = 130
     lblResTotSaidaCaixa.setHorizontalAlignment( JLabel.RIGHT );
     lblResTotSaidaCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     
     lblResValTotSaidaCaixa = new JLabel( "R$ 0,00" );
-    lblResValTotSaidaCaixa.setBounds( 455, 80, 100, 21 );
+    lblResValTotSaidaCaixa.setBounds( 145, 128, 100, 21 );
     lblResValTotSaidaCaixa.setHorizontalAlignment( JLabel.RIGHT );
     lblResValTotSaidaCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    pnlGrafico = new JPanel();
+    pnlGrafico.setLayout( null );
+    pnlGrafico.setBounds( 340, 35, 160, 160 );
+    pnlGrafico.setBorder( BorderFactory.createEtchedBorder() );
+    
+    pnlResumoConta = new JPanel();
+    pnlResumoConta.setLayout( null );
+    pnlResumoConta.setBounds( 10, 230, 610, 120 );
+    pnlResumoConta.setBorder( BorderFactory.createEtchedBorder() );
+    
+    lblResumoConta = new JLabel( "Resumo Conta (no Período)" );
+    lblResumoConta.setBounds( 215, 5, 180, 21 );
+    lblResumoConta.setHorizontalAlignment( JLabel.CENTER );
+    lblResumoConta.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    lblResNomeConta = new JLabel( "Conta:" );
+    lblResNomeConta.setBounds( 30, 45, 50, 21 );
+    lblResNomeConta.setHorizontalAlignment( JLabel.RIGHT );
+    lblResNomeConta.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    cbxResConta = new JComboBox();
+    cbxResConta.setBounds( 85, 45, 180, 21 );
+    cbxResConta.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    btnResConta = new JButton( new ImageIcon( Tela.class.getResource( "confirm.png" ) ) );
+    btnResConta.setBounds( 270, 45, 21, 21 );
+    btnResConta.addActionListener(
+      new ActionListener()
+      {
+        @Override
+        public void actionPerformed( ActionEvent e )
+        {
+          AOCLICARbtnResConta();
+        }
+      }
+    );
+    
+    ckbResumoConta = new JCheckBox( " Considerar provisões" );
+    ckbResumoConta.setBounds( 85, 76, 200, 21 );
+    ckbResumoConta.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    lblResMovContaPc = new JLabel( "Movimentou (%):" );
+    lblResMovContaPc.setBounds( 330, 25, 120, 21 ); // x = 450
+    lblResMovContaPc.setHorizontalAlignment( JLabel.RIGHT );
+    lblResMovContaPc.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    lblResValorMovContaPc = new JLabel( "0,00 %" );
+    lblResValorMovContaPc.setBounds( 455, 25, 100, 21 );
+    lblResValorMovContaPc.setHorizontalAlignment( JLabel.RIGHT );
+    lblResValorMovContaPc.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    lblResMovContaRs = new JLabel( "Movimentou (R$):" );
+    lblResMovContaRs.setBounds( 330, 55, 120, 21 ); // x = 450
+    lblResMovContaRs.setHorizontalAlignment( JLabel.RIGHT );
+    lblResMovContaRs.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    lblResValorMovContaRs = new JLabel( "R$ 0,00" );
+    lblResValorMovContaRs.setBounds( 455, 55, 100, 21 );
+    lblResValorMovContaRs.setHorizontalAlignment( JLabel.RIGHT );
+    lblResValorMovContaRs.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    lblResMovContaAno = new JLabel( "Movimentou no ano:" );
+    lblResMovContaAno.setBounds( 300, 85, 150, 21 ); // x = 450
+    lblResMovContaAno.setHorizontalAlignment( JLabel.RIGHT );
+    lblResMovContaAno.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    lblResValorMovContaAno = new JLabel( "R$ 0,00" );
+    lblResValorMovContaAno.setBounds( 455, 85, 100, 21 );
+    lblResValorMovContaAno.setHorizontalAlignment( JLabel.RIGHT );
+    lblResValorMovContaAno.setFont( new Font( "Verdana", 0, 12 ) );
     
     pnlMovimento = new JPanel();
     pnlMovimento.setLayout( null );
     pnlMovimento.setBounds( new Rectangle( 0, 0, 640, 420 ) );
-    pnlMovimento.setName( "Movimento" );
+    pnlMovimento.setName( "Lançamentos" );
     pnlMovimento.setBorder( BorderFactory.createEtchedBorder() );
     pnlMovimento.setFont( new Font( "Verdana", 0, 12 ) );
     
-    lblMovDescricao = new JLabel( "Descrição:" );
-    lblMovDescricao.setBounds( 20, 10, 70, 21 );
-    lblMovDescricao.setFont( new Font( "Verdana", 0, 12 ) );
-    lblMovDescricao.setHorizontalAlignment( JLabel.RIGHT );
-    
     pnlCadastroMov = new JPanel();
     pnlCadastroMov.setLayout( null );
-    pnlCadastroMov.setBounds( 10, 10, 280, 340 );
+    pnlCadastroMov.setBounds( 10, 10, 260, 340 );
     pnlCadastroMov.setBorder( BorderFactory.createEtchedBorder() );
     pnlCadastroMov.setFont( new Font( "Verdana", 0, 12 ) );
     
+    lblMovDescricao = new JLabel( "Descrição:" );
+    lblMovDescricao.setBounds( 10, 10, 70, 21 );
+    lblMovDescricao.setFont( new Font( "Verdana", 0, 12 ) );
+    lblMovDescricao.setHorizontalAlignment( JLabel.RIGHT );
+    
     txfMovDescricao = new JTextField( "" );
-    txfMovDescricao.setBounds( 100, 10, 150, 21 );
+    txfMovDescricao.setBounds( 90, 10, 150, 21 );
     txfMovDescricao.setFont( new Font( "Verdana", 0, 12 ) );
     txfMovDescricao.setToolTipText( "Descrição do lançamento" );
     
     lblMovData = new JLabel( "Data:" );
-    lblMovData.setBounds( 50, 41, 40, 21 );
+    lblMovData.setBounds( 40, 41, 40, 21 );
     lblMovData.setFont( new Font( "Verdana", 0, 12 ) );
     lblMovData.setHorizontalAlignment( JLabel.RIGHT );
     
     dtcMovData = new JDateChooser();
-    dtcMovData.setBounds( 100, 41, 100, 21 );
+    dtcMovData.setBounds( 90, 41, 100, 21 );
     dtcMovData.setFont( new Font( "Verdana", 0, 12 ) );
     dtcMovData.setToolTipText( "Data do lançameneto" );
     
     lblMovValor = new JLabel( "Valor:" );
-    lblMovValor.setBounds( 40, 72, 50, 21 );
+    lblMovValor.setBounds( 30, 72, 50, 21 );
     lblMovValor.setFont( new Font( "Verdana", 0, 12 ) );
     lblMovValor.setHorizontalAlignment( JLabel.RIGHT );
     
     dbfMovValor = new JDoubleField();
-    dbfMovValor.setBounds( 100, 72, 80, 21 );
+    dbfMovValor.setBounds( 90, 72, 80, 21 );
     dbfMovValor.setFont( new Font( "Verdana", 0, 12 ) );
     dbfMovValor.setToolTipText( "Valor do lançamento" );
     
     lblMovConta = new JLabel( "Conta:" );
-    lblMovConta.setBounds( 40, 103, 50, 21 );
+    lblMovConta.setBounds( 30, 103, 50, 21 );
     lblMovConta.setFont( new Font( "Verdana", 0, 12 ) );
     lblMovConta.setHorizontalAlignment( JLabel.RIGHT );
     
     cbxMovConta = new JComboBox();
-    cbxMovConta.setBounds( 100, 103, 150, 21 );
+    cbxMovConta.setBounds( 90, 103, 150, 21 );
     cbxMovConta.setFont( new Font( "Verdana", 0, 12 ) );
     cbxMovConta.setToolTipText( "Escolha uma conta" );
     
     lblMovCaixa = new JLabel( "Caixa:" );
-    lblMovCaixa.setBounds( 40, 134, 50, 21 );
+    lblMovCaixa.setBounds( 30, 134, 50, 21 );
     lblMovCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     lblMovCaixa.setHorizontalAlignment( JLabel.RIGHT );
     
     cbxMovCaixa = new JComboBox();
-    cbxMovCaixa.setBounds( 100, 134, 150, 21 );
+    cbxMovCaixa.setBounds( 90, 134, 150, 21 );
     cbxMovCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     cbxMovCaixa.setToolTipText( "Escolha um caixa" );
+    cbxMovCaixa.addKeyListener(
+      new KeyAdapter()
+      {
+        @Override
+        public void keyPressed( KeyEvent e )
+        {
+          AOPRESSIONARcbxMovCaixa( e );
+        }
+      }
+    );
     
-    ckbMovPago = new JCheckBox( "Pago" );
+    ckbMovPago = new JCheckBox( "Pago/Recebido" );
     ckbMovPago.setSelected( true );
-    ckbMovPago.setBounds( 100, 165, 60, 21 );
+    ckbMovPago.setBounds( 90, 165, 130, 21 );
     ckbMovPago.setFont( new Font( "Verdana", 0, 12 ) );
     ckbMovPago.setToolTipText( "Deixe desmarcado para um lançamento futuro." );
     
@@ -475,7 +589,7 @@ public class Tela extends JFrame
       cbxPeriodo.addItem( periodo );
     
 
-    btnMovAdd = new JButton( new ImageIcon( this.camIconeAdd ) );
+    btnMovAdd = new JButton( new ImageIcon( Tela.class.getResource( "add.png" ) ) );
     btnMovAdd.setBounds( 30, 300, 30, 30 );
     btnMovAdd.setFont( new Font( "Verdana", 0, 12 ) );
     btnMovAdd.setToolTipText( "Adicione um lançamento" );
@@ -490,8 +604,19 @@ public class Tela extends JFrame
         }
       }
     );
+    btnMovAdd.addKeyListener
+    (
+      new KeyAdapter()
+      {
+        @Override
+        public void keyPressed( KeyEvent e )
+        {
+          AOPRESSIONARbtnMovAdd( e );
+        }
+      }
+    );
 
-    btnMovEditar = new JButton( new ImageIcon( this.camIconeEditar ) );
+    btnMovEditar = new JButton( new ImageIcon( Tela.class.getResource( "edit.png" ) ) );
     btnMovEditar.setBounds( 90, 300, 30, 30 );
     btnMovEditar.setFont( new Font( "Verdana", 0, 12 ) );
     btnMovEditar.setToolTipText( "Selecione um lançamento para editar." );
@@ -507,7 +632,7 @@ public class Tela extends JFrame
       }
     );
 
-    btnMovExcluir = new JButton( new ImageIcon( this.camIconeExcluir ) );
+    btnMovExcluir = new JButton( new ImageIcon( Tela.class.getResource( "delete.png" ) ) );
     btnMovExcluir.setBounds( 150, 300, 30, 30 );
     btnMovExcluir.setFont( new Font( "Verdana", 0, 12 ) );
     btnMovExcluir.setToolTipText( "Selecione um lançamento para excluir." );
@@ -523,7 +648,7 @@ public class Tela extends JFrame
       }
     );
 
-    btnMovCancelar = new JButton( new ImageIcon( this.camIconeCancelar ) );
+    btnMovCancelar = new JButton( new ImageIcon( Tela.class.getResource( "cancel.png" ) ) );
     btnMovCancelar.setBounds( 210, 300, 30, 30 );
     btnMovCancelar.setFont( new Font( "Verdana", 0, 12 ) );
     btnMovCancelar.setToolTipText( "Cancele a edição/seleção." );
@@ -541,12 +666,12 @@ public class Tela extends JFrame
     
     pnlLancamentoMov = new JPanel();
     pnlLancamentoMov.setLayout( null );
-    pnlLancamentoMov.setBounds( 300, 10, 320, 340 );
+    pnlLancamentoMov.setBounds( 280, 10, 340, 340 );
     pnlLancamentoMov.setBorder( BorderFactory.createEtchedBorder() );
     pnlLancamentoMov.setFont( new Font( "Verdana", 0, 12 ) );
     
     // movimento model inicio
-    String[] colunasMov = { "Data", "Descrição", "Valor", "Pago" };
+    String[] colunasMov = { "Data", "Tipo", "Descrição", "Valor", "Pg/Rc" };
     Object[][] dadosMov = {};
     
     movimentoModel = new DefaultTableModel(dadosMov, colunasMov);
@@ -569,16 +694,92 @@ public class Tela extends JFrame
         }
       }
     );
-    movimentoTable.getColumnModel().getColumn(0).setPreferredWidth(70);
-    movimentoTable.getColumnModel().getColumn(1).setPreferredWidth(150);
-    movimentoTable.getColumnModel().getColumn(2).setPreferredWidth(60);
-    movimentoTable.getColumnModel().getColumn(3).setPreferredWidth(40);
+    movimentoTable.getColumnModel().getColumn(0).setPreferredWidth( 70 );  // data
+    movimentoTable.getColumnModel().getColumn(1).setPreferredWidth( 30 );  // tipo
+    movimentoTable.getColumnModel().getColumn(2).setPreferredWidth( 80 ); // descricao
+    movimentoTable.getColumnModel().getColumn(3).setPreferredWidth( 70 );  // valor
+    movimentoTable.getColumnModel().getColumn(4).setPreferredWidth( 30 );  // pago/recebido
     
     pnlLancamentoMov.setLayout( new BorderLayout() );
     pnlLancamentoMov.add( new JScrollPane( movimentoTable ) );
     
     movimentoTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
+    // alinhar a direita um JTable - http://stackoverflow.com/questions/3467052/how-to-set-right-alignment-in-jtable-cell
+    DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+    rightRenderer.setHorizontalAlignment( JLabel.RIGHT );
+    movimentoTable.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
+    
+    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+    movimentoTable.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
+    movimentoTable.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
+    movimentoTable.getColumnModel().getColumn(4).setCellRenderer( centerRenderer );
     // movimento model fim
+    
+    pnlExtratos = new JPanel();
+    pnlExtratos.setLayout( null );
+    pnlExtratos.setBounds( new Rectangle( 0, 0, 640, 420 ) );
+    pnlExtratos.setName( "Extratos" );
+    pnlExtratos.setBorder( BorderFactory.createEtchedBorder() );
+    pnlExtratos.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    pnlExtrato = new JPanel();
+    pnlExtrato.setLayout( null );
+    pnlExtrato.setBounds( new Rectangle( 10, 10, 610, 340 ) );
+    pnlExtrato.setBorder( BorderFactory.createEtchedBorder() );
+    pnlExtrato.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    lblExtratoConta = new JLabel( "Conta:" );
+    lblExtratoConta.setBounds( 10, 15, 45, 21 );
+    lblExtratoConta.setFont( new Font( "Verdana", 0, 12 ) );
+    lblExtratoConta.setHorizontalAlignment( JLabel.RIGHT );
+    
+    cbxExtratoConta = new JComboBox();
+    cbxExtratoConta.setBounds( 60, 15, cbxMovConta.getWidth(), 21 );
+    cbxExtratoConta.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    lblExtratoPeriodo = new JLabel( "Período: " );
+    lblExtratoPeriodo.setBounds( 220, 15, 60, 21 );
+    lblExtratoPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
+    lblExtratoPeriodo.setHorizontalAlignment( JLabel.RIGHT );
+    
+    dtcExtratoIni = new JDateChooser();
+    dtcExtratoIni.setBounds( 290, 15, 110, 21 );
+    dtcExtratoIni.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    lblExtratoHifen = new JLabel( "-" );
+    lblExtratoHifen.setBounds( 410, 15, 15, 21 );
+    lblExtratoHifen.setFont( new Font( "Verdana", 0, 12 ) );
+    lblExtratoHifen.setHorizontalAlignment( JLabel.CENTER );
+    
+    dtcExtratoFim = new JDateChooser();
+    dtcExtratoFim.setBounds( 435, 15, 110, 21 );
+    dtcExtratoFim.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    btnExtrato = new JButton( new ImageIcon( Tela.class.getResource( "confirm.png" ) ) );
+    btnExtrato.setBounds( 560, 15, 21, 21 );
+    btnExtrato.addActionListener(
+      new ActionListener()
+      {
+        @Override
+        public void actionPerformed( ActionEvent e )
+        {
+          AOCLICARbtnExtrato();
+        }
+      }
+    );
+    
+    ckbExtratoProvisao = new JCheckBox( " Considerar provisões" );
+    ckbExtratoProvisao.setBounds( 220, 42, 200, 21 );
+    ckbExtratoProvisao.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    txtExtrato = new JTextPane();
+    txtExtrato.setFont( new Font( "Monospaced", 0, 12 ) );
+    txtExtrato.setEditable( false );
+    txtExtrato.setBackground( pnlSuperior.getBackground() );
+    
+    scbExtratoConta = new JScrollPane( txtExtrato );
+    scbExtratoConta.setBounds( 30, 70, 540, 230 );
     
     pnlCadastros = new JPanel();
     pnlCadastros.setLayout( null );
@@ -594,14 +795,13 @@ public class Tela extends JFrame
     pnlCadConta.setBorder( BorderFactory.createEtchedBorder() );
     pnlCadConta.setFont( new Font( "Verdana", 0, 12 ) );
     
-    lblAddConta = new JLabel( "Cadastrar Contas:" );
+    lblAddConta = new JLabel( "Cadastro de Contas:" );
     lblAddConta.setBounds( 10, 10, 200, 21 );
     lblAddConta.setName( "lblAddConta" );
     lblAddConta.setFont( new Font( "Verdana", 0, 12 ) );
     
     lblNomeConta = new JLabel( "Nome:" );
     lblNomeConta.setBounds( 10, 40, 45, 21 );
-    lblNomeConta.setName( "lblNomeConta" );
     lblNomeConta.setFont( new Font( "Verdana", 0, 12 ) );
     lblNomeConta.setHorizontalAlignment( JLabel.RIGHT );
     
@@ -623,7 +823,7 @@ public class Tela extends JFrame
       cbxTipoConta.addItem( tipo );
     
 
-    btnAddConta = new JButton( new ImageIcon( this.camIconeAdd ) );
+    btnAddConta = new JButton( new ImageIcon( Tela.class.getResource( "add.png" ) ) );
     btnAddConta.setBounds( 30, 103, 30, 30 );
     btnAddConta.setFont( new Font( "Verdana", 0, 12 ) );
     btnAddConta.setToolTipText( "Adicione uma conta" );
@@ -638,8 +838,22 @@ public class Tela extends JFrame
         }
       }
     );
+    btnAddConta.addKeyListener
+    (
+      new KeyAdapter()
+      {
+        @Override
+        public void keyPressed( KeyEvent e )
+        {
+          if( e.getKeyCode() == KeyEvent.VK_ENTER )
+          {
+            AOPRESSIONARbtnAddConta( e );
+          }
+        }
+      }
+    );
     
-    btnEditarConta = new JButton( new ImageIcon( this.camIconeEditar ) );
+    btnEditarConta = new JButton( new ImageIcon( Tela.class.getResource( "edit.png" ) ) );
     btnEditarConta.setBounds( 90, 103, 30, 30 );
     btnEditarConta.setFont( new Font( "Verdana", 0, 12 ) );
     btnEditarConta.setToolTipText( "Selecione uma conta para editar." );
@@ -655,7 +869,7 @@ public class Tela extends JFrame
       }
     );
     
-    btnExcluirConta = new JButton( new ImageIcon( this.camIconeExcluir ) );
+    btnExcluirConta = new JButton( new ImageIcon( Tela.class.getResource( "delete.png" ) ) );
     btnExcluirConta.setBounds( 150, 103, 30, 30 );
     btnExcluirConta.setFont( new Font( "Verdana", 0, 12 ) );
     btnExcluirConta.setToolTipText( "Selecione uma conta para excluir." );
@@ -671,7 +885,7 @@ public class Tela extends JFrame
       }
     );
     
-    btnCancelarConta = new JButton( new ImageIcon( this.camIconeCancelar ) );
+    btnCancelarConta = new JButton( new ImageIcon( Tela.class.getResource( "cancel.png" ) ) );
     btnCancelarConta.setBounds( 210, 103, 30, 30 );
     btnCancelarConta.setFont( new Font( "Verdana", 0, 12 ) );
     btnCancelarConta.setToolTipText( "Cancele a edição/seleção." );
@@ -715,6 +929,24 @@ public class Tela extends JFrame
         }
       }
     );
+    // Fonte: http://www.java-forums.org/awt-swing/541-how-change-color-jtable-row-having-particular-value.html
+    contasTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer()
+    {
+      @Override
+      public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
+      {
+        final Component c = super.getTableCellRendererComponent(table,value,isSelected,hasFocus,row,column);
+        
+        String tipoConta = contasTable.getModel().getValueAt( row, 1 ).toString();
+        
+        if( tipoConta.equals( "Débito" ) )
+            c.setForeground(new Color(255,69,0) );
+        else
+            c.setForeground( Color.BLUE );
+
+        return( c );
+      }
+    });
     
     pnlContas.setLayout( new BorderLayout() );
     pnlContas.add( new JScrollPane( contasTable ) );
@@ -729,7 +961,7 @@ public class Tela extends JFrame
     pnlCadCaixa.setBorder( BorderFactory.createEtchedBorder() );
     pnlCadCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     
-    lblAddCaixa = new JLabel( "Cadastrar Caixas:" );
+    lblAddCaixa = new JLabel( "Cadastro de Caixas:" );
     lblAddCaixa.setBounds( 10, 10, 200, 21 );
     lblAddCaixa.setName( "lblAddCaixa" );
     lblAddCaixa.setFont( new Font( "Verdana", 0, 12 ) );
@@ -751,11 +983,11 @@ public class Tela extends JFrame
     lblSaldoInicial.setFont( new Font( "Verdana", 0, 12 ) );
     lblSaldoInicial.setHorizontalAlignment( JLabel.RIGHT );
     
-    dbfSaldoInicialConta = new JDoubleField();
-    dbfSaldoInicialConta.setBounds( 95, 70, 100, 21 );
-    dbfSaldoInicialConta.setFont( new Font( "Verdana", 0, 12 ) );
+    dbfSaldoInicialCaixa = new JDoubleField();
+    dbfSaldoInicialCaixa.setBounds( 95, 70, 100, 21 );
+    dbfSaldoInicialCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     
-    btnAddCaixa = new JButton( new ImageIcon( this.camIconeAdd ) );
+    btnAddCaixa = new JButton( new ImageIcon( Tela.class.getResource( "add.png" ) ) );
     btnAddCaixa.setBounds( 30, 103, 30, 30 );
     btnAddCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     btnAddCaixa.setToolTipText( "Adicione um caixa" );
@@ -770,8 +1002,19 @@ public class Tela extends JFrame
         }
       }
     );
+    btnAddCaixa.addKeyListener
+    (
+      new KeyAdapter()
+      {
+        @Override
+        public void keyPressed( KeyEvent e )
+        {
+          AOCLICARbtnAddCaixa();
+        }
+      }
+    );
     
-    btnEditarCaixa = new JButton( new ImageIcon( this.camIconeEditar ) );
+    btnEditarCaixa = new JButton( new ImageIcon( Tela.class.getResource( "edit.png" ) ) );
     btnEditarCaixa.setBounds( 90, 103, 30, 30 );
     btnEditarCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     btnEditarCaixa.setToolTipText( "Selecione um caixa para editar." );
@@ -787,7 +1030,7 @@ public class Tela extends JFrame
       }
     );
     
-    btnExcluirCaixa = new JButton( new ImageIcon( this.camIconeExcluir ) );
+    btnExcluirCaixa = new JButton( new ImageIcon( Tela.class.getResource( "delete.png" ) ) );
     btnExcluirCaixa.setBounds( 150, 103, 30, 30 );
     btnExcluirCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     btnExcluirCaixa.setToolTipText( "Selecione um caixa para excluir." );
@@ -803,7 +1046,7 @@ public class Tela extends JFrame
       }
     );
     
-    btnCancelarCaixa = new JButton( new ImageIcon( this.camIconeCancelar ) );
+    btnCancelarCaixa = new JButton( new ImageIcon( Tela.class.getResource( "cancel.png" ) ) );
     btnCancelarCaixa.setBounds( 210, 103, 30, 30 );
     btnCancelarCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     btnCancelarCaixa.setToolTipText( "Cancele a edição/seleção." );
@@ -852,6 +1095,8 @@ public class Tela extends JFrame
     pnlCaixas.add( new JScrollPane( caixasTable ) );
     
     caixasTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
+    // alinhar a direita um JTable - http://stackoverflow.com/questions/3467052/how-to-set-right-alignment-in-jtable-cell
+    caixasTable.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
     // caixas model fim
     
     pnlConfig = new JPanel();
@@ -880,7 +1125,7 @@ public class Tela extends JFrame
     txfDiretorioBD.setBounds( 85, 40, 300, 21 );
     txfDiretorioBD.setFont( new Font( "Verdana", 0, 12 ) );
     
-    btnPesquisarDir = new JButton( new ImageIcon( this.camIconeLupa ) );
+    btnPesquisarDir = new JButton( new ImageIcon( Tela.class.getResource( "lupa.png" ) ) );
     btnPesquisarDir.setBounds( 390, 35, 30, 30 );
     btnPesquisarDir.setFont( new Font( "Verdana", 0, 12 ) );
     btnPesquisarDir.addActionListener
@@ -989,25 +1234,108 @@ public class Tela extends JFrame
       }
     );
     
+    pnlSobre = new JPanel();
+    pnlSobre.setLayout( null );
+    pnlSobre.setBounds( new Rectangle( 0, 0, 640, 420 ) );
+    pnlSobre.setName( "Sobre" );
+    pnlSobre.setBorder( BorderFactory.createEtchedBorder() );
+    pnlSobre.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    pnlAutor = new JPanel();
+    pnlAutor.setLayout( null );
+    pnlAutor.setBounds( 20, 20, 590, 120 );
+    pnlAutor.setBorder( BorderFactory.createEtchedBorder() );
+    
+    lblNomeAutor = new JLabel( "Autor: Ricardo Montania Prado de Campos" );
+    lblNomeAutor.setBounds( 20, 15, 400, 21 );
+    lblNomeAutor.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    lblEmailAutor = new JLabel( "E-mail: ricardo@linuxafundo.com.br" );
+    lblEmailAutor.setBounds( 20, 45, 400, 21 );
+    lblEmailAutor.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    lblContatoAutor = new JLabel( "Contato: http://www.linuxafundo.com.br/contato" );
+    lblContatoAutor.setBounds( 20, 75, 400, 21 );
+    lblContatoAutor.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    pnlTexto = new JPanel();
+    pnlTexto.setLayout( null );
+    pnlTexto.setBounds( 20, 160, 590, 180 );
+    pnlTexto.setBorder( BorderFactory.createEtchedBorder() );
+    
+    String texto =
+      "   O QUE ESTE PROGRAMA OFERECE:\n\n" +
+      "Este programa visa oferecer um controle financeiro pessoal a nível\n" +
+      "intermediário, através de movimentações e agendamentos de valores. É\n" +
+      "possível cadastrar cada uma de suas contas, (Ex: Aluguel, Internet) e\n" +
+      "caixas (Ex: Carteira, Conta Bancária) a fim de obter um breve resumo\n" +
+      "em um dado período.\n\n" +
+      "   Na versão atual não é possível gerenciar de maneira clara o fluxo\n" +
+      "de caixa. Todavia, através das totalizações de entrada e saída por\n" +
+      "período, é possível obter um resumo prático e simples que oferece\n" +
+      "informações precisas baseadas nos lançamentos feitos.\n\n" +
+      "   Além dos totalizadores, este programa oferece uma interface para\n" +
+      "obtenção de um extrato de uma determinada conta. Que mostra detalha-\n" +
+      "damente todas as movimentações referente àquela conta num período\n" +
+      "selecionado.\n\n" +
+      "COMO USAR:\n\n" +
+      "   Antes de iniciar o uso do programa, é necessária a criação de um\n" +
+      "sistema de armazenamento para os dados do programa. Isso é evidenciado\n" +
+      "quando o programa é iniciado e nenhum banco de dados foi localizado.\n" +
+      "Neste caso, a aba selecionada será \"Configurações\", para que seja\n" +
+      "criado o banco de dados. Para isto, basta clicar no botão \"Criar BD\".\n" +
+      "O banco de dados será criado, e o uso do programa pode ser iniciado.\n\n" +
+      "   CADASTROS\n\n" +
+      "   ...\n\n" +
+      "LICENÇA:\n\n" +
+      "   Este software encontra-se sob a licença GPL v3, a qual lhe permite\n" +
+      "executar para qualquer propósito, estudar o funcionamento, redistri-\n" +
+      "buir e aperfeiçoar da maneira que melhor julgar.\n" +
+         "O código fonte pode ser obtido em: https://github.com/RMCampos/WealCash";
+    
+    JTextPane txtTexto = new JTextPane();
+    txtTexto.setText( texto );
+    txtTexto.setFont( new Font( "Monospaced", 0, 12 ) );
+    txtTexto.setEditable( false );
+    txtTexto.setBackground( pnlSobre.getBackground() );
+    
+    JScrollPane textoJ = new JScrollPane( txtTexto );
+    textoJ.setBounds( 20, 20, 550, 140 );
+    
     // Adicao dos componentes ao frame
     this.getContentPane().add( pnlSuperior );
+       pnlSuperior.add( lblPeriodo );
+       pnlSuperior.add( btnMenosPeriodo );
+       pnlSuperior.add( dtcPeriodoIni );
+       pnlSuperior.add( lblPeriodoA );
+       pnlSuperior.add( dtcPeriodoFim );
+       pnlSuperior.add( btnMaisPeriodo );
     this.getContentPane().add( tbpPainelAbas );
        tbpPainelAbas.add( pnlHome );
-          pnlHome.add( pnlPeriodo );
-             pnlPeriodo.add( lblPeriodo );
-             pnlPeriodo.add( dtcPeriodoIni );
-             pnlPeriodo.add( lblPeriodoA );
-             pnlPeriodo.add( dtcPeriodoFim );
           pnlHome.add( pnlResumoCaixa );
              pnlResumoCaixa.add( lblResumoCaixa );
              pnlResumoCaixa.add( lblResNomeCaixa );
              pnlResumoCaixa.add( cbxResCaixa );
+             pnlResumoCaixa.add( btnResCaixa );
              pnlResumoCaixa.add( lblResSaldoCaixa );
              pnlResumoCaixa.add( lblResValorSaldoCaixa );
              pnlResumoCaixa.add( lblResTotEntrCaixa );
              pnlResumoCaixa.add( lblResValTotEntrCaixa );
              pnlResumoCaixa.add( lblResTotSaidaCaixa );
              pnlResumoCaixa.add( lblResValTotSaidaCaixa );
+             pnlResumoCaixa.add( pnlGrafico );
+          pnlHome.add( pnlResumoConta );
+             pnlResumoConta.add( lblResumoConta );
+             pnlResumoConta.add( lblResNomeConta );
+             pnlResumoConta.add( cbxResConta );
+             pnlResumoConta.add( ckbResumoConta );
+             pnlResumoConta.add( btnResConta );
+             pnlResumoConta.add( lblResMovContaPc );
+             pnlResumoConta.add( lblResValorMovContaPc );
+             pnlResumoConta.add( lblResMovContaRs );
+             pnlResumoConta.add( lblResValorMovContaRs );
+             pnlResumoConta.add( lblResMovContaAno );
+             pnlResumoConta.add( lblResValorMovContaAno );
        tbpPainelAbas.add( pnlMovimento );
           pnlMovimento.add( pnlCadastroMov );
              pnlCadastroMov.add( lblMovDescricao );
@@ -1035,6 +1363,17 @@ public class Tela extends JFrame
              pnlCadastroMov.add( btnMovExcluir );
              pnlCadastroMov.add( btnMovCancelar );
           pnlMovimento.add( pnlLancamentoMov );
+       tbpPainelAbas.add( pnlExtratos );
+          pnlExtratos.add( pnlExtrato );
+             pnlExtrato.add( lblExtratoConta );
+             pnlExtrato.add( cbxExtratoConta );
+             pnlExtrato.add( lblExtratoPeriodo );
+             pnlExtrato.add( dtcExtratoIni );
+             pnlExtrato.add( lblExtratoHifen );
+             pnlExtrato.add( dtcExtratoFim );
+             pnlExtrato.add( btnExtrato );
+             pnlExtrato.add( ckbExtratoProvisao );
+             pnlExtrato.add( scbExtratoConta );
        tbpPainelAbas.add( pnlCadastros );
           pnlCadastros.add( pnlCadConta );
              pnlCadConta.add( lblAddConta );
@@ -1052,7 +1391,7 @@ public class Tela extends JFrame
              pnlCadCaixa.add( lblNomeCaixa );
              pnlCadCaixa.add( txfNomeCaixa );
              pnlCadCaixa.add( lblSaldoInicial );
-             pnlCadCaixa.add( dbfSaldoInicialConta );
+             pnlCadCaixa.add( dbfSaldoInicialCaixa );
              pnlCadCaixa.add( btnAddCaixa );
              pnlCadCaixa.add( btnEditarCaixa );
              pnlCadCaixa.add( btnExcluirCaixa );
@@ -1073,6 +1412,13 @@ public class Tela extends JFrame
              pnlGerBD.add( btnExcluirBD );
              pnlGerBD.add( btnImportarBD );
              pnlGerBD.add( btnExportarBD );
+       tbpPainelAbas.add( pnlSobre );
+          pnlSobre.add( pnlAutor );
+             pnlAutor.add( lblNomeAutor );
+             pnlAutor.add( lblEmailAutor );
+             pnlAutor.add( lblContatoAutor );
+          pnlSobre.add( pnlTexto );
+             pnlTexto.add( textoJ );
   }
   public void acessar()
   {
@@ -1087,11 +1433,10 @@ public class Tela extends JFrame
     }
     catch( InterruptedException e )
     {
-      System.out.println( "Exception no metodo acessar()" );
       e.printStackTrace();
     }
   }
-  public void selecionarAba( Integer indexParam )
+  public void selecionarAba( int indexParam )
   {
     tbpPainelAbas.setSelectedIndex( indexParam );
   }
@@ -1107,7 +1452,7 @@ public class Tela extends JFrame
   public void limparCamposCaixa()
   {
     setTxfNomeCaixa( "" );
-    setDbfSaldoInicialConta( Double.NaN );
+    setDbfSaldoInicialCaixa( Double.NaN );
   }
   public void limparCamposLancamento()
   {
@@ -1120,6 +1465,7 @@ public class Tela extends JFrame
     rbtMovRecorrenciaNao.setSelected( true );
     rbtMovRecorrenciaSim.setSelected( false );
     setModoBotoesMovimento( "NOVO" );
+    habilitarRecorrencia( false );
   }
   public void setModoBotoesConta( String modoParam )
   {
@@ -1185,9 +1531,32 @@ public class Tela extends JFrame
       }
     }
   }
+  public void AOCLICARbtnResCaixa()
+  {
+    this.comando = "CARREGAR_CAIXA_HOME";
+  }
+  public void AOCLICARbtnResConta()
+  {
+    this.comando = "CARREGAR_CONTA_HOME";
+  }
   public void AOCLICARbtnAddConta()
   {
     this.comando = "ADICIONAR_CONTA";
+  }
+  public void AOPRESSIONARbtnAddConta( KeyEvent e )
+  {
+    if( e.getKeyCode() == KeyEvent.VK_ENTER )
+      this.comando = "ADICIONAR_CONTA";
+  }
+  public void AOPRESSIONARbtnMovAdd( KeyEvent e )
+  {
+    if( e.getKeyCode() == KeyEvent.VK_ENTER )
+      this.comando = "ADICIONAR_LANCAMENTO";
+  }
+  public void AOPRESSIONARcbxMovCaixa( KeyEvent e )
+  {
+    if( e.getKeyCode() == KeyEvent.VK_ENTER )
+      this.comando = "ADICIONAR_LANCAMENTO";
   }
   public void AOCLICARbtnAddCaixa()
   {
@@ -1212,29 +1581,29 @@ public class Tela extends JFrame
   public void AOCLICARpnlContas( MouseEvent e )
   {
     if( e.getClickCount() == 1 )
-      this.comando = "CARREGAR_CONTA";
+      this.comando = "CARREGAR_CONTA_SELECIONADA";
   }
   public void AOCLICARpnlCaixas( MouseEvent e )
   {
     if( e.getClickCount() == 1 )
-      this.comando = "CARREGAR_CAIXA";
+      this.comando = "CARREGAR_CAIXA_SELECIONADO";
   }
   public void AOCLICARpnlMovimento( MouseEvent e )
   {
     if( e.getClickCount() == 1 )
-      this.comando = "CARREGAR_LANCAMENTO";
+      this.comando = "CARREGAR_LANCAMENTO_SELECIONADO";
   }
   public void AOCLICARbtnCancelarConta()
   {
-    this.comando = "CANCELAR_CONTA";
+    this.comando = "CANCELAR_CONTA_SELECIONADA";
   }
   public void AOCLICARbtnCancelarCaixa()
   {
-    this.comando = "CANCELAR_CAIXA";
+    this.comando = "CANCELAR_CAIXA_SELECIONADO";
   }
   public void AOCLICARbtnMovCancelar()
   {
-    this.comando = "CANCELAR_LANCAMENTO";
+    this.comando = "CANCELAR_LANCAMENTO_SELECIONADO";
   }
   public void AOCLICARbtnMovExcluir()
   {
@@ -1251,6 +1620,10 @@ public class Tela extends JFrame
   public void AOCLICARbtnPesquisarDir()
   {
     this.comando = "PESQUISAR_DIR";
+  }
+  public void AOCLICARbtnExtrato()
+  {
+    this.comando = "CONFIRMAR_EXTRATO";
   }
   public void AOCLICARdtcPeriodoIni()
   {
@@ -1279,6 +1652,14 @@ public class Tela extends JFrame
   public void AOCLICARbtnImportarBD()
   {
     this.comando = "IMPORTAR_BD";
+  }
+  public void AOCLICARbtnMaisPeriodo()
+  {
+    this.comando = "INCREMENTAR_PERIODO";
+  }
+  public void AOCLICARbtnMenosPeriodo()
+  {
+    this.comando = "DECREMENTAR_PERIODO";
   }
   public String getTxfNomeConta()
   {
@@ -1324,7 +1705,6 @@ public class Tela extends JFrame
   }
   public Date getDtcMovData()
   {
-    System.out.println( "Data lida: " + dtcMovData.getDate() );
     return( dtcMovData.getDate() );
   }
   public void setDtcMovData( Date dataParam )
@@ -1379,89 +1759,222 @@ public class Tela extends JFrame
   {
     return( (rbtMovRecorrenciaSim.isSelected())? 'S' : 'N' );
   }
-  public void addConta( String nomeParam, String tipoParam )
+  public void addConta( Conta contaParam )
   {
-    Object[] dados = { nomeParam, tipoParam };
+    Object[] dados = { contaParam.getNome(), EnumTipoConta.getPorCodigo( contaParam.getTipo() ).toString() };
     contasModel.addRow(dados);
+    
     // adiciona ao comboBox de movimento
-    atualizarContaAdicionada( nomeParam );
+    atualizarContaAdicionada( contaParam.getNome() );
   }
-  public void addCaixa( String nomeParam, Double saldoParam )
+  public void addCaixa( Caixa caixaParam )
   {
-    Object[] dados = { nomeParam, saldoParam };
+    Object[] dados = { caixaParam.getNome(), ValueTools.format( caixaParam.getSaldo() ) };
     caixasModel.addRow( dados );
     // adiciona ao comboBox de movimento
-    atualizarCaixaAdicionado( nomeParam );
+    atualizarCaixaAdicionado( caixaParam.getNome() );
   }
   public void addLancamento( Lancamento lancamentoParam )
   {
-    DateFormat f = new SimpleDateFormat( "dd/MM/yyyy" );
+    Object[] dados = { "", ' ', "", "", ' ' };
     
-    Object[] dados =
+    dados[0] = DateTools.formatDataIntToStringBR( lancamentoParam.getDataVencimento() );
+    dados[1] = lancamentoParam.getTipo();
+    dados[2] = lancamentoParam.getDescricao();
+    dados[3] = ValueTools.format( lancamentoParam.getValor() );
+    
+    if( lancamentoParam.getDataVencimento() == lancamentoParam.getDataEmissao() )
     {
-      f.format( lancamentoParam.getDataEmissao()),
-      lancamentoParam.getDescricao(),
-      lancamentoParam.getValor(),
-      'S'
-    };
+      dados[4] = 'S';
+    }
+    else
+    {
+      dados[4] = 'N';
+    }
   
     movimentoModel.addRow( dados );
   }
-  public String[] getConta()
+  public Conta getContaSelecionada()
   {
-    String[] dados = { "", "" };
-    dados[0] = (String) contasModel.getValueAt(contasTable.getSelectedRow(), 0 );
-    dados[1] = (String) contasModel.getValueAt(contasTable.getSelectedRow(), 1 );
-    return( dados );
+    Conta conta = new Conta();
+    
+    conta.setNome( (String) contasModel.getValueAt(contasTable.getSelectedRow(), 0 ) );
+    conta.setTipo( EnumTipoConta.getPorDescricao( (String) contasModel.getValueAt(contasTable.getSelectedRow(), 1 ) ).getCodigo() );
+    
+    return( conta );
   }
-  public Object[] getCaixa()
+  public Caixa getCaixa( String nomeParam )
+  { 
+    for( int i=0; i<caixasModel.getRowCount(); i++ )
+    {
+      String nomeTela = (String) caixasModel.getValueAt( i, 0 );
+      
+      if( nomeTela.equals( nomeParam ) )
+      {
+        Caixa caixa = new Caixa();
+        caixa.setNome( (String) caixasModel.getValueAt( i, 0 ) );
+        caixa.setSaldo( ValueTools.unformat( (String) caixasModel.getValueAt( i, 1 ) ) );
+        return( caixa );
+      }
+    }
+    return( null );
+  }
+  public Caixa getCaixaSelecionado()
   {
-    Object[] dados = { "", Double.NaN };    
-    dados[0] = (String) caixasModel.getValueAt(caixasTable.getSelectedRow(), 0 );
-    dados[1] = (Double) caixasModel.getValueAt(caixasTable.getSelectedRow(), 1 );
-    return( dados );
+    Caixa caixa = new Caixa();
+    
+    caixa.setNome( (String) caixasModel.getValueAt( caixasTable.getSelectedRow(), 0 ) );
+    caixa.setSaldo( ValueTools.unformat( (String)caixasModel.getValueAt( caixasTable.getSelectedRow(), 1 ) ) );
+    
+    return( caixa );
   }
-  public int getContaSelecionada()
+  public Lancamento getLancamentoSelecionado()
   {
-    return( contasTable.getSelectedRow() );
+    Lancamento lancamento = new Lancamento();
+    int linha = movimentoTable.getSelectedRow();
+    
+    String dataTela = (String) movimentoModel.getValueAt( linha, 0 );
+    lancamento.setDataVencimento( DateTools.parseDataStringBRToInteger( dataTela ) );
+    
+    lancamento.setTipo( (char) movimentoModel.getValueAt( linha, 1 ) );
+    lancamento.setDescricao( (String) movimentoModel.getValueAt( linha, 2 ) );
+    
+    String valor = (String)movimentoModel.getValueAt(linha, 3 );
+    valor = valor.replace( "R$", "" );
+    valor = valor.replaceAll( "\\.", "" );
+    valor = valor.replaceAll( ",", "." );
+    lancamento.setValor( Double.parseDouble( String.valueOf( valor.trim() ) ) );
+    
+    char pago = (char) movimentoModel.getValueAt( linha, 4 );
+    if( pago == 'S' )
+    {
+      lancamento.setDataEmissao( lancamento.getDataVencimento() );
+      lancamento.setDataQuitacao( lancamento.getDataVencimento() );
+    }
+    else
+    {
+      lancamento.setDataEmissao( DateTools.parseDateToInteger( new Date() ) );
+      lancamento.setDataQuitacao( 0 );
+    }
+    
+    return( lancamento );
   }
-  public int getCaixaSelecionado()
-  {
-    return( caixasTable.getSelectedRow() );
-  }
-  public String removeConta( int linha )
+  public void removeConta( Conta contaParam )
   {
     if( contasModel.getRowCount() > 0 )
     {
-      String conta = (String) contasModel.getValueAt( linha, 0 );
-      contasModel.removeRow(linha);
-      atualizarContaRemovida(conta);
-      return( conta );
+      for( int i=0; i<contasModel.getRowCount(); i++ )
+      {
+        String conta = (String) contasModel.getValueAt( i, 0 );
+        if( conta.equals( contaParam.getNome() ) )
+        {
+          contasModel.removeRow( i );
+          atualizarContaRemovida( conta );
+        }
+      }
     }
-    return( null );
   }
-  public String removeCaixa( int linha )
+  public void removeCaixa( Caixa caixaParam )
   {
     if( caixasModel.getRowCount() > 0 )
     {
-      String caixa = (String) caixasModel.getValueAt( linha, 0 );
-      caixasModel.removeRow(linha);
-      atualizarCaixaRemovido( caixa );
-      return( caixa );
+      for( int i=0; i<caixasModel.getRowCount(); i++ )
+      {
+        String caixa = (String) caixasModel.getValueAt( i, 0 );
+        if( caixa.equals( caixaParam.getNome() ) )
+        {
+          contasModel.removeRow( i );
+          atualizarCaixaRemovido( caixa );
+        }
+      }
     }
-    return( null );
   }
-  public void substituirConta( int linhaParam, String nomeParam, String tipoParam )
+  public void removeLancamento( Lancamento lancamentoParam )
   {
-    contasModel.removeRow( linhaParam );
-    Object[] dados = { nomeParam, tipoParam };
-    contasModel.addRow(dados);
+    if( movimentoModel.getRowCount() > 0 )
+    {
+      String dataFormatada = DateTools.formatDataIntToStringBR( lancamentoParam.getDataVencimento() );
+      String valorFormatado = ValueTools.format( lancamentoParam.getValor() );
+      
+      for( int i=0; i<movimentoModel.getRowCount(); i++ )
+      {
+        String dataTela      = (String) movimentoModel.getValueAt( i, 0 );
+        String descricaoTela = (String) movimentoModel.getValueAt( i, 2 );
+        String valorTela     = (String) movimentoModel.getValueAt( i, 3 );
+        
+        if( dataTela.equals( dataFormatada ) &&
+            descricaoTela.equals( lancamentoParam.getDescricao() ) &&
+            valorTela.equals( valorFormatado )
+          )
+        {
+          movimentoModel.removeRow( i );
+        }
+      }
+    }
   }
-  public void substituirCaixa( int linhaParam, String nomeParam, Double saldoParam )
+  public void substituirConta( Conta contaVelhaParam, Conta contaNovaParam )
   {
-    caixasModel.removeRow( linhaParam );
-    Object[] dados = { nomeParam, saldoParam };
-    caixasModel.addRow(dados);
+    for( int i=0; i<contasModel.getRowCount(); i++ )
+    {
+      String contaAtual = (String) contasModel.getValueAt( i, 0 );
+      if( contaAtual.equals( contaVelhaParam.getNome() ) )
+      {
+        contasModel.setValueAt( contaNovaParam.getNome(), i, 0 );
+        contasModel.setValueAt( EnumTipoConta.getPorCodigo( contaNovaParam.getTipo() ).toString(), i, 1 );
+        atualizarPainelContas();
+        return;
+      }
+    }
+  }
+  public void substituirLancamento( Lancamento lancamentoVelhoParam, Lancamento lancamentoNovoParam )
+  {
+    String dataFormatada = DateTools.formatDataIntToStringBR( lancamentoVelhoParam.getDataVencimento() );
+    String valorFormatado = ValueTools.format( lancamentoVelhoParam.getValor() );
+      
+    for( int i=0; i<movimentoModel.getRowCount(); i++ )
+    {
+      String dataTela      = (String) movimentoModel.getValueAt( i, 0 );
+      String descricaoTela = (String) movimentoModel.getValueAt( i, 2 );
+      String valorTela     = (String) movimentoModel.getValueAt( i, 3 );
+        
+      if( dataTela.equals( dataFormatada ) &&
+          descricaoTela.equals( lancamentoVelhoParam.getDescricao() ) &&
+          valorTela.equals( valorFormatado )
+        )
+      {
+        movimentoModel.setValueAt( DateTools.formatDataIntToStringBR( lancamentoNovoParam.getDataVencimento() ), i, 0 );
+        movimentoModel.setValueAt( lancamentoNovoParam.getDescricao(), i, 2 );
+        movimentoModel.setValueAt( ValueTools.format( lancamentoNovoParam.getValor() ), i, 3 );
+        
+        if( lancamentoNovoParam.getDataQuitacao() > 0 ) // pago
+        {
+          movimentoModel.setValueAt( 'S', i, 4 );
+        }
+        else // a pagar
+        {
+          movimentoModel.setValueAt( 'N', i, 4 );
+        }
+        
+        atualizarPainelMovimento();
+        return;
+      }
+    }
+  }
+  public void substituirCaixa( Caixa caixaVelhoParam, Caixa caixaNovoParam )
+  {
+    for( int i=0; i<caixasModel.getRowCount(); i++ )
+    {
+      String caixaAtual = (String) caixasModel.getValueAt( i, 0 );
+      if( caixaAtual.equals( caixaVelhoParam.getNome() ) )
+      {
+        caixasModel.setValueAt( caixaNovoParam.getNome(), i, 0 );
+        caixasModel.setValueAt( ValueTools.format( caixaNovoParam.getSaldo() ), i, 1 );
+        atualizarPainelCaixas();
+        atualizarCaixaRemovido( caixaVelhoParam.getNome() );
+        atualizarCaixaAdicionado( caixaNovoParam.getNome() );
+        return;
+      }
+    }
   }
   public void atualizarPainelContas()
   {
@@ -1471,9 +1984,13 @@ public class Tela extends JFrame
   {
     caixasTable.repaint();
   }
+  public void atualizarPainelMovimento()
+  {
+    movimentoTable.repaint();
+  }
   public void atualizarContaRemovida( String conta )
   {
-    JComboBox[] combos = {cbxMovConta};
+    JComboBox[] combos = {cbxMovConta, cbxExtratoConta, cbxResConta};
     
     for( JComboBox combo : combos )
     {
@@ -1524,6 +2041,10 @@ public class Tela extends JFrame
   public void atualizarContaAdicionada( String conta )
   {
     cbxMovConta.addItem( conta );
+    cbxResConta.addItem( conta );
+    cbxExtratoConta.addItem( conta );
+    
+    cbxResConta.setSelectedIndex( 0 );
   }
   public void atualizarCaixaAdicionado( String caixa )
   {
@@ -1547,13 +2068,13 @@ public class Tela extends JFrame
   {
     txfNomeCaixa.setText( nomeParam );
   }
-  public Double getDbfSaldoInicialConta()
+  public Double getDbfSaldoInicialCaixa()
   {
-    return( dbfSaldoInicialConta.getValue() );
+    return( dbfSaldoInicialCaixa.getValue() );
   }
-  public void setDbfSaldoInicialConta( Double valorParam )
+  public void setDbfSaldoInicialCaixa( Double valorParam )
   {
-    dbfSaldoInicialConta.setValue( valorParam );
+    dbfSaldoInicialCaixa.setValue( valorParam );
   }
   public void limparSelecaoMovimento()
   {
@@ -1567,10 +2088,23 @@ public class Tela extends JFrame
   {
     caixasTable.getSelectionModel().clearSelection();
   }
-  public void limparModel( DefaultTableModel model )
+  public void limparMovimentosModel()
+  { 
+    movimentoModel.setRowCount(0);
+  }
+  public void limparCaixasModel()
   {
-    for( int i=0; i<model.getRowCount(); i++ )
-      model.removeRow( i );
+    caixasModel.setRowCount( 0 );
+  }
+  public void limparContasModel()
+  {
+    contasModel.setRowCount( 0 );
+  }
+  public void limparResumoConta()
+  {
+    setLblResValorMovContaPc( "0,00 %" );
+    setLblResValorMovContaRs( "R$ 0,00" );
+    setLblResValorMovContaAno( "R$ 0,00" );
   }
   public DefaultTableModel getMovimentoModel()
   {
@@ -1589,9 +2123,9 @@ public class Tela extends JFrame
     JComboBox[] j = new JComboBox[5];
     j[0] = cbxMovCaixa;
     j[1] = cbxMovConta;
-    j[2] = cbxPeriodo;
+    j[2] = cbxExtratoConta;
     j[3] = cbxResCaixa;
-    j[4] = cbxTipoConta;
+    j[4] = cbxResConta;
     
     for( JComboBox combo : j )
     {
@@ -1603,8 +2137,185 @@ public class Tela extends JFrame
     if( combo.getItemCount() > 0 )
       combo.removeAllItems();
   }
-  public String getOS()
+  public void limparTudo()
   {
-    return( this.OS );
+    // Home
+    cbxResCaixa.setSelectedIndex( -1 );
+    setLblResValorSaldoCaixa( "R$ 0,00" );
+    setLblResValTotEntrCaixa( "R$ 0,00" );
+    setLblResValTotSaidaCaixa( "R$ 0,00" );
+    cbxResConta.setSelectedIndex( -1 );
+    setLblResValorMovContaPc( "0.00 %" );
+    setLblResValorMovContaRs( "R$ 0,00" );
+    setLblResValorMovContaAno( "R$ 0,00" );
+    // Movimento
+    txfMovDescricao.setText( "" );
+    dtcMovData.setDate( null );
+    dbfMovValor.setValue( 0.0 );
+    cbxMovConta.setSelectedIndex( -1 );
+    cbxMovCaixa.setSelectedIndex( -1 );
+    ckbMovPago.setSelected( true );
+    rbtMovRecorrenciaNao.setSelected( true );
+    rbtMovRecorrenciaSim.setSelected( false );
+    habilitarRecorrencia( false );
+    // Cadastros
+    txfNomeConta.setText( "" );
+    cbxTipoConta.setSelectedIndex( -1 );
+    txfNomeCaixa.setText( "" );
+  }
+  public void limparCamposHome()
+  {
+    cbxResCaixa.setSelectedIndex( -1 );
+    cbxResConta.setSelectedIndex( -1 );
+  }
+  public void selecionarCaixaHome( String caixaParam )
+  {
+    cbxResCaixa.setSelectedItem( caixaParam );
+  }
+  public void setLblResValorSaldoCaixa( String saldoParam )
+  {
+    lblResValorSaldoCaixa.setText( saldoParam );
+  }
+  public String getCbxResCaixa()
+  {
+    if( cbxResCaixa.getSelectedIndex() >= 0 )
+    {
+      return( (String) cbxResCaixa.getSelectedItem() );
+    }
+    return( null );
+  }
+  public String getCbxResConta()
+  {
+    if( cbxResConta.getSelectedIndex() >= 0 )
+    {
+      return( (String) cbxResConta.getSelectedItem() );
+    }
+    return( null );
+  }
+  public Date getDtcPeriodoIni()
+  {
+    return( dtcPeriodoIni.getDate() );
+  }
+  public Date getDtcPeriodoFim()
+  {
+    return( dtcPeriodoFim.getDate() );
+  }
+  public void setLblResValTotEntrCaixa( String valorParam )
+  {
+    lblResValTotEntrCaixa.setText( valorParam );
+  }
+  public void setLblResValTotSaidaCaixa( String valorParam )
+  {
+    lblResValTotSaidaCaixa.setText( valorParam );
+  }
+  public void setLblResValorMovContaPc( String valorParam )
+  {
+    lblResValorMovContaPc.setText( valorParam );
+  }
+  public void setLblResValorMovContaRs( String valorParam )
+  {
+    lblResValorMovContaRs.setText( valorParam );
+  }
+  public void setLblResValorMovContaAno( String valorParam )
+  {
+    lblResValorMovContaAno.setText( valorParam );
+  }
+  public Caixa getCaixaTela()
+  {
+    Caixa caixa = new Caixa();
+    
+    caixa.setNome( getTxfNomeCaixa() );
+    caixa.setSaldo( getDbfSaldoInicialCaixa() );
+    return( caixa );
+  }
+  public Conta getContaTela()
+  {
+    Conta conta = new Conta();
+    conta.setNome( getTxfNomeConta() );
+    conta.setTipo( getCbxTipoConta().getCodigo() );
+    return( conta );
+  }
+  public Lancamento getLancamentoTela( BD banco )
+  {
+    Lancamento lancamento = new Lancamento();
+    
+    if( getCkbMovPago() )
+    {
+      // lancamento a vista
+      lancamento.setDataEmissao( DateTools.parseDateToInteger( getDtcMovData() ) );
+      lancamento.setDataVencimento( DateTools.parseDateToInteger( getDtcMovData() ) );
+      lancamento.setDataQuitacao( DateTools.parseDateToInteger( getDtcMovData() ) );
+    }
+    else
+    {
+      // provisao
+      lancamento.setDataEmissao( DateTools.parseDateToInteger( new Date() ) );
+      lancamento.setDataVencimento( DateTools.parseDateToInteger( getDtcMovData() ) );
+      lancamento.setDataQuitacao( 0 );
+    }
+    
+    lancamento.setDescricao( getTxfMovDescricao() );
+    lancamento.setValor( getDbfMovValor() );
+    lancamento.setTipo( banco.selectTipoConta( banco.selectCodConta( getCbxMovConta() ) ) );
+    lancamento.setCodConta( banco.selectCodConta( getCbxMovConta() ) );
+    lancamento.setCodCaixa( banco.selectCodCaixa( getCbxMovCaixa() ) );
+    
+    return( lancamento );
+  }
+  public JTable getCaixasTable()
+  {
+    return( caixasTable );
+  }
+  public JTable getContasTable()
+  {
+    return( contasTable );
+  }
+  public JTable getMovimentoTable()
+  {
+    return( movimentoTable );
+  }
+  public int getItfNumVezes()
+  {
+    return( itfNumVezes.getValue() );
+  }
+  public int getItfNumPeriodo()
+  {
+    return( itfNumPeriodo.getValue() );
+  }
+  public EnumPeriodo getCbxPeriodo()
+  {
+    if( cbxPeriodo.getSelectedIndex() >= 0 )
+    {
+      return( (EnumPeriodo) cbxPeriodo.getSelectedItem() );
+    }
+    return( null );
+  }
+  public void setTxtExtrato( String pTexto )
+  {
+    this.txtExtrato.setText( pTexto );
+  }
+  public String getTxtExtrato()
+  {
+    return( this.txtExtrato.getText() );
+  }
+  public String getCbxExtratoConta()
+  {
+    if( cbxExtratoConta.getSelectedIndex() >= 0 )
+    {
+      return( (String) this.cbxExtratoConta.getSelectedItem() );
+    }
+    return( null );
+  }
+  public Date getDtcExtratoIni()
+  {
+    return( this.dtcExtratoIni.getDate() );
+  }
+  public Date getDtcExtratoFim()
+  {
+    return( this.dtcExtratoFim.getDate() );
+  }
+  public boolean getCkbExtratoProvisao()
+  {
+    return( ckbExtratoProvisao.isSelected() );
   }
 }

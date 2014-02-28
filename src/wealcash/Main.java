@@ -16,14 +16,19 @@
  */
 
 package wealcash;
+
 import java.awt.HeadlessException;
 import java.io.File;
 import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import javax.swing.JFileChooser;
 /**
  *
@@ -32,18 +37,24 @@ import javax.swing.JFileChooser;
 public class Main
 {
   private final Tela frame;
-  private BD banco;
+  private final BD banco;
   private boolean bancoCriado;
+  private Date perDataIni;
+  private Date perDataFim;
   
   public Main()
   {
-    this.frame = new Tela( "WealCash - Controle Financeiro - Versão 1.0.0" );
+    // 1.0.1 - Periodo foi para painel superior
+    // 1.0.2 - Banco de dados totalmente modificado
+    this.frame = new Tela( "WealCash - Controle Financeiro - Versão 1.0.2" );
     this.frame.limparCamposConta();
     this.frame.setModoBotoesConta( "NOVO" );
     this.frame.setModoBotoesCaixa( "NOVO" );
     this.frame.setModoBotoesMovimento( "NOVO" );
     this.bancoCriado = false;
     this.banco = new BD();
+    this.perDataIni = new Date();
+    this.perDataFim = new Date();
   }
   public void exec()
   {
@@ -55,7 +66,6 @@ public class Main
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no medoto exec()" );
       e.printStackTrace();
     }
   }
@@ -69,7 +79,6 @@ public class Main
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo setarCaminhoDirBD()" );
       e.printStackTrace();
     }
   }
@@ -83,105 +92,73 @@ public class Main
     if( this.bancoCriado )
     {
       setarPeriodoHome();
-      carregarContas();
-      carregarCaixas();
-      carregarLancamentos();
+      carregarContasAoIniciarPrograma();
+      carregarCaixasAoIniciarPrograma();
+      carregarLancamentosAoIniciarPrograma();
       this.frame.selecionarAba( 0 );
+      this.frame.atualizarPainelCaixas();
+      this.frame.atualizarPainelContas();
+      this.frame.atualizarPainelMovimento();
     }
     else
     {
-      this.frame.selecionarAba( 3 );
+      this.frame.selecionarAba( 4 );
     }
   }
-  private void carregarContas()
+  private void carregarContasAoIniciarPrograma()
   {
     try
     {
-      ArrayList<Object[]> contasList = this.banco.getTodasAsContas();
+      ArrayList<Conta> contasList = this.banco.selectTodasAsContas();
       
-      if( contasList == null || contasList.size() == 0 )
+      if( contasList.isEmpty() )
         return;
-      
-      System.out.println( "Contas recebidas: " );
-      for( int i=0; i<contasList.size(); i++ )
+
+      for( Conta conta : contasList )
       {
-        Object[] select = contasList.get( i );
-        String nomeConta = (String)select[0];
-        String tipoConta = (String)select[1];
-        
-        Conta conta = new Conta();
-        conta.setNome( nomeConta );
-        conta.setTipo( tipoConta.charAt( 0 ) );
-        this.frame.addConta( nomeConta, EnumTipoConta.getPorCodigo( tipoConta.charAt( 0 ) ).getDescricao() );
+        this.frame.addConta( conta );
       }
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo carregarContas()" );
       e.printStackTrace();
     }
   }
-  private void carregarCaixas()
+  private void carregarCaixasAoIniciarPrograma()
   {
     try
     {
-      ArrayList<Object[]> contasList = this.banco.getTodosOsCaixas();
+      ArrayList<Caixa> caixasList = this.banco.selectTodosOsCaixas();
       
-      if( contasList == null || contasList.size() == 0 )
+      if( caixasList.isEmpty() )
         return;
-      
-      System.out.println( "Caixas recebidos: " );
-      for( int i=0; i<contasList.size(); i++ )
+
+      for( Caixa caixa : caixasList )
       {
-        Object[] select = contasList.get( i );
-        String nomeCaixa  = (String)select[0];
-        BigDecimal saldoCaixa = (BigDecimal)select[1];
-        
-        Caixa caixa = new Caixa();
-        caixa.setNome( nomeCaixa );
-        caixa.setSaldo( saldoCaixa );
-        this.frame.addCaixa( nomeCaixa, saldoCaixa.doubleValue() );
+        this.frame.addCaixa( caixa );
       }
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo carregarCaixas()" );
       e.printStackTrace();
     }
   }
-  private void carregarLancamentos()
+  private void carregarLancamentosAoIniciarPrograma()
   {
-    try
+    ArrayList<Lancamento> lancamentosList = this.banco.selectTodosOsLancamentosPeriodo
+    (
+      DateTools.parseDateToInteger( this.perDataIni ),
+      DateTools.parseDateToInteger( this.perDataFim )
+    );
+    
+    if( lancamentosList.isEmpty() )
     {
-      ArrayList<Object[]> lancamentosList = this.banco.getTodosOsLancamentos();
-      
-      if( lancamentosList == null || lancamentosList.size() == 0 )
-        return;
-      
-      System.out.println( "Lançamentos recebidos: " );
-      for( int i=0; i<lancamentosList.size(); i++ )
-      {
-        Object[] select = lancamentosList.get( i );
-        String data  = (String)select[0];
-        String descricao = (String)select[1];
-        Double valor = (Double)select[2];
-        
-        data = data.replaceAll( "-", "/" );
-        
-        DateFormat f = new SimpleDateFormat( "dd/MM/yyyy" );
-        
-        Lancamento l = new Lancamento();
-        l.setDataEmissao(f.parse( data ) );
-        l.setDescricao( descricao );
-        l.setValor( valor );
-        
-        this.frame.addLancamento( l );
-      }
+      return;
     }
-    catch( Exception e )
+    
+    for( Lancamento lancamento : lancamentosList )
     {
-      System.out.println( "Exception no metodo carregarLancamentos()" );
-      e.printStackTrace();
+      this.frame.addLancamento( lancamento );
     }
   }
   private void setarPeriodoHome()
@@ -216,10 +193,11 @@ public class Main
       
       this.frame.setDtcPeriodoIni( dataIni );
       this.frame.setDtcPeriodoFim( dataFim );
+      this.perDataIni = dataIni;
+      this.perDataFim = dataFim;
     }
     catch( NumberFormatException | ParseException e )
     {
-      System.out.println( "Exception no metodo setarPeriodoHome()" );
       e.printStackTrace();
     }
   }
@@ -227,12 +205,10 @@ public class Main
   {
     try
     {
+      System.out.println( "Comando Tela: " + this.frame.getComandoTela() );
+
       do
       {
-        System.out.println( "Comando Tela: " + this.frame.getComandoTela() );
-        
-        this.frame.acessar();
-        
         if( this.frame.getComandoTela().equals( "ADICIONAR_CAIXA" ) )
         {
           adicionarCaixa();
@@ -243,39 +219,55 @@ public class Main
         }
         if( this.frame.getComandoTela().equals( "ADICIONAR_LANCAMENTO" ) )
         {
-          tratarLancamentoProvisao();
+          adicionarLancamento();
         }
         if( this.frame.getComandoTela().equals( "ATUALIZAR_PERIODO" ) )
         {
-          atualizarPeriodoHome();
+          atualizarPeriodo();
         }
-        if( this.frame.getComandoTela().equals( "CANCELAR_CAIXA" ) )
+        if( this.frame.getComandoTela().equals( "CANCELAR_CAIXA_SELECIONADO" ) )
         {
-          cancelarCaixa();
+          cancelarCaixaSelecionado();
         }
-        if( this.frame.getComandoTela().equals( "CANCELAR_CONTA" ) )
+        if( this.frame.getComandoTela().equals( "CANCELAR_CONTA_SELECIONADA" ) )
         {
-          cancelarConta();
+          cancelarContaSelecionada();
         }
-        if( this.frame.getComandoTela().equals( "CANCELAR_LANCAMENTO" ) )
+        if( this.frame.getComandoTela().equals( "CANCELAR_LANCAMENTO_SELECIONADO" ) )
         {
-          cancelarLancamento();
+          cancelarLancamentoSelecionado();
         }
-        if( this.frame.getComandoTela().equals( "CARREGAR_CAIXA" ) )
+        if( this.frame.getComandoTela().equals( "CARREGAR_CAIXA_SELECIONADO" ) )
         {
-          carregarCaixa();
+          carregarCaixaSelecionado();
         }
-        if( this.frame.getComandoTela().equals( "CARREGAR_CONTA" ) )
+        if( this.frame.getComandoTela().equals( "CARREGAR_CAIXA_HOME" ) )
         {
-          carregarConta();
+          carregarCaixaHome();
         }
-        if( this.frame.getComandoTela().equals( "CARREGAR_LANCAMENTO" ) )
+        if( this.frame.getComandoTela().equals( "CARREGAR_CONTA_SELECIONADA" ) )
         {
-          carregarLancamento();
+          carregarContaSelecionada();
+        }
+        if( this.frame.getComandoTela().equals( "CARREGAR_CONTA_HOME" ) )
+        {
+          carregarContaHome();
+        }
+        if( this.frame.getComandoTela().equals( "CARREGAR_LANCAMENTO_SELECIONADO" ) )
+        {
+          carregarLancamentoSelecionado();
+        }
+        if( this.frame.getComandoTela().equals( "CONFIRMAR_EXTRATO" ) )
+        {
+          obterExtratoConta();
         }
         if( this.frame.getComandoTela().equals( "CRIAR_BD" ) )
         {
           criarBD();
+        }
+        if( this.frame.getComandoTela().equals( "DECREMENTAR_PERIODO" ) )
+        {
+          decrementarPeriodo();
         }
         if( this.frame.getComandoTela().equals( "EDITAR_CAIXA" ) )
         {
@@ -313,6 +305,10 @@ public class Main
         {
           importarBD();
         }
+        if( this.frame.getComandoTela().equals( "INCREMENTAR_PERIODO" ) )
+        {
+          incrementarPeriodo();
+        }
         if( this.frame.getComandoTela().equals( "LIMPAR_BD" ) )
         {
           limparBD();
@@ -321,38 +317,20 @@ public class Main
         {
           pesquisarDir();
         }
+        this.frame.acessar();
       }
       while( !this.frame.getComandoTela().equals( "SAIR" ) );
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo processar()" );
       e.printStackTrace();
     }
   }
-  private void tratarLancamentoProvisao()
+  private void atualizarPeriodo()
   {
-    try
-    {
-      if( this.frame.getCkbMovPago() )
-        adicionarLancamento();
-      else
-        adicionarProvisao();
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void adicionarProvisao()
-  {
-    try
-    {
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
+    this.perDataIni = this.frame.getDtcPeriodoIni();
+    this.perDataFim = this.frame.getDtcPeriodoFim();
+    recarregarLancamentos();
   }
   private void criarBD()
   {
@@ -366,15 +344,6 @@ public class Main
       
       String caminhoBanco = this.frame.getTxfDiretorioBD();
       String nomeBanco = this.frame.getTxfNomeBD();
-      
-      if( this.frame.getOS().equals( "WINDOWS" ) && !caminhoBanco.endsWith( "\\") )
-      {
-        caminhoBanco += "\\";
-      }
-      else if( this.frame.getOS().equals( "LINUX" ) && !caminhoBanco.endsWith( "/" ) )
-      {
-        caminhoBanco += "/";
-      }
 
       this.banco.criarBancoDeDados( caminhoBanco + nomeBanco );
       this.bancoCriado = true;
@@ -382,19 +351,6 @@ public class Main
     }
     catch( ClassNotFoundException e )
     {
-      System.out.println( "Exception no metodo criarBD()" );
-      e.printStackTrace();
-    }
-  }
-  private void atualizarPeriodoHome()
-  {
-    try
-    {
-      // fazer alguma coisa quando atualizar..
-    }
-    catch( Exception e )
-    {
-      System.out.println( "Exception no metodo atualizarPeriodoHome()" );
       e.printStackTrace();
     }
   }
@@ -406,21 +362,20 @@ public class Main
       {
         if( Mensagem.confirmacao( "Confirma DELETAR todos os dados existentes?" , this.frame ) )
         {
-          this.banco.limparGeral();
-          this.frame.limparModel( this.frame.getMovimentoModel() );
-          this.frame.limparModel( this.frame.getContasModel() );
-          this.frame.limparModel( this.frame.getCaixasModel() );
+          this.banco.excluirTodosRegistros();
+          this.frame.limparMovimentosModel();
+          this.frame.limparContasModel();
+          this.frame.limparCaixasModel();
           this.frame.limparCombos();
         }
       }
       else
       {
-        Mensagem.aviso( "Não existe nenhum banco criado!", this.frame );
+        Mensagem.aviso( "Não existe nenhum banco de dados criado!", this.frame );
       }
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo limparBD()" );
       e.printStackTrace();
     }
   }
@@ -440,16 +395,19 @@ public class Main
         
         if( bancoAtual.delete() )
         {
-          this.frame.limparModel( this.frame.getMovimentoModel() );
-          this.frame.limparModel( this.frame.getContasModel() );
-          this.frame.limparModel( this.frame.getCaixasModel() );
+          this.frame.limparMovimentosModel();
+          this.frame.limparContasModel();
+          this.frame.limparCaixasModel();
           
           System.out.println
           (
-            "Deletando o arquivo:\n" +
+            "Deletando o arquivo: " +
             this.banco.getCaminhoAbsoluto() + "... \n" +
             "Banco de dados deletado com sucesso!"
           );
+          
+          // limpa as contas e caixas do home
+          this.frame.limparCombos();
           
           this.bancoCriado = false;
         }
@@ -460,12 +418,11 @@ public class Main
       }
       else
       {
-        Mensagem.aviso( "Não existe nenhum banco criado!", this.frame );
+        Mensagem.aviso( "Não existe nenhum banco de dadaos criado!", this.frame );
       }
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo excluirBD()" );
       e.printStackTrace();
     }
   }
@@ -473,16 +430,10 @@ public class Main
   {
     try
     {
-      if( !this.bancoCriado )
-      {
-        Mensagem.aviso( "Não existe nenhum banco criado!", this.frame );
-        return;
-      }
-      this.banco.exportar();
+      Mensagem.aviso( "Função em desenvolvimento...!", this.frame );
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo exportarBD()" );
       e.printStackTrace();
     }
   }
@@ -490,11 +441,10 @@ public class Main
   {
     try
     {
-      // fazer alguma coisa quando clicar..s
+      Mensagem.aviso( "Função em desenvolvimento...!", this.frame );
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo importarBD()" );
       e.printStackTrace();
     }
   }
@@ -516,7 +466,6 @@ public class Main
     }
     catch( HeadlessException e )
     {
-      System.out.println( "Exception no metodo pesquisarDir()" );
       e.printStackTrace();
     }
   }
@@ -524,26 +473,26 @@ public class Main
   {
     try
     {
+      if( !this.bancoCriado )
+      {
+        Mensagem.aviso( "Não existe nenhum banco de dados criado!", this.frame );
+        return;
+      }
+
       if( validarCamposConta() )
       {
-        Conta conta = new Conta();
-
-        conta.setNome( this.frame.getTxfNomeConta() );
-        conta.setTipo( this.frame.getCbxTipoConta().getCodigo() );
-          
-        String nomeConta = this.frame.getTxfNomeConta();
-        String tipoConta = this.frame.getCbxTipoConta().getDescricao();        
-        this.frame.addConta( nomeConta, tipoConta );
+        Conta conta = this.frame.getContaTela();
         
-        this.banco.inserirConta(conta);
-        
-        this.frame.limparCamposConta();
+        this.frame.addConta( conta );
+        this.banco.inserirConta( conta );
         this.frame.setModoBotoesConta( "NOVO" );
+
+        this.frame.limparCamposLancamento();
+        this.frame.limparCamposConta();
       }
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo adicionarConta()" );
       e.printStackTrace();
     }
   }
@@ -553,35 +502,32 @@ public class Main
     {
       if( Mensagem.confirmacao( "Confirma exclusão da Conta?", this.frame ) )
       {
-        int linhaSelecionada = this.frame.getContaSelecionada();
-        String contaRemovida = this.frame.removeConta(linhaSelecionada);
-        this.frame.atualizarPainelContas();
+        Conta conta = this.frame.getContaSelecionada();
+        conta.setCodConta( this.banco.selectCodConta( conta.getNome() ) );
+        
+        this.frame.removeConta( conta );
+        this.banco.excluirConta( conta );
         this.frame.limparCamposConta();
         this.frame.setModoBotoesConta( "NOVO" );
-        
-        this.banco.apagarConta( this.banco.obterCodConta( contaRemovida ) );
       }
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo excluirConta()" );
       e.printStackTrace();
     }
   }
-  private void carregarConta()
+  private void carregarContaSelecionada()
   {
     try
     {
-      this.frame.setModoBotoesConta( "SELECIONADO" );
+      Conta conta = this.frame.getContaSelecionada();
       
-      String[] linhaSelecionada = this.frame.getConta();
-
-      this.frame.setTxfNomeConta( linhaSelecionada[0] );
-      this.frame.setCbxTipoConta( EnumTipoConta.getPorDescricao( linhaSelecionada[1] ) );
+      this.frame.setModoBotoesConta( "SELECIONADO" );
+      this.frame.setTxfNomeConta( conta.getNome() );
+      this.frame.setCbxTipoConta( EnumTipoConta.getPorCodigo( conta.getTipo() ) );
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo carregarConta()");
       e.printStackTrace();
     }
   }
@@ -591,21 +537,26 @@ public class Main
     {
       if( validarCamposConta() )
       {
-        String nomeConta = this.frame.getTxfNomeConta();
-        String tipoConta = this.frame.getCbxTipoConta().getDescricao();
+        Conta contaVelha = this.frame.getContaSelecionada();
+        Conta contaNova = new Conta();
         
-        this.frame.substituirConta( this.frame.getContaSelecionada(), nomeConta, tipoConta );
+        contaVelha.setCodConta( this.banco.selectCodConta( contaVelha.getNome() ) );
+        contaNova.setCodConta( contaVelha.getCodConta() );
+        contaNova.setNome( this.frame.getTxfNomeConta() );
+        contaNova.setTipo( this.frame.getCbxTipoConta().getCodigo() );
+        
+        this.frame.substituirConta( contaVelha, contaNova );
+        this.banco.alterarConta( contaNova );
         this.frame.limparCamposConta();
         this.frame.setModoBotoesConta( "NOVO" );
       }
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo editarConta()" );
       e.printStackTrace();
     }
   }
-  private void cancelarConta()
+  private void cancelarContaSelecionada()
   {
     try
     {
@@ -615,7 +566,6 @@ public class Main
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo cancelarConta()" );
       e.printStackTrace();
     }
   }
@@ -647,7 +597,6 @@ public class Main
     }
     catch( HeadlessException e )
     {
-      System.out.println( "Exception no metodo validarCamposConta()" );
       e.printStackTrace();
       return( false );
     }
@@ -656,25 +605,115 @@ public class Main
   {
     try
     {
+      if( !this.bancoCriado )
+      {
+        Mensagem.aviso( "Não existe nenhum banco de dados criado!", this.frame );
+        return;
+      }
+
       if( validarCamposLancamento() )
       {
-        Lancamento lancamento = new Lancamento();
-
-        lancamento.setDescricao( this.frame.getTxfMovDescricao() );
-        lancamento.setDataEmissao(this.frame.getDtcMovData() );
-        lancamento.setValor( this.frame.getDbfMovValor() );
-        lancamento.setCod_caixa( this.banco.obterCodCaixa( this.frame.getCbxMovCaixa() ) );
-        lancamento.setCod_conta( this.banco.obterCodConta( this.frame.getCbxMovConta() ) );
+        Lancamento lancamento = this.frame.getLancamentoTela( this.banco );
         
-        this.frame.addLancamento( lancamento );
-        this.banco.inserirLancamento( lancamento );
+        // soma ou subtrai o saldo do caixa no banco de dados e no painel de cadastro caixa
+        if( this.frame.getCkbMovPago() )
+        {
+          if( lancamento.getTipo() == 'D' )
+          {
+            this.banco.subtrairDoSaldoCaixa( lancamento.getCodCaixa(), lancamento.getValor() );
+            atualizarSaldoCadastroCaixa( this.frame.getCbxMovCaixa(), lancamento.getValor(), "-" );
+          }
+          else
+          {
+            this.banco.adicionarAoSaldoCaixa( lancamento.getCodCaixa(), lancamento.getValor() );
+            atualizarSaldoCadastroCaixa( this.frame.getCbxMovCaixa(), lancamento.getValor(), "+" );
+          }
+        }
+        
+        // tratar recorrencia
+        if( this.frame.getMovRecorrencia() == 'S' )
+        {
+          ArrayList<Integer> datasVencimento = DateTools.calcularVencimentos
+          (
+            lancamento.getDataVencimento(),
+            this.frame.getItfNumVezes(),
+            (this.frame.getItfNumPeriodo()*this.frame.getCbxPeriodo().getDias())
+          );
+          
+          for( Integer data : datasVencimento )
+          {
+            Lancamento provisao = new Lancamento();
+            
+            provisao.setDataEmissao( DateTools.parseDateToInteger( new Date() ) );
+            provisao.setDataVencimento( data );
+            provisao.setDataQuitacao( 0 );
+            provisao.setDescricao( lancamento.getDescricao() );
+            provisao.setValor( lancamento.getValor() );
+            provisao.setCodConta( lancamento.getCodConta() );
+            provisao.setCodCaixa( lancamento.getCodCaixa() );
+            
+            this.banco.inserirLancamento( provisao );
+          }
+        }
+        else
+        {
+          this.banco.inserirLancamento( lancamento );
+        }
+
         this.frame.limparCamposLancamento();
         this.frame.setModoBotoesMovimento( "NOVO" );
+        recarregarLancamentos();
+        
+        Mensagem.info( "Lançamento incluído com sucesso!" , this.frame);
       }
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo adicionarConta()" );
+      e.printStackTrace();
+    }
+  }
+  private void recarregarLancamentos()
+  {
+    this.frame.limparMovimentosModel();
+    ArrayList<Lancamento> lancamentosList = this.banco.selectTodosOsLancamentosPeriodo
+    (
+      DateTools.parseDateToInteger( this.perDataIni ),
+      DateTools.parseDateToInteger( this.perDataFim )
+    );
+    
+    if( lancamentosList.isEmpty() )
+    {
+      return;
+    }
+    
+    for( Lancamento lancamento : lancamentosList )
+    {
+      this.frame.addLancamento( lancamento );
+    }
+  }
+  private void atualizarSaldoCadastroCaixa( String caixaParam, Double valorParam, String operacaoParam )
+  {
+    try
+    {
+      Caixa caixa = this.frame.getCaixa( caixaParam );
+      
+      switch( operacaoParam )
+      {
+        case "+":
+        {
+          caixa.setSaldo( caixa.getSaldo() + valorParam);
+          break;
+        }
+        case "-":
+        {
+          caixa.setSaldo( caixa.getSaldo() - valorParam);
+        }
+      }
+      
+      this.frame.substituirCaixa( caixa, caixa );
+    }
+    catch( Exception e )
+    {
       e.printStackTrace();
     }
   }
@@ -724,56 +763,198 @@ public class Main
     }
     catch( HeadlessException e )
     {
-      System.out.println( "Exception no metodo validarCamposLancamento()" );
       e.printStackTrace();
       return( false );
     }
   }
-  private void tratarProvisao( Lancamento lancamentoParam )
-  {
-     //
-  }
   private void editarLancamento()
   {
-    //
+    try
+    {
+      if( validarCamposLancamento() )
+      {
+        Lancamento lancamentoVelho = this.frame.getLancamentoSelecionado();
+        lancamentoVelho.setCodConta( this.banco.selectCodConta( lancamentoVelho.getDataVencimento(), lancamentoVelho.getValor() ) );
+        lancamentoVelho.setCodCaixa( this.banco.selectCodCaixa( lancamentoVelho.getDataVencimento(), lancamentoVelho.getValor() ) );
+        int cod = this.banco.selectCodLancamento( lancamentoVelho.getDataVencimento(), lancamentoVelho.getValor(), lancamentoVelho.getCodConta(), lancamentoVelho.getCodCaixa() );
+        Lancamento lancamentoNovo  = this.frame.getLancamentoTela( this.banco );
+        lancamentoNovo.setCodLancamento( cod );
+        lancamentoVelho.setCodLancamento( cod );
+        
+        if( lancamentoNovo.getTipo() != lancamentoVelho.getTipo() )
+        {
+          Mensagem.erro( "Alteração não permidita: D -> C ou C-> D", this.frame );
+          return;
+        }
+        
+        if( lancamentoVelho.getDataQuitacao() != 0 && !this.frame.getCkbMovPago() )
+        {
+          // transformar em provisao
+          // -> remover o valor do lancamento do caixa
+          if( lancamentoVelho.getTipo() == 'D' )
+          {
+            // somar no caixa
+            this.banco.adicionarAoSaldoCaixa( lancamentoNovo.getCodCaixa(), lancamentoNovo.getValor() );
+          }
+          else if( lancamentoVelho.getTipo() == 'C' )
+          {
+            // debitar no caixa
+            this.banco.subtrairDoSaldoCaixa( lancamentoVelho.getCodCaixa(), lancamentoVelho.getValor() );
+          }
+        }
+        else if( lancamentoVelho.getDataQuitacao() == 0 && this.frame.getCkbMovPago() )
+        {
+          // transformat em lancamento a vista
+          // -> adicionar o valor do lancamento ao caixa
+          if( lancamentoVelho.getTipo() == 'D' )
+          {
+            // debitar no caixa
+            this.banco.subtrairDoSaldoCaixa( lancamentoNovo.getCodCaixa(), lancamentoNovo.getValor() );
+          }
+          else if( lancamentoVelho.getTipo() == 'C' )
+          {
+            // somar no caixa
+            this.banco.adicionarAoSaldoCaixa( lancamentoNovo.getCodCaixa(), lancamentoNovo.getValor() );
+          }
+        }
+        
+        this.frame.substituirLancamento( lancamentoVelho, lancamentoNovo );
+        this.banco.alterarLancamento( lancamentoNovo );
+        this.frame.limparCamposLancamento();
+        this.frame.setModoBotoesMovimento( "NOVO" );
+        recarregarLancamentos();
+      }
+    }
+    catch( Exception e )
+    {
+      e.printStackTrace();
+    }
   }
   private void excluirLancamento()
   {
-    //
+    try
+    {
+      if( Mensagem.confirmacao( "Confirma exclusão do Lançamento?", this.frame ) )
+      {
+        Lancamento lancamento = this.frame.getLancamentoSelecionado();
+        
+        int codConta = this.banco.selectCodConta( lancamento.getDataVencimento(), lancamento.getValor() );
+        int codCaixa = this.banco.selectCodCaixa( lancamento.getDataVencimento(), lancamento.getValor() );
+        int codLancamento = this.banco.selectCodLancamento
+        (
+          lancamento.getDataVencimento(),
+          lancamento.getValor(),
+          codConta,
+          codCaixa
+        );
+        
+        lancamento.setCodLancamento( codLancamento );
+        lancamento.setCodConta( codConta );
+        lancamento.setCodCaixa( codCaixa );
+        
+        if( lancamento.getTipo() == 'D' )
+        {
+          this.banco.adicionarAoSaldoCaixa( codCaixa, lancamento.getValor() );
+          atualizarSaldoCadastroCaixa( this.banco.selectNomeCaixa(codCaixa), lancamento.getValor(), "+" );
+        }
+        else
+        {
+          this.banco.subtrairDoSaldoCaixa( codCaixa, lancamento.getValor() );
+          atualizarSaldoCadastroCaixa( this.banco.selectNomeCaixa(codCaixa), lancamento.getValor(), "-" );
+        }
+        
+        this.frame.removeLancamento( lancamento );
+        this.banco.excluirLancamento( lancamento );
+        this.frame.limparCamposLancamento();
+        this.frame.setModoBotoesMovimento("NOVO" );
+      }
+    }
+    catch( Exception e )
+    {
+      e.printStackTrace();
+    }
   }
-  private void cancelarLancamento()
+  private void cancelarLancamentoSelecionado()
   {
-    //
+    try
+    {
+      this.frame.limparCamposLancamento();
+      this.frame.limparSelecaoMovimento();
+      this.frame.setModoBotoesMovimento( "NOVO" );
+    }
+    catch( Exception e )
+    {
+      e.printStackTrace();
+    }
   }
-  private void carregarLancamento()
+  private void carregarLancamentoSelecionado()
   {
-    //
+    try
+    {
+      Lancamento lanc = this.frame.getLancamentoSelecionado();
+      
+      this.frame.setTxfMovDescricao( lanc.getDescricao() );
+      this.frame.setDtcMovData( DateTools.parseDataIntToDate( lanc.getDataVencimento() ) );
+      this.frame.setDbfMovValor( lanc.getValor() );
+      this.frame.setCkbMovPago( true );
+      
+      int codConta = this.banco.selectCodConta( lanc.getDataVencimento(), lanc.getValor() );
+      int codCaixa = this.banco.selectCodCaixa( lanc.getDataVencimento(), lanc.getValor() );
+      
+      String nomeConta = this.banco.selectNomeConta( codConta );
+      String nomeCaixa = this.banco.selectNomeCaixa( codCaixa );
+      
+      this.frame.setCbxMovConta( nomeConta );
+      this.frame.setCbxMovCaixa( nomeCaixa );
+      
+      if( lanc.getDataEmissao() == lanc.getDataVencimento() )
+        this.frame.setCkbMovPago( true );
+      else
+        this.frame.setCkbMovPago( false );
+      
+      this.frame.setModoBotoesMovimento( "SELECIONADO" );
+    }
+    catch( Exception e )
+    {
+      e.printStackTrace();
+    }
   }
   private void adicionarCaixa()
   {
     try
     {
+      if( !this.bancoCriado )
+      {
+        Mensagem.aviso( "Não existe nenhum banco de dados criado!", this.frame );
+        return;
+      }
+
       if( validarCamposCaixa() )
       {
-        Caixa caixa = new Caixa();
+        Caixa caixa = this.frame.getCaixaTela();
         
-        String nomeCaixa = frame.getTxfNomeCaixa();
-        Double saldoInicial = frame.getDbfSaldoInicialConta();
-        
-        caixa.setNome( nomeCaixa );
-        caixa.setSaldo( new BigDecimal( saldoInicial ) );
-        
-        this.frame.addCaixa( nomeCaixa, saldoInicial );
-        
-        this.banco.inserirCaixa(caixa);
-        
+        this.frame.addCaixa( caixa );
+        this.banco.inserirCaixa( caixa );
         this.frame.limparCamposCaixa();
         this.frame.setModoBotoesCaixa( "NOVO" );
       }
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo adicionarCaixa()" );
+      e.printStackTrace();
+    }
+  }
+  private void selecionarCaixaRecemAdicionado( Caixa caixaParam )
+  {
+    try
+    {
+      this.frame.selecionarCaixaHome( caixaParam.getNome() );
+      
+      NumberFormat df = new DecimalFormat( "#,##0.00", new DecimalFormatSymbols (new Locale ("pt", "BR") ) );
+      this.frame.setLblResValorSaldoCaixa( "R$ " + df.format( caixaParam.getSaldo() ).toString() );
+    }
+    catch( Exception e )
+    {
       e.printStackTrace();
     }
   }
@@ -799,7 +980,6 @@ public class Main
     }
     catch( HeadlessException e )
     {
-      System.out.println( "Exception no metodo validarCamposCaixa()" );
       e.printStackTrace();
       return( false );
     }
@@ -810,17 +990,22 @@ public class Main
     {
       if( validarCamposCaixa() )
       {
-        String nomeCaixa  = this.frame.getTxfNomeCaixa();
-        Double saldoCaixa = this.frame.getDbfSaldoInicialConta();
+        Caixa caixaVelho = this.frame.getCaixaSelecionado();
+        Caixa caixaNovo  = new Caixa();
         
-        this.frame.substituirCaixa( this.frame.getCaixaSelecionado(), nomeCaixa, saldoCaixa );
+        caixaVelho.setCodCaixa( this.banco.selectCodCaixa( caixaVelho.getNome() ) );
+        caixaNovo.setCodCaixa( caixaVelho.getCodCaixa() );
+        caixaNovo.setNome( this.frame.getTxfNomeCaixa() );
+        caixaNovo.setSaldo( this.frame.getDbfSaldoInicialCaixa() );
+        
+        this.frame.substituirCaixa( caixaVelho, caixaNovo );
+        this.banco.alterarCaixa( caixaNovo );
         this.frame.limparCamposCaixa();
         this.frame.setModoBotoesCaixa( "NOVO" );
       }
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo editarCaixa()" );
       e.printStackTrace();
     }
   }
@@ -830,22 +1015,21 @@ public class Main
     {
       if( Mensagem.confirmacao( "Confirma exclusão do Caixa?", this.frame ) )
       {
-        int linhaSelecionada = this.frame.getCaixaSelecionado();
-        String caixaRemovido = this.frame.removeCaixa(linhaSelecionada);
-        this.frame.atualizarPainelCaixas();
+        Caixa caixa = this.frame.getCaixaSelecionado();
+        caixa.setCodCaixa( this.banco.selectCodCaixa( caixa.getNome() ) );
+        
+        this.frame.removeCaixa( caixa );
+        this.banco.excluirCaixa( caixa );
         this.frame.limparCamposCaixa();
         this.frame.setModoBotoesCaixa( "NOVO" );
-        
-        this.banco.apagarCaixa( this.banco.obterCodCaixa( caixaRemovido ) );
       }
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo excluirCaixa()" );
       e.printStackTrace();
     }
   }
-  private void cancelarCaixa()
+  private void cancelarCaixaSelecionado()
   {
     try
     {
@@ -855,26 +1039,277 @@ public class Main
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo cancelarCaixa()" );
       e.printStackTrace();
     }
   }
-  private void carregarCaixa()
+  private void carregarCaixaSelecionado()
   {
     try
     {
-      this.frame.setModoBotoesCaixa( "SELECIONADO" );
+      Caixa caixa = this.frame.getCaixaSelecionado();
       
-      Object[] linhaSelecionada = this.frame.getCaixa();
-
-      this.frame.setTxfNomeCaixa        ( (String) linhaSelecionada[0] );
-      this.frame.setDbfSaldoInicialConta( (Double) linhaSelecionada[1] );
+      this.frame.setModoBotoesCaixa( "SELECIONADO" );
+      this.frame.setTxfNomeCaixa( caixa.getNome() );
+      this.frame.setDbfSaldoInicialCaixa( caixa.getSaldo() );
     }
     catch( Exception e )
     {
-      System.out.println( "Exception no metodo carregarCaixa()");
       e.printStackTrace();
     }
+  }
+  private void carregarCaixaHome()
+  { 
+    String caixaSelecionado = this.frame.getCbxResCaixa();
+    
+    // saldo do caixa
+    Double saldoSelecionado = this.banco.selectSaldoCaixa( caixaSelecionado );
+    this.frame.setLblResValorSaldoCaixa( ValueTools.format( saldoSelecionado ) );
+    
+    // total de entradas
+    BigDecimal totalEntradas = this.banco.selectTotalEntradaPorCaixa
+    (
+      caixaSelecionado,
+      DateTools.parseDateToInteger( this.perDataIni ),
+      DateTools.parseDateToInteger( this.perDataFim )
+    );
+    
+    if( totalEntradas.compareTo( BigDecimal.ZERO ) != 0 )
+      this.frame.setLblResValTotEntrCaixa( ValueTools.format( totalEntradas.doubleValue() ) );
+    else
+      this.frame.setLblResValTotEntrCaixa( "R$ 0,00" );
+    
+    // total de saidas
+    BigDecimal totalSaidas = this.banco.selectTotalSaidaPorCaixa
+    (
+      caixaSelecionado,
+      DateTools.parseDateToInteger( this.perDataIni ),
+      DateTools.parseDateToInteger( this.perDataFim )
+    );
+    
+    if( totalSaidas.compareTo( BigDecimal.ZERO ) != 0 )
+      this.frame.setLblResValTotSaidaCaixa( ValueTools.format( totalSaidas.doubleValue() ) );
+    else
+      this.frame.setLblResValTotSaidaCaixa( "R$ 0,00" );
+  }
+  private void carregarContaHome()
+  {
+    try
+    {
+      String contaSelecionada = this.frame.getCbxResConta();
+      int codConta = this.banco.selectCodConta( contaSelecionada );
+      char tipoConta = this.banco.selectTipoConta( codConta );
+    
+      // total de saida/entrada
+      BigDecimal totalMovPeriodo = this.banco.selectTotalMovimentoPeriodo
+      (
+        tipoConta,
+        DateTools.parseDateToInteger( this.perDataIni ),
+        DateTools.parseDateToInteger( this.perDataFim )
+      );
+      
+      if( totalMovPeriodo.compareTo( BigDecimal.ZERO ) == 0 )
+      {
+        this.frame.limparResumoConta();
+        return;
+      }
+      
+      BigDecimal totalContaPeriodo = this.banco.selectTotalContaPeriodo
+      (
+        codConta,
+        DateTools.parseDateToInteger( this.perDataIni ),
+        DateTools.parseDateToInteger( this.perDataFim )
+      );
+        
+      if( totalContaPeriodo.compareTo( BigDecimal.ZERO ) == 0 )
+      {
+        this.frame.limparResumoConta();
+        return;
+      }
+      
+      // porcentagem do periodo
+      BigDecimal porcentagem = totalContaPeriodo.divide( totalMovPeriodo, 4, BigDecimal.ROUND_HALF_UP );
+      Double porcentagemFinal = porcentagem.doubleValue() * 100;
+      String formatado = porcentagemFinal.toString();
+      
+      
+      if( formatado.length() - formatado.indexOf( "." ) >= 3 )
+        formatado = formatado.substring( 0, formatado.indexOf( "." )+3 );
+      else if( formatado.length() - formatado.indexOf( "." ) == 2 )
+        formatado = formatado + "0";
+      else if( formatado.length() - formatado.indexOf( "." ) == 1 )
+        formatado = formatado + "00";
+
+      this.frame.setLblResValorMovContaPc( formatado + " %" );
+      
+      // valor do periodo
+      this.frame.setLblResValorMovContaRs( ValueTools.format( totalContaPeriodo.doubleValue() ) );
+    
+      // total do ano
+      String inicioAno = DateTools.getAnoAtual() + "0101";
+      String fimAno    = DateTools.getAnoAtual() + "1231";
+      
+      int inicioAnoInt = Integer.parseInt( inicioAno );
+      int fimAnoInt = Integer.parseInt( fimAno );
+      
+      BigDecimal totalAnual = this.banco.selectTotalContaPeriodo( codConta, inicioAnoInt, fimAnoInt );
+
+      if( totalAnual.compareTo( BigDecimal.ZERO ) != 0 )
+        this.frame.setLblResValorMovContaAno( ValueTools.format( totalAnual.doubleValue() ) );
+    }
+    catch( NumberFormatException e )
+    {
+      e.printStackTrace();
+    }
+  }
+  public void decrementarPeriodo()
+  {
+    if( !this.bancoCriado )
+    {
+      Mensagem.aviso( "Não existe nenhum banco de dados criado!", this.frame );
+      return;
+    }
+    
+    Date dataIni = DateTools.somarSubtrairUmMes( this.perDataIni, '-' );
+    Date dataFim = DateTools.somarSubtrairUmMes( this.perDataFim, '-' );
+    
+    this.perDataIni = dataIni;
+    this.perDataFim = dataFim;
+    
+    this.frame.setDtcPeriodoIni( dataIni );
+    this.frame.setDtcPeriodoFim( dataFim );
+    
+    recarregarLancamentos();
+  }
+  public void incrementarPeriodo()
+  {
+    if( !this.bancoCriado )
+    {
+      Mensagem.aviso( "Não existe nenhum banco de dados criado!", this.frame );
+      return;
+    }
+
+    Date dataIni = DateTools.somarSubtrairUmMes( this.perDataIni, '+' );
+    Date dataFim = DateTools.somarSubtrairUmMes( this.perDataFim, '+' );
+    
+    this.perDataIni = dataIni;
+    this.perDataFim = dataFim;
+    
+    this.frame.setDtcPeriodoIni( dataIni );
+    this.frame.setDtcPeriodoFim( dataFim );
+    
+    recarregarLancamentos();
+  }
+  private boolean validarCamposExtrato()
+  {
+    try
+    {
+      boolean valido = true;
+      String mensagem = "";
+      
+      if( this.frame.getCbxExtratoConta() == null )
+      {
+        valido = false;
+        mensagem += "Selecione uma conta.\n";
+      }
+      if( this.frame.getDtcExtratoIni() == null )
+      {
+        valido = false;
+        mensagem += "Período Inicial inválido.\n";
+      }
+      if( this.frame.getDtcExtratoFim() == null )
+      {
+        valido = false;
+        mensagem += "Período Final inválido.\n";
+      }
+      
+      if( !valido )
+      {
+        Mensagem.erro( "Erro ao solicitar extrato:\n" + mensagem, this.frame );
+      }
+      
+      return( valido );
+    }
+    catch( Exception e )
+    {
+      e.printStackTrace();
+      return( false );
+    }
+  }
+  private void obterExtratoConta()
+  {
+    if( !this.bancoCriado )
+    {
+      Mensagem.aviso( "Não existe nenhum banco de dados criado!", this.frame );
+      return;
+    }
+
+    if( !validarCamposExtrato() )
+    {
+      return;
+    }
+    
+    int codConta = this.banco.selectCodConta( this.frame.getCbxExtratoConta() );
+    
+    ArrayList<String[]> extratoList = this.banco.selectExtratoContaPeriodo
+    (
+      codConta,                                                       // conta
+      DateTools.parseDateToInteger( this.frame.getDtcExtratoIni() ),  // data inicial
+      DateTools.parseDateToInteger( this.frame.getDtcExtratoFim() ),  // data final
+      this.frame.getCkbExtratoProvisao()                              // provisao?
+     );
+    
+    if( extratoList.isEmpty() )
+    {
+      this.frame.setTxtExtrato( "Não existem lançamentos para esta conta." );
+      return;
+    }
+    
+    String dtEmissao  = "Data Vcto";
+    String dtQuitacao = "Data Quitação";
+    String descricao  = "Descrição";
+    String valor      = "Valor";
+    String caixa      = "Caixa";
+      
+    dtEmissao  = String.format( "%1$-" + 15 + "s", dtEmissao );
+    dtQuitacao = String.format( "%1$-" + 15 + "s", dtQuitacao );
+    descricao  = String.format( "%1$-" + 15 + "s", descricao );
+    valor      = String.format( "%1$-" + 15 + "s", valor );
+    caixa      = String.format( "%1$-" + 15 + "s", caixa );
+      
+    String cabecalho =
+      dtEmissao + dtQuitacao + descricao + valor + caixa;
+
+    this.frame.setTxtExtrato( cabecalho );
+    
+    Double totalGeral = new Double( 0.0 );
+
+    for( String[] linha : extratoList )
+    {
+      String dtEmi = String.format( "%1$-" + 15 + "s", linha[0] );
+      String dtQui = String.format( "%1$-" + 15 + "s", linha[1] );
+      String descr = String.format( "%1$-" + 15 + "s", linha[2] );
+      String val   = String.format( "%1$-" + 15 + "s", linha[3] );
+      String cai   = String.format( "%1$-" + 15 + "s", linha[4] );
+
+      // trata descricao para ter no maximo 15 caracteres
+      if( descr.length() > 15 )
+        descr = descr.substring( 0, 14 ) + " ";
+
+      totalGeral += ValueTools.unformat( val );
+      String linhaFinal = dtEmi + dtQui + descr + val + cai;
+      this.frame.setTxtExtrato( this.frame.getTxtExtrato() + "\n" + linhaFinal );
+    }
+    
+    // linha do total
+    String divisor = "---------------------------------------------------------------------------";
+    String ultimaLinha =
+      String.format( "%1$-" + 15 + "s", " " ) +
+      String.format( "%1$-" + 15 + "s", " " ) +
+      String.format( "%1$-" + 15 + "s", "TOTAL:" ) +
+      String.format( "%1$-" + 15 + "s", ValueTools.format( totalGeral ) ) +
+      String.format( "%1$-" + 15 + "s", " " );
+
+    this.frame.setTxtExtrato( this.frame.getTxtExtrato() + "\n" + divisor + "\n" + ultimaLinha );
   }
   public static void main( String[] s )
   {

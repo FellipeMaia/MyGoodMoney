@@ -28,16 +28,16 @@ public enum EnumPeriodo
   MESES  ( 30, "Mês(es)" ),
   ANOS   ( 365, "Ano(s)");
   
-  private final Integer dias;
+  private final int    dias;
   private final String descricao;
   
-  private EnumPeriodo( Integer diasParam, String descricaoParam )
+  private EnumPeriodo( int diasParam, String descricaoParam )
   {
     this.dias = diasParam;
     this.descricao = descricaoParam;
   }
   
-  public Integer getDias()
+  public int getDias()
   {
     return( this.dias );
   }

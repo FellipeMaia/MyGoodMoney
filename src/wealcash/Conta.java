@@ -23,22 +23,22 @@ package wealcash;
  */
 public class Conta
 {
-  Integer   cod_conta;
+  int       codConta;
   String    nome;
   Character tipo;
   
   public Conta()
   {
-    this.cod_conta = 0;
+    this.codConta = 0;
     this.nome = "";
     this.tipo = ' ';
   }
   /**
-   * @return the cod_conta
+   * @return the codConta
    */
-  public Integer getCod_conta()
+  public int getCodConta()
   {
-    return cod_conta;
+    return codConta;
   }
   /**
    * @return the nome
@@ -55,11 +55,11 @@ public class Conta
     return tipo;
   }
   /**
-   * @param cod_conta the cod_conta to set
+   * @param codConta the codConta to set
    */
-  public void setCod_conta(Integer cod_conta)
+  public void setCodConta(int codConta)
   {
-    this.cod_conta=cod_conta;
+    this.codConta = codConta;
   }
   /**
    * @param nome the nome to set
