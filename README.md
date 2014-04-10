@@ -1,4 +1,4 @@
-WealCash
-========
+MyGoodMoney
+===========
 
-An application to manage your money. Written in Java with Swing UI and SQLite.  However, it's not complete yet. :)
+Projeto open source que visa oferecer um ambiente simples e eficiente para controle financeiro pessoal. Escrito em Java, com janelas Swing, e banco de dados SQLite.
