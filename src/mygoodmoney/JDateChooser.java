@@ -22,6 +22,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.AbstractAction;
@@ -49,48 +50,11 @@ public class JDateChooser extends JPanel {
     
     /** A set of date formatters that could be used for parsing dates */
     protected static final SimpleDateFormat[] DATE_FORMATS = new SimpleDateFormat[] {
-        new SimpleDateFormat("M/d/yyyy"),
-        new SimpleDateFormat("M-d-yyyy"),
-        new SimpleDateFormat("M d yyyy"),
-        //new SimpleDateFormat("MM/dd/yyyy"),
-        new SimpleDateFormat("MM-dd-yyyy"),
-        new SimpleDateFormat("MM dd yyyy"),
-        new SimpleDateFormat("MMM d, yyyy"),
-        new SimpleDateFormat("MMM d,yyyy"),
-        new SimpleDateFormat("MMM d yyyy"),
-        new SimpleDateFormat("MMMM d, yyyy"),
-        new SimpleDateFormat("MMMM d,yyyy"),
-        new SimpleDateFormat("MMMM d yyyy"),
-        new SimpleDateFormat("MMM dd, yyyy"),
-        new SimpleDateFormat("MMM dd,yyyy"),
-        new SimpleDateFormat("MMM dd yyyy"),
-        new SimpleDateFormat("MMMM dd, yyyy"),
-        new SimpleDateFormat("MMMM dd,yyyy"),
-        new SimpleDateFormat("MMMM dd yyyy"),
-        new SimpleDateFormat("d MMM, yyyy"),
-        new SimpleDateFormat("d MMM,yyyy"),
-        new SimpleDateFormat("d MMM yyyy"),
-        new SimpleDateFormat("d MMMM, yyyy"),
-        new SimpleDateFormat("d MMMM,yyyy"),
-        new SimpleDateFormat("d MMMM yyyy"),
-        new SimpleDateFormat("dd MMM, yyyy"),
-        new SimpleDateFormat("dd MMM,yyyy"),
         new SimpleDateFormat("dd MMM yyyy"),
         new SimpleDateFormat("dd/MM/yyyy"),
         new SimpleDateFormat("dd-MM-yyyy" ),
-        new SimpleDateFormat("dd MMMM, yyyy"),
-        new SimpleDateFormat("dd MMMM,yyyy"),
-        new SimpleDateFormat("dd MMMM yyyy"),
-        new SimpleDateFormat("yyyy-M-d"),
-        new SimpleDateFormat("yyyy/M/d"),
-        new SimpleDateFormat("yyyy M d"),
-        new SimpleDateFormat("yyyy MMM d"),
-        new SimpleDateFormat("yyyy MMMM d"),
-        new SimpleDateFormat("yyyy-MM-dd"),
-        new SimpleDateFormat("yyyy/MM/dd"),
-        new SimpleDateFormat("yyyy MM dd"),
-        new SimpleDateFormat("yyyy MMM dd"),
-        new SimpleDateFormat("yyyy MMMM dd")
+        new SimpleDateFormat("ddMMyyyy" ),
+        new SimpleDateFormat("ddMMyy" )
     };
 
     /** Internal state varialble - date formatter for current local date format */
@@ -117,9 +81,9 @@ public class JDateChooser extends JPanel {
     /** The date picker within the popup window */
     protected JDatePicker datePicker;
     
-    private Color colorBackground = Color.WHITE;
-    private Color colorBackgroundError = new Color(0xFFAAAA);
-    private Color colorBackgroundChange = new Color(0xFFFFAA);
+    private final Color colorBackground = Color.WHITE;
+    private final Color colorBackgroundError = new Color(0xFFAAAA);
+    private final Color colorBackgroundChange = new Color(0xFFFFAA);
     
     /** Construct a JDateChooser initialized with selected date. */    
     public JDateChooser() {
@@ -140,7 +104,8 @@ public class JDateChooser extends JPanel {
     }
     
     // UI FUNCTIONALITY    
-    private Action onComboButtonClick = new AbstractAction() {
+    private final Action onComboButtonClick = new AbstractAction() {
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (datePickerVisible == false) {
                 showDatePicker();
@@ -150,7 +115,8 @@ public class JDateChooser extends JPanel {
         }
     };
 
-    private Action onSelectDate = new AbstractAction() {
+    private final Action onSelectDate = new AbstractAction() {
+        @Override
         public void actionPerformed(ActionEvent e) {
             Date date = datePicker.getDate();
             dateField.setText(currentDateFormat.format(date));
@@ -162,27 +128,39 @@ public class JDateChooser extends JPanel {
         }
     };
 
-    private DocumentListener dateFieldDocumentListener = new DocumentListener() {
+    private final DocumentListener dateFieldDocumentListener = new DocumentListener() {
+        @Override
         public void insertUpdate(DocumentEvent e) { onTextChange(); }
+        @Override
         public void removeUpdate(DocumentEvent e) { onTextChange(); }
+        @Override
         public void changedUpdate(DocumentEvent e) { onTextChange(); }
     };
     
-    private ComponentListener componentListener = new ComponentListener() {
+    private final ComponentListener componentListener = new ComponentListener() {
+        @Override
         public void componentResized(ComponentEvent e) { hideDatePicker(); }
+        @Override
         public void componentMoved(ComponentEvent e) { hideDatePicker(); }
+        @Override
         public void componentShown(ComponentEvent e) { hideDatePicker(); }
+        @Override
         public void componentHidden(ComponentEvent e) { hideDatePicker(); }
     };
     
-    private WindowFocusListener windowFocusListener = new WindowFocusListener() {
+    private final WindowFocusListener windowFocusListener = new WindowFocusListener() {
+        @Override
         public void windowGainedFocus(WindowEvent e) { }
+        @Override
         public void windowLostFocus(WindowEvent e) { hideDatePicker(); }
     };
     
-    private AncestorListener ancestorListener = new AncestorListener() {
+    private final AncestorListener ancestorListener = new AncestorListener() {
+        @Override
         public void ancestorAdded(AncestorEvent event){ hideDatePicker(); }
+        @Override
         public void ancestorRemoved(AncestorEvent event){ hideDatePicker(); }
+        @Override
         public void ancestorMoved(AncestorEvent event){
             if (event.getSource() != datePickerWindow) {
                 hideDatePicker();
@@ -254,7 +232,7 @@ public class JDateChooser extends JPanel {
                     lastDateFormat = dateFormat;
                     break;
                 }
-            } catch (Exception ex) {
+            } catch (ParseException ex) {
                 // continue
             }
         }
@@ -286,7 +264,7 @@ public class JDateChooser extends JPanel {
         listenerList.remove(ActionListener.class, listener);
     }
 
-    private final void fireActionPerformed(ActionEvent event) {
+    private void fireActionPerformed(ActionEvent event) {
         Object[] listeners = listenerList.getListenerList();
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == ActionListener.class) {
@@ -298,7 +276,7 @@ public class JDateChooser extends JPanel {
     // DATE ACCESSORS
     /** Set the current selected date of the date chooser.  The date may be null.
      * This will update the text field and the rest of the UI to reflect the change.
-     * @param the newly current selected date */
+     * @param date the newly current selected date */
     public void setDate(Date date) {
         if (date != null) {
             dateField.setText(currentDateFormat.format(date));
@@ -334,14 +312,18 @@ public class JDateChooser extends JPanel {
     // COMBO BOX UI
     /** This class performs the ComboBox style layout of the component elements. */
     private class ComboBoxLayout implements LayoutManager {
+        @Override
         public void addLayoutComponent(String name, Component component) {}
+        @Override
         public void removeLayoutComponent(Component component) {}
 
+        @Override
         public Dimension preferredLayoutSize(Container parent) {
             Dimension dimension = new Dimension(comboBoxButton.getPreferredSize().width + dateField.getPreferredSize().width, combineDimensions(new Dimension[] { comboBoxButton.getPreferredSize(), dateField.getPreferredSize() }, true).height);
             return dimension;
         }
 
+        @Override
         public Dimension minimumLayoutSize(Container parent) {
             return comboBoxButton.getMinimumSize();
         }
@@ -357,6 +339,7 @@ public class JDateChooser extends JPanel {
             return new Rectangle(insets.left, insets.top, width - (insets.left + insets.right + buttonSize), height - (insets.top + insets.bottom));
         }
 
+        @Override
         public void layoutContainer(Container parent) {
             int width = JDateChooser.this.getWidth();
             int height = JDateChooser.this.getHeight();
@@ -411,5 +394,17 @@ public class JDateChooser extends JPanel {
             }
         }
         return false;
+    }
+    
+    public void setText( String texto )
+    {
+      this.dateField.setText( texto );
+    }
+    
+    public void setEditable( boolean ed )
+    {
+      this.dateField.setEditable(ed);
+      this.dateField.setEnabled(ed);
+      this.comboBoxButton.setEnabled(ed);
     }
 }

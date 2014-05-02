@@ -50,15 +50,18 @@ public class Main
   
   public Main()
   {
-    // 1.0.1 - Periodo foi para painel superior
-    // 1.0.2 - Banco de dados totalmente modificado
-    // 1.0.3 - Muitos bugs corrigidos e provisao funcionando
-    // 1.0.4 - Grafico funcionando
-    this.frame = new Tela( "My Good Money - Controle Financeiro - Versão 1.0.4" );
+    // 1.1 - Periodo foi para painel superior
+    // 1.2 - Banco de dados totalmente modificado
+    // 1.3 - Muitos bugs corrigidos e provisao funcionando
+    // 1.4 - Grafico funcionando
+    // 1.5 - Pode digitar a data sem o usar o mouse
+    // 1.6 - Fazer transferencia
+    // 2.0 - Novo layout modelo novo/editar/excluir (22/04/2014)
+    this.frame = new Tela( "My Good Money - Controle Financeiro - Versão 2.0" );
     this.frame.limparCamposConta();
-    this.frame.setModoBotoesConta( "NOVO" );
-    this.frame.setModoBotoesCaixa( "NOVO" );
-    this.frame.setModoBotoesMovimento( "NOVO" );
+    this.frame.setModoBotoesConta( "NAVEGACAO" );
+    this.frame.setModoBotoesCaixa( "NAVEGACAO" );
+    this.frame.setModoBotoesMovimento( "NAVEGACAO" );
     this.bancoCriado = false;
     this.banco = new BD();
     this.perDataIni = new Date();
@@ -227,13 +230,9 @@ public class Main
         {
           adicionarCaixa();
         }
-        if( this.frame.getComandoTela().equals( "ADICIONAR_CONTA" ) )
+        if( this.frame.getComandoTela().equals( "ALTERAR_CONTA" ) )
         {
-          adicionarConta();
-        }
-        if( this.frame.getComandoTela().equals( "ADICIONAR_LANCAMENTO" ) )
-        {
-          adicionarLancamento();
+          alterarConta();
         }
         if( this.frame.getComandoTela().equals( "ATUALIZAR_PERIODO" ) )
         {
@@ -243,9 +242,9 @@ public class Main
         {
           cancelarCaixaSelecionado();
         }
-        if( this.frame.getComandoTela().equals( "CANCELAR_CONTA_SELECIONADA" ) )
+        if( this.frame.getComandoTela().equals( "CANCELAR_CONTA" ) )
         {
-          cancelarContaSelecionada();
+          cancelarConta();
         }
         if( this.frame.getComandoTela().equals( "CANCELAR_LANCAMENTO_SELECIONADO" ) )
         {
@@ -275,6 +274,14 @@ public class Main
         {
           obterExtratoConta();
         }
+        if( this.frame.getComandoTela().equals( "CONFIRMAR_LANCAMENTO" ) )
+        {
+          confirmarLancamento();
+        }
+        if( this.frame.getComandoTela().equals( "CONFIRMAR_CONTA" ) )
+        {
+          confirmarConta();
+        }
         if( this.frame.getComandoTela().equals( "CRIAR_BD" ) )
         {
           criarBD();
@@ -287,13 +294,9 @@ public class Main
         {
           editarCaixa();
         }
-        if( this.frame.getComandoTela().equals( "EDITAR_CONTA" ) )
-        {
-          editarConta();
-        }
         if( this.frame.getComandoTela().equals( "EDITAR_LANCAMENTO" ) )
         {
-          editarLancamento();
+          alterarLancamento();
         }
         if( this.frame.getComandoTela().equals( "EXCLUIR_BD" ) )
         {
@@ -311,13 +314,13 @@ public class Main
         {
           excluirLancamento();
         }
-        if( this.frame.getComandoTela().equals( "EXPORTAR_BD" ) )
+        if( this.frame.getComandoTela().equals( "INCLUIR_CONTA" ) )
         {
-          exportarBD();
+          incluirConta();
         }
-        if( this.frame.getComandoTela().equals( "IMPORTAR_BD" ) )
+        if( this.frame.getComandoTela().equals( "INCLUIR_LANCAMENTO" ) )
         {
-          importarBD();
+          incluirLancamento();
         }
         if( this.frame.getComandoTela().equals( "INCREMENTAR_PERIODO" ) )
         {
@@ -438,28 +441,6 @@ public class Main
       e.printStackTrace();
     }
   }
-  private void exportarBD()
-  {
-    try
-    {
-      Mensagem.aviso( "Função em desenvolvimento...!", this.frame );
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void importarBD()
-  {
-    try
-    {
-      Mensagem.aviso( "Função em desenvolvimento...!", this.frame );
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
   private void pesquisarDir()
   {
     try
@@ -481,7 +462,7 @@ public class Main
       e.printStackTrace();
     }
   }
-  private void adicionarConta()
+  private void confirmarIncluirConta()
   {
     try
     {
@@ -497,8 +478,7 @@ public class Main
 
         this.frame.addConta( conta );
         this.banco.inserirConta( conta );
-        this.frame.setModoBotoesConta( "NOVO" );
-        this.frame.limparCamposLancamento();
+        this.frame.setModoBotoesConta( "NAVEGACAO" );
         this.frame.limparCamposConta();
       }
     }
@@ -509,6 +489,12 @@ public class Main
   }
   private void excluirConta()
   {
+    if( this.frame.getTxfNomeConta().isEmpty() )
+    {
+      Mensagem.info( "Selecione uma conta para excluir.", this.frame );
+      return;
+    }
+
     try
     {
       if( Mensagem.confirmacao( "Confirma exclusão da Conta?", this.frame ) )
@@ -544,7 +530,18 @@ public class Main
       e.printStackTrace();
     }
   }
-  private void editarConta()
+  private void alterarConta()
+  {
+    if( this.frame.getTxfNomeConta().isEmpty() )
+    {
+      Mensagem.info( "Selecione uma conta para alterar.", this.frame );
+      return;
+    }
+    
+    this.transacaoConta = 'A';
+    this.frame.setModoBotoesConta( "EDICAO" );
+  }
+  private void confirmarAlterarConta()
   {
     try
     {
@@ -570,14 +567,14 @@ public class Main
       e.printStackTrace();
     }
   }
-  private void cancelarContaSelecionada()
+  private void cancelarConta()
   {
     try
     {
-      this.frame.limparCamposConta();
+      //this.frame.limparCamposConta();
       this.frame.limparSelecaoConta();
-      this.frame.setModoBotoesConta( "NOVO" );
-      this.transacaoConta = 'I';
+      this.frame.setModoBotoesConta( "NAVEGACAO" );
+      this.transacaoConta = 'C';
     }
     catch( Exception e )
     {
@@ -629,7 +626,7 @@ public class Main
       return( false );
     }
   }
-  private void adicionarLancamento()
+  private void confirmarIncluirLancamento()
   {
     try
     {
@@ -706,8 +703,8 @@ public class Main
           }
         }
 
-        this.frame.limparCamposLancamento();
-        this.frame.setModoBotoesMovimento( "NOVO" );
+        //this.frame.limparCamposLancamento();
+        this.frame.setModoBotoesMovimento( "NAVEGACAO" );
         recarregarLancamentos();
         
         Mensagem.info( "Lançamento incluído com sucesso!" , this.frame);
@@ -782,7 +779,7 @@ public class Main
         mensagemErro += "-> Data do lançamento inválida.\n";
       }
       
-      if( this.frame.getDbfMovValor() == 0 )
+      if( this.frame.getDbfMovValor().intValue() == 0 )
       {
         lancamentoValido = false;
         mensagemErro += "-> Valor do lançamento inválido.\n";
@@ -828,74 +825,25 @@ public class Main
       return( false );
     }
   }
-  private void editarLancamento()
+  private void alterarLancamento()
   {
-    try
+    if( this.frame.getTxfMovDescricao().isEmpty() )
     {
-      if( validarCamposLancamento() )
-      {
-        Lancamento lancamentoVelho = this.frame.getLancamentoSelecionado( this.banco );
-        Lancamento lancamentoNovo  = this.frame.getLancamentoTela( this.banco );
-        lancamentoNovo.setICodLancamento( lancamentoVelho.getICodLancamento() );
-        
-        if( lancamentoNovo.getCTipo() != lancamentoVelho.getCTipo() )
-        {
-          Mensagem.erro( "Alteração não permidita: D -> C ou C-> D", this.frame );
-          return;
-        }
-        
-        if( lancamentoVelho.getIDataQuitacao() != 0 && !this.frame.getCkbMovPago() )
-        {
-          // transformar em provisao
-          lancamentoNovo.setIDataEmissao( lancamentoVelho.getIDataEmissao() );
-          lancamentoNovo.setIDataQuitacao( 0 );
-          // -> remover o valor do lancamento do caixa
-          if( lancamentoVelho.getCTipo() == 'D' )
-          {
-            // somar no caixa
-            this.banco.adicionarAoSaldoCaixa( lancamentoNovo.getICodCaixa(), lancamentoNovo.getDValor() );
-          }
-          else if( lancamentoVelho.getCTipo() == 'C' )
-          {
-            // debitar no caixa
-            this.banco.subtrairDoSaldoCaixa( lancamentoVelho.getICodCaixa(), lancamentoVelho.getDValor() );
-          }
-        }
-        else if( lancamentoVelho.getIDataQuitacao() == 0 && this.frame.getCkbMovPago() )
-        {
-          // transformat em lancamento a vista
-          lancamentoNovo.setIDataVencimento( lancamentoVelho.getIDataVencimento() );
-          // -> adicionar o valor do lancamento ao caixa
-          if( lancamentoVelho.getCTipo() == 'D' )
-          {
-            // debitar no caixa
-            this.banco.subtrairDoSaldoCaixa( lancamentoNovo.getICodCaixa(), lancamentoNovo.getDValor() );
-          }
-          else if( lancamentoVelho.getCTipo() == 'C' )
-          {
-            // somar no caixa
-            this.banco.adicionarAoSaldoCaixa( lancamentoNovo.getICodCaixa(), lancamentoNovo.getDValor() );
-          }
-        }
-        
-        this.frame.substituirLancamento( lancamentoVelho, lancamentoNovo );
-        this.banco.alterarLancamento( lancamentoNovo );
-        this.frame.limparCamposLancamento();
-        this.frame.setModoBotoesMovimento( "NOVO" );
-        recarregarLancamentos();
-        this.transacaoLancamento = 'I';
-        Caixa caixa = this.banco.selectCaixa( lancamentoNovo.getICodCaixa() );
-        this.frame.atualizarSaldoCaixa( caixa );
-        this.frame.habilitarComponentesRecorrencia( true );
-      }
+      Mensagem.info( "Selecione um lançamento para editar.", this.frame );
+      return;
     }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
+    
+    this.frame.setModoBotoesMovimento( "EDICAO" );
+    this.transacaoLancamento = 'I';
   }
   private void excluirLancamento()
   {
+    if( this.frame.getTxfMovDescricao().isEmpty() )
+    {
+      Mensagem.info( "Selecione um lançamento para excluir.", this.frame );
+      return;
+    }
+    
     try
     {
       if( Mensagem.confirmacao( "Confirma exclusão do Lançamento?", this.frame ) )
@@ -916,8 +864,8 @@ public class Main
         this.frame.removeLancamento( lancamento );
         this.banco.excluirLancamento( lancamento );
         this.frame.limparCamposLancamento();
-        this.frame.setModoBotoesMovimento("NOVO" );
-        this.transacaoLancamento = 'I';
+        this.frame.setModoBotoesMovimento( "NAVEGACAO" );
+        this.transacaoLancamento = 'C';
         this.frame.habilitarComponentesRecorrencia( true );
       }
     }
@@ -932,7 +880,7 @@ public class Main
     {
       this.frame.limparCamposLancamento();
       this.frame.limparSelecaoMovimento();
-      this.frame.setModoBotoesMovimento( "NOVO" );
+      this.frame.setModoBotoesMovimento( "NAVEGACAO" );
       this.frame.habilitarComponentesRecorrencia( true );
       this.transacaoLancamento = 'I';
     }
@@ -1480,6 +1428,106 @@ public class Main
     chart.removeSubtitle( null );
     
     this.frame.setGrafico( chart );
+  }
+  private void incluirLancamento()
+  {
+    this.frame.setModoBotoesMovimento( "EDICAO" );
+    this.transacaoLancamento = 'I';
+    this.frame.limparCamposLancamento();
+  }
+  private void confirmarLancamento()
+  {
+    if( this.transacaoLancamento == 'I' )
+    {
+      confirmarIncluirLancamento();
+    }
+    else if( this.transacaoLancamento == 'A' )
+    {
+      confirmarAlterarLancamento();
+    }
+  }
+  private void confirmarAlterarLancamento()
+  {
+    try
+    {
+      if( validarCamposLancamento() )
+      {
+        Lancamento lancamentoVelho = this.frame.getLancamentoSelecionado( this.banco );
+        Lancamento lancamentoNovo  = this.frame.getLancamentoTela( this.banco );
+        lancamentoNovo.setICodLancamento( lancamentoVelho.getICodLancamento() );
+        
+        if( lancamentoNovo.getCTipo() != lancamentoVelho.getCTipo() )
+        {
+          Mensagem.erro( "Alteração não permidita: D -> C ou C-> D", this.frame );
+          return;
+        }
+        
+        if( lancamentoVelho.getIDataQuitacao() != 0 && !this.frame.getCkbMovPago() )
+        {
+          // transformar em provisao
+          lancamentoNovo.setIDataEmissao( lancamentoVelho.getIDataEmissao() );
+          lancamentoNovo.setIDataQuitacao( 0 );
+          // -> remover o valor do lancamento do caixa
+          if( lancamentoVelho.getCTipo() == 'D' )
+          {
+            // somar no caixa
+            this.banco.adicionarAoSaldoCaixa( lancamentoNovo.getICodCaixa(), lancamentoNovo.getDValor() );
+          }
+          else if( lancamentoVelho.getCTipo() == 'C' )
+          {
+            // debitar no caixa
+            this.banco.subtrairDoSaldoCaixa( lancamentoVelho.getICodCaixa(), lancamentoVelho.getDValor() );
+          }
+        }
+        else if( lancamentoVelho.getIDataQuitacao() == 0 && this.frame.getCkbMovPago() )
+        {
+          // transformat em lancamento a vista
+          lancamentoNovo.setIDataVencimento( lancamentoVelho.getIDataVencimento() );
+          // -> adicionar o valor do lancamento ao caixa
+          if( lancamentoVelho.getCTipo() == 'D' )
+          {
+            // debitar no caixa
+            this.banco.subtrairDoSaldoCaixa( lancamentoNovo.getICodCaixa(), lancamentoNovo.getDValor() );
+          }
+          else if( lancamentoVelho.getCTipo() == 'C' )
+          {
+            // somar no caixa
+            this.banco.adicionarAoSaldoCaixa( lancamentoNovo.getICodCaixa(), lancamentoNovo.getDValor() );
+          }
+        }
+        
+        this.frame.substituirLancamento( lancamentoVelho, lancamentoNovo );
+        this.banco.alterarLancamento( lancamentoNovo );
+        //this.frame.limparCamposLancamento();
+        this.frame.setModoBotoesMovimento( "NAVEGACAO" );
+        recarregarLancamentos();
+        this.transacaoLancamento = 'C';
+        Caixa caixa = this.banco.selectCaixa( lancamentoNovo.getICodCaixa() );
+        this.frame.atualizarSaldoCaixa( caixa );
+        this.frame.habilitarComponentesRecorrencia( true );
+      }
+    }
+    catch( Exception e )
+    {
+      e.printStackTrace();
+    }
+  }
+  private void incluirConta()
+  {
+    this.transacaoConta = 'I';
+    this.frame.limparCamposConta();
+    this.frame.setModoBotoesConta( "EDICAO" );
+  }
+  private void confirmarConta()
+  {
+    if( this.transacaoConta == 'I' )
+    {
+      confirmarIncluirConta();
+    }
+    else if( this.transacaoConta == 'A' )
+    {
+      confirmarAlterarConta();
+    }
   }
   public static void main( String[] s )
   {

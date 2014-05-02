@@ -5,7 +5,6 @@
  */
 package mygoodmoney;
 
-//import BasicDate;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -32,12 +31,12 @@ import javax.swing.event.ChangeListener;
 public class JDatePicker extends JPanel {
     /** Number of days in each month.  Used to adjust the day of the month near the boundary dates when
      * switching the selected month. */ 
-    private static int[] DAYS_IN_MONTH_LIST = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    private static final int[] DAYS_IN_MONTH_LIST = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
     
     /** Month labels used in selecting the month */
-    private static String[] MONTH_LIST;
+    private static final String[] MONTH_LIST;
     static {
-        List<String> monthList = new ArrayList<String>();
+        List<String> monthList = new ArrayList<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM");
         Calendar calendar = Calendar.getInstance();
         for (int month = 0; month < 12; month++) {
@@ -55,19 +54,17 @@ public class JDatePicker extends JPanel {
     private Date date = null;
     
     /** Combo box to select the month */
-    private JComboBox monthComboBox;
+    private final JComboBox monthComboBox;
     
     /** Spinner to select the year */
-    private JSpinner yearSpinner;
+    private final JSpinner yearSpinner;
     
     /** Calendar component for displaying and selecting the date */
     private JCalendar calendarComponent;
 
-    private Color colorBackground = Color.WHITE;
-    private Color colorBackgroundChanged = new Color(0xFFFFAA);
-    private Color colorNewRange = Color.CYAN;
-    private Color colorSelectedRange = Color.GREEN;
-    private Color colorCursor = Color.BLUE;
+    private final Color colorBackground = Color.WHITE;
+    private final Color colorBackgroundChanged = new Color(0xFFFFAA);
+    private final Color colorSelectedRange = Color.GREEN;
     
     /** Construct a JDatePicker with no current selected date.  The month and
      * year defeault to the current month and year. */
@@ -95,12 +92,14 @@ public class JDatePicker extends JPanel {
         yearSpinner.setEditor(editor);
 
         ActionListener monthActionListener = new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 updateCalendar();
             }
         };
         monthComboBox.addActionListener(monthActionListener);
         ChangeListener yearChangeListener = new ChangeListener() {
+            @Override
             public void stateChanged(ChangeEvent e) {
                 updateCalendar();
             }
@@ -111,7 +110,8 @@ public class JDatePicker extends JPanel {
     }
 
     // UI FUNCTIONALITY    
-    private ActionListener calendarActions = new ActionListener() {
+    private final ActionListener calendarActions = new ActionListener() {
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getActionCommand() == JCalendar.ACTION_CURSOR_MOVED) {
                 updateCalendarHighlights();
@@ -127,6 +127,7 @@ public class JDatePicker extends JPanel {
 
     /** See if any of the internal components has focus (and this the date picker itself).
      * @return true if any internal components have focus */
+    @Override
     public boolean hasFocus() {
         boolean focused = false;
         if (isVisible()) {
@@ -213,7 +214,7 @@ public class JDatePicker extends JPanel {
         listenerList.remove(ActionListener.class, listener);
     }
 
-    private final void fireActionPerformed(ActionEvent event) {
+    private void fireActionPerformed(ActionEvent event) {
         Object[] listeners = listenerList.getListenerList();
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == ActionListener.class) {
