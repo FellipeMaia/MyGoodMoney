@@ -27,193 +27,156 @@ package mygoodmoney;
 /**
  * @class Lancamento
  */
-public class Lancamento
-{
-  private int    iCodLancamento;  /**< O Código de um Lancamento. */
-  private int    iDataEmissao;    /**< A data de emissão de um Lancamento. */
-  private int    iDataVencimento; /**< A data de vencimento de um Lancamento. */
-  private int    iDataQuitacao;   /**< A data de quitação de um Lancamento (Será 0 para provisão). */
-  private String sDescricao;      /**< A descrição de um Lancamento. */
-  private double dValor;          /**< O valor de um Lancamento. */
-  private int    iCodConta;       /**< O código da conta de um Lancamento. */
-  private int    iCodCaixa;       /**< O código do caixa de um Lancamento. */
-  private char   cTipo;           /**< O tipo de um Lancamento (D ou C ).*/
+public class Lancamento {
+  private int    codLancamento;  /**< O Código de um Lancamento. */
+  private int    dataEmissao;    /**< A data de emissão de um Lancamento. */
+  private int    dataVencimento; /**< A data de vencimento de um Lancamento. */
+  private int    dataQuitacao;   /**< A data de quitação de um Lancamento (Será 0 para provisão). */
+  private String descricao;      /**< A descrição de um Lancamento. */
+  private double valor;          /**< O valor de um Lancamento. */
+  private char   pago;           /**< S se pago ou N se não */
+  private Conta  conta;
+  private Caixa  caixa;
 
   /**
-  * @brief Construtor da classe.
-  */
-  public Lancamento()
-  {
-    this.iCodLancamento  = 0;
-    this.iDataEmissao    = 0;
-    this.iDataVencimento = 0;
-    this.iDataQuitacao   = 0;
-    this.sDescricao      = "";
-    this.dValor          = 0;
-    this.iCodConta       = 0;
-    this.iCodCaixa       = 0;
-    this.cTipo           = ' ';
+   * @brief Construtor da classe.
+   */
+  public Lancamento() {
+    this.codLancamento  = 0;
+    this.dataEmissao    = 0;
+    this.dataVencimento = 0;
+    this.dataQuitacao   = 0;
+    this.descricao      = "";
+    this.valor          = 0;
+    this.pago           = ' ';
+    this.conta          = null;
+    this.caixa          = null;
   }
 
   /**
-  * @brief Obtém o código do Lancamento.
-  * @return O código do Lancamento.
-  */
-  public int getICodLancamento()
-  {
-    return( this.iCodLancamento );
+   * @brief Obtém o código do Lancamento.
+   * @return O código do Lancamento.
+   */
+  public int getCodLancamento() {
+    return( this.codLancamento );
   }
-
   /**
-  * @brief Obtém a data de emissão do Lancamento.
-  * @return A data de emissão do Lancamento.
-  */
-  public int getIDataEmissao()
-  {
-    return( this.iDataEmissao );
+   * @brief Obtém a data de emissão do Lancamento.
+   * @return A data de emissão do Lancamento.
+   */
+  public int getDataEmissao() {
+    return( this.dataEmissao );
   }
-
   /**
-  * @brief Obtém a data de vencimento do Lancamento.
-  * @return A data de vencimento do Lancamento.
-  */
-  public int getIDataVencimento()
-  {
-    return( this.iDataVencimento );
+   * @brief Obtém a data de vencimento do Lancamento.
+   * @return A data de vencimento do Lancamento.
+   */
+  public int getDataVencimento() {
+    return( this.dataVencimento );
   }
-
   /**
-  * @brief Obtém a data de quitação do Lancamento.
-  * @return A data de quitação do Lancamento.
-  */
-  public int getIDataQuitacao()
-  {
-    return( this.iDataQuitacao );
+   * @brief Obtém a data de quitação do Lancamento.
+   * @return A data de quitação do Lancamento.
+   */
+  public int getDataQuitacao() {
+    return( this.dataQuitacao );
   }
-
   /**
-  * @brief Obtém a descrição do Lancamento.
-  * @return A descrição do Lancamento.
-  */
-  public String getSDescricao()
-  {
-    return( this.sDescricao );
+   * @brief Obtém a descrição do Lancamento.
+   * @return A descrição do Lancamento.
+   */
+  public String getDescricao() {
+    return( this.descricao );
   }
-
   /**
-  * @brief Obtém o valor do Lancamento.
-  * @return O valor do Lancamento.
-  */
-  public double getDValor()
-  {
-    return( this.dValor );
+   * @brief Obtém o valor do Lancamento.
+   * @return O valor do Lancamento.
+   */
+  public double getValor() {
+    return( this.valor );
   }
-
   /**
-  * @brief Obtém o tipo do Lancamento.
-  * @return O tipo do Lancamento.
-  */
-  public char getCTipo()
-  {
-    return( this.cTipo );
+   * @brief Seta o código do Lancamento.
+   * @param pCodLancamento O código a ser setado.
+   */
+  public void setCodLancamento( int pCodLancamento ) {
+    this.codLancamento = pCodLancamento;
   }
-
   /**
-  * @brief Seta o código do Lancamento.
-  * @param piCodLancamento O código a ser setado.
-  */
-  public void setICodLancamento( int piCodLancamento )
-  {
-    this.iCodLancamento = piCodLancamento;
+   * @brief Seta a data de emissão do Lancamento.
+   * @param pDataEmissao A data de emissão a ser setada.
+   */
+  public void setDataEmissao( int pDataEmissao ) {
+    this.dataEmissao = pDataEmissao;
   }
-
   /**
-  * @brief Seta a data de emissão do Lancamento.
-  * @param piDataEmissao A data de emissão a ser setada.
-  */
-  public void setIDataEmissao( int piDataEmissao )
-  {
-    this.iDataEmissao = piDataEmissao;
+   * @brief Seta a data de vencimento do Lancamento.
+   * @param pDataVencimento A data de vencimento a ser setada.
+   */
+  public void setDataVencimento( int pDataVencimento ) {
+    this.dataVencimento = pDataVencimento;
   }
-
   /**
-  * @brief Seta a data de vencimento do Lancamento.
-  * @param piDataVencimento A data de vencimento a ser setada.
-  */
-  public void setIDataVencimento( int piDataVencimento )
-  {
-    this.iDataVencimento = piDataVencimento;
+   * @brief Seta a data de quitação do Lancamento.
+   * @param pDataQuitacao A data de quitação a ser setada.
+   */
+  public void setDataQuitacao( int pDataQuitacao ) {
+    this.dataQuitacao = pDataQuitacao;
   }
-
   /**
-  * @brief Seta a data de quitação do Lancamento.
-  * @param piDataQuitacao A data de quitação a ser setada.
-  */
-  public void setIDataQuitacao( int piDataQuitacao )
-  {
-    this.iDataQuitacao = piDataQuitacao;
+   * @brief Seta a descrição do Lancamento.
+   * @param pDescricao A descrição a ser setada.
+   */
+  public void setDescricao( String pDescricao ) {
+    this.descricao = pDescricao;
   }
-
   /**
-  * @brief Seta a descrição do Lancamento.
-  * @param psDescricao A descrição a ser setada.
-  */
-  public void setDescricao( String psDescricao )
-  {
-    this.sDescricao = psDescricao;
+   * @brief Seta o valor do Lancamento.
+   * @param pValor O valor a ser setado.
+   */
+  public void setValor( double pValor ) {
+    this.valor = pValor;
   }
-
   /**
-  * @brief Seta o valor do Lancamento.
-  * @param pdValor O valor a ser setado.
-  */
-  public void setDValor( double pdValor )
-  {
-    this.dValor = pdValor;
+   * @brief Obtém se um lançamento já foi pago.
+   * @return S se pago ou N se não.
+   */
+  public char getPago() {
+    return( this.pago );
   }
-
   /**
-  * @brief Seta o tipo do Lancamento.
-  * @param pcTipo O tipo a ser setado.
-  */
-  public void setCTipo( char pcTipo )
-  {
-    this.cTipo = pcTipo;
+   * @brief Obtém a Conta do lançamento.
+   * @return A Conta do lançamento.
+   */
+  public Conta getConta() {
+    return( this.conta );
   }
-
   /**
-  * @brief Obtém o código da conta do Lancamento.
-  * @return O código da conta do Lancamento.
-  */
-  public int getICodConta()
-  {
-    return( this.iCodConta );
+   * @brief Seta a Conta do lançamento
+   * @param pConta A Conta a ser setada.
+   */
+  public void setConta( Conta pConta ) {
+    this.conta = pConta;
   }
-
   /**
-  * @brief Obtém o código do caixa do Lancamento.
-  * @return O código do caixa do Lancamento.
-  */
-  public int getICodCaixa()
-  {
-    return( this.iCodCaixa );
+   * @brief Seta se um lançamento foi pago ou não.
+   * @param pPago O pagamento a ser setado, S ou N.
+   */
+  public void setPago( char pPago ) {
+    this.pago = pPago;
   }
-
   /**
-  * @brief Seta o código da conta do Lancamento.
-  * @param piCodConta O código da conta a ser setado.
-  */
-  public void setICodConta( int piCodConta )
-  {
-    this.iCodConta = piCodConta;
+   * @brief Obtém o Caixa do lançamento.
+   * @return O Caixa do lançamento.
+   */
+  public Caixa getCaixa() {
+    return( this.caixa );
   }
-
   /**
-  * @brief Seta o código do caixa do Lancamento.
-  * @param piCodCaixa O código do caixa a ser setado.
-  */
-  public void setICodCaixa( int piCodCaixa )
-  {
-    this.iCodCaixa = piCodCaixa;
+   * @brief Seta o Caixa do lançamento.
+   * @param pCaixa O Caixa a ser setado.
+   */
+  public void setCaixa( Caixa pCaixa ) {
+    this.caixa = pCaixa;
   }
 }

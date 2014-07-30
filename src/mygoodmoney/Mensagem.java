@@ -26,77 +26,73 @@ package mygoodmoney;
 
 import javax.swing.JOptionPane;
 import java.awt.Component;
+import java.awt.Font;
+import javax.swing.UIManager;
 
 /**
  * @class Mensagem
  */
-public class Mensagem
-{
+public class Mensagem {
   /**
-  * @brief Exibe uma mensagem do tipo JOptionPane.INFORMATION_MESSAGE. 
-  * @param psMensagem A mensagem a ser exibida.
-  * @param pComponent O component vinculado ao diálogo.
-  */
-  public static void info( String psMensagem, Component pComponent )
-  {
-    JOptionPane.showMessageDialog
-    (
+   * @brief Exibe uma mensagem do tipo JOptionPane.INFORMATION_MESSAGE. 
+   * @param pMensagem A mensagem a ser exibida.
+   * @param pComponent O component vinculado ao diálogo.
+   */
+  public static void info( String pMensagem, Component pComponent ) {
+    JOptionPane.showMessageDialog(
       pComponent,
-      psMensagem,
+      pMensagem,
       "Informação",
       JOptionPane.INFORMATION_MESSAGE
     );
   }
-
   /**
-  * @brief Exibe uma mensagem to tipo JOptionPane.ERROR_MESSAGE. 
-  * @param psMensagem A mensagem a ser exibida.
-  * @param pComponent O component vinculado ao diálogo.
-  */
-  public static void erro( String psMensagem, Component pComponent )
-  {
-    JOptionPane.showMessageDialog
-    (
+   * @brief Exibe uma mensagem to tipo JOptionPane.ERROR_MESSAGE. 
+   * @param pMensagem A mensagem a ser exibida.
+   * @param pComponent O component vinculado ao diálogo.
+   */
+  public static void erro( String pMensagem, Component pComponent ) {
+    JOptionPane.showMessageDialog(
       pComponent,
-      psMensagem,
+      pMensagem,
       "Erro",
       JOptionPane.ERROR_MESSAGE
     );
   }
-
   /**
-  * @brief Exibe uma mensagem do tipo confirmação. 
-  * @param psMensagem A mensagem a ser exibida.
-  * @param pComponent O component vinculado ao diálogo.
-  * @return true se resposta igual a JOptionPane.YES_OPTION ou false se não.
-  */
-  public static boolean confirmacao( String psMensagem, Component pComponent )
-  {
+   * @brief Exibe uma mensagem do tipo confirmação. 
+   * @param pMensagem A mensagem a ser exibida.
+   * @param pComponent O component vinculado ao diálogo.
+   * @return true se resposta igual a JOptionPane.YES_OPTION ou false se não.
+   */
+  public static boolean confirmacao( String pMensagem, Component pComponent ) {
+    //Mensagem.setFont();
     int resposta =
-    JOptionPane.showConfirmDialog
-    (
+    JOptionPane.showConfirmDialog(
       pComponent,
-      psMensagem,
+      pMensagem,
       "Confirmação",
       JOptionPane.YES_NO_OPTION
     );
     
     return( resposta == JOptionPane.YES_OPTION );
   }
-
   /**
-  * @brief Exibe uma mensagem do tipo JOptionPane.WARNING_MESSAGE. 
-  * @param psMensagem A mensagem a ser exibida.
-  * @param pComponent O component vinculado ao diálogo.
-  */
-  public static void aviso( String psMensagem, Component pComponent )
-  {
-    JOptionPane.showMessageDialog
-    (
+   * @brief Exibe uma mensagem do tipo JOptionPane.WARNING_MESSAGE. 
+   * @param pMensagem A mensagem a ser exibida.
+   * @param pComponent O component vinculado ao diálogo.
+   */
+  public static void aviso( String pMensagem, Component pComponent ) {
+    JOptionPane.showMessageDialog(
       pComponent,
-      psMensagem,
+      pMensagem,
       "Aviso",
       JOptionPane.WARNING_MESSAGE
     );
   }
+  public static void setFont(){
+    UIManager.put( "OptionPane.font", new Font( "Verdana", 0, 12 ) );
+    UIManager.put( "OptionPane.messageFont", new Font( "Verdana", 0, 12 ) );
+  }
+  
 }

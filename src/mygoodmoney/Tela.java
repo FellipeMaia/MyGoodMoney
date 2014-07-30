@@ -27,20 +27,24 @@ package mygoodmoney;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 
-/**
- *
- * @author Ricardo
- */
-public class Tela extends JFrame
-{
-  private String comando;                          /**< Contém o comando a ser executado, de eventos */
+public class Tela extends JFrame {
+  private String comando;                          /**< Contém o comando a ser executado, disparado por eventos */
+  private FrConsole console;
   
   private JPanel pnlSuperior;
      private JLabel     lblPeriodo;
@@ -57,11 +61,13 @@ public class Tela extends JFrame
            private JComboBox  cbxResCaixa;
            private JButton    btnResCaixa;
            private JLabel     lblResSaldoCaixa;
-           private JLabel     lblResValorSaldoCaixa;
+           private JTextField txfResValorSaldoCaixa;
+           private JLabel     lblResSaldoCaixaLimite;
+           private JTextField txfResSaldoCaixaLimite;
            private JLabel     lblResTotEntrCaixa;
-           private JLabel     lblResValTotEntrCaixa;
+           private JTextField txfResValTotEntrCaixa;
            private JLabel     lblResTotSaidaCaixa;
-           private JLabel     lblResValTotSaidaCaixa;
+           private JTextField txfResValTotSaidaCaixa;
            private JCheckBox  ckbResumoCaixa;
            private ChartPanel     pnlGrafico;
         private JPanel     pnlResumoConta;
@@ -71,11 +77,11 @@ public class Tela extends JFrame
            private JButton    btnResConta;
            private JCheckBox  ckbResumoConta;
            private JLabel     lblResMovContaPc;
-           private JLabel     lblResValorMovContaPc;
+           private JTextField txfResValorMovContaPc;
            private JLabel     lblResMovContaRs;
-           private JLabel     lblResValorMovContaRs;
+           private JTextField txfResValorMovContaRs;
            private JLabel     lblResMovContaAno;
-           private JLabel     lblResValorMovContaAno;
+           private JTextField txfResValorMovContaAno;
      private JPanel     pnlMovimento;
         private JTabbedPane   tbpMovimento;
            private JPanel     pnlCadastroMov;
@@ -83,6 +89,7 @@ public class Tela extends JFrame
               private JTextField txfMovDescricao;
               private JLabel     lblMovData;
               private JDateChooser dtcMovData;
+              private JLabel     lblInfoData;
               private JLabel     lblMovValor;
               private JDoubleField dbfMovValor;
               private JLabel     lblMovConta;
@@ -105,9 +112,23 @@ public class Tela extends JFrame
               private JButton    btnMovCancelar;
               private JButton    btnMovConfirmar;
            private JPanel     pnlTransferencia;
+              private JButton    btnTransfAdd;
+              private JButton    btnTransfCancelar;
+              private JButton    btnTransfConfirmar;
+              private JLabel     lblTransfCaixaOrigem;
+              private JComboBox  cbxTransfCaixaOrigem;
+              private JLabel     lblTransfCaixaDestino;
+              private JComboBox  cbxTransfCaixaDestino;
+              private JLabel     lblTransfDescricao;
+              private JTextField txfTransfDescricao;
+              private JLabel     lblTransfData;
+              private JDateChooser dtcTransfData;
+              private JLabel     lblTransfValor;
+              private JDoubleField dbfTransfValor;
+              private JCheckBox  ckbTransf;
         private JPanel     pnlLancamentoMov;
            private JTable     movimentoTable;
-           private DefaultTableModel movimentoModel;
+           private LancamentoModel movimentoModel;
      private JPanel     pnlExtratos;
         private JPanel     pnlExtrato;
            private JLabel     lblExtratoConta;
@@ -134,13 +155,18 @@ public class Tela extends JFrame
            private JButton    btnCancelarConta;
            private JPanel     pnlContas;
            private JTable     contasTable;
-           private DefaultTableModel contasModel;
+           private ContaModel contasModel;
         private JPanel     pnlCadCaixa;
            private JLabel     lblAddCaixa;
            private JLabel     lblNomeCaixa;
            private JTextField txfNomeCaixa;
            private JLabel     lblSaldoInicial;
            private JDoubleField dbfSaldoInicialCaixa;
+           private JLabel     lblTipoCaixa;
+           private JRadioButton rbtTipoCaixaCartao;
+           private JRadioButton rbtTipoCaixaNormal;
+           private JLabel     lblValorLimite;
+           private JDoubleField dbfValorLimite;
            private JButton    btnAddCaixa;
            private JButton    btnEditarCaixa;
            private JButton    btnExcluirCaixa;
@@ -148,1175 +174,1429 @@ public class Tela extends JFrame
            private JButton    btnCancelarCaixa;
            private JPanel     pnlCaixas;
            private JTable     caixasTable;
-           private DefaultTableModel caixasModel;
+           private CaixaModel caixasModel;
      private JPanel     pnlConfig;
         private JPanel     pnlBD;
            private JLabel     lblBD;
            private JLabel     lblDiretorioBD;
            private JTextField txfDiretorioBD;
-           private JButton    btnPesquisarDir;
            private JLabel     lblNomeBD;
            private JTextField txfNomeBD;
-        private JPanel     pnlGerBD;
-           private JLabel     lblGerBD;
-           private JButton    btnCriarBD;
-           private JButton    btnLimparBD;
-           private JButton    btnExcluirBD;
      private JPanel     pnlSobre;
         private JPanel     pnlAutor;
            private JLabel     lblNomeAutor;
            private JLabel     lblEmailAutor;
            private JLabel     lblContatoAutor;
+           private JLabel     lblPaginaOficial;
         private JPanel     pnlTexto;
   
-  public Tela( String nomeParam )
-  {
+  public Tela( String nomeParam ) {
     super( nomeParam );
-
-    try
-    {
-      SwingUtilities.invokeAndWait
-      (
-        new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            initComponents();
-          }
-        }
-      );
-    }
-    catch (InterruptedException | InvocationTargetException e)
-    {
-      e.printStackTrace();
-    }
-
-    obterImagemPrograma();
-    habilitarRecorrencia( false );
-  }
-  
-  private void obterImagemPrograma()
-  {
-    try
-    {
-      setIconImage( new ImageIcon( Tela.class.getResource( "money.png" ) ).getImage() );
-    }
-    catch( Exception ex )
-    {
-      ex.printStackTrace();
-    }
-  }
-  private void initComponents()
-  {
-    comando = "";
-    
+    setarLookAndFeel();
+    initComponents();
     this.getContentPane().setLayout( null );
-    this.setSize( 640, 480 );
+    this.setSize( 740, 510 );
     this.setResizable( true );
+    this.setLocationRelativeTo( null );
     this.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
     this.setVisible( true );
-    this.addComponentListener
-    (
-      new ComponentAdapter()
-      {
-        @Override
-        public void componentResized( ComponentEvent e )
-        {
-          Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-          pnlSuperior.setBounds(0, 0, getSize().width, 60);
-          tbpPainelAbas.setBounds( 0, 60, getSize().width, (screenSize.height - 60) );
-        }
+    criarModelLancamentos();
+    criarModelContas();
+    criarModelCaixas();
+    obterImagemPrograma();
+    habilitarRecorrencia( false );
+    criarListener();
+    iniciarConsole();
+    Mensagem.setFont();
+  }
+  
+  private void setarLookAndFeel(){
+    try{
+      if( System.getProperty( "os.name").toUpperCase().contains(  "WIN" ) ) {
+        UIManager.setLookAndFeel( "com.sun.java.swing.plaf.windows.WindowsLookAndFeel" );
       }
-    );
-    
-    pnlSuperior = new JPanel();
-    pnlSuperior.setBounds( new Rectangle( 0, 0, 640 , 60 ) );
-    pnlSuperior.setName( "pnlSuperior" );
-    pnlSuperior.setEnabled( true );
-    pnlSuperior.setLayout( null );
-    
-    tbpPainelAbas = new JTabbedPane();
-    tbpPainelAbas.setBounds( 0,60, 640, 420 );
-    tbpPainelAbas.setName( "tbpPainelAbas" );
-    tbpPainelAbas.setBorder( BorderFactory.createEtchedBorder() );
-    tbpPainelAbas.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    pnlHome = new JPanel();
-    pnlHome.setLayout( null );
-    pnlHome.setBounds( new Rectangle( 0, 0, 640, 420 ) );
-    pnlHome.setName( "Home" );
-    pnlHome.setBorder( BorderFactory.createEtchedBorder() );
-    pnlHome.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblPeriodo = new JLabel( "Período:" );
-    lblPeriodo.setBounds( 30, 20, 60, 21 );
-    lblPeriodo.setHorizontalAlignment( JLabel.RIGHT );
-    lblPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    btnMenosPeriodo = new JButton( "-" );
-    btnMenosPeriodo.setBounds( 95, 20, 45, 21 );
-    btnMenosPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
-    btnMenosPeriodo.setFocusable( false );
-    btnMenosPeriodo.addActionListener(
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnMenosPeriodo();
-        }
+      else {
+          setarLookAndFeelLinux();
       }
-    );
+    }
+    catch( ClassNotFoundException ex ){
+      System.out.println( "ClassNotFoundException: " + ex.getLocalizedMessage() );
+    }
+    catch( InstantiationException ex ){
+      System.out.println( "InstantiationException: " + ex.getLocalizedMessage() );
+    }
+    catch( IllegalAccessException ex ){
+      System.out.println( "IllegalAccessException: " + ex.getLocalizedMessage() );
+    }
+    catch( UnsupportedLookAndFeelException ex ){
+      System.out.println( "UnsupportedLookAndFeelException: " + ex.getLocalizedMessage() );
+    }
+  }
+  
+  private void setarLookAndFeelLinux(){
+    try{
+      UIManager.setLookAndFeel( "com.sun.java.swing.plaf.gtk.GTKLookAndFeel" );
+    }
+    catch( ClassNotFoundException ex ){
+      System.out.println( "ClassNotFoundException: " + ex.getLocalizedMessage() );
+    }
+    catch( InstantiationException ex ){
+      System.out.println( "InstantiationException: " + ex.getLocalizedMessage() );
+    }
+    catch( IllegalAccessException ex ){
+      System.out.println( "IllegalAccessException: " + ex.getLocalizedMessage() );
+    }
+    catch( UnsupportedLookAndFeelException ex ){
+      System.out.println( "UnsupportedLookAndFeelException: " + ex.getLocalizedMessage() );
+    }
+  }
+  
+  private void criarModelLancamentos() {
+    this.movimentoModel = new LancamentoModel();
+    this.movimentoTable = new JTable();
     
-    dtcPeriodoIni = new JDateChooser();
-    dtcPeriodoIni.setBounds( 150, 20, 130, 21 );
-    dtcPeriodoIni.setFont( new Font( "Verdana", 0, 12 ) );
-    dtcPeriodoIni.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARdtcPeriodoIni();
-        }
-      }
-    );
-    
-    lblPeriodoA = new JLabel( "à" );
-    lblPeriodoA.setBounds( 290, 20, 15, 21 );
-    lblPeriodoA.setFont( new Font( "Verdana", 0, 12 ) );
-    lblPeriodoA.setHorizontalAlignment( JLabel.CENTER );
-    
-    dtcPeriodoFim = new JDateChooser();
-    dtcPeriodoFim.setBounds( 315, 20, 130, 21 );
-    dtcPeriodoFim.setFont( new Font( "Verdana", 0, 12 ) );
-    dtcPeriodoFim.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARdtcPeriodoFim();
-        }
-      }
-    );
-    
-    btnMaisPeriodo = new JButton( "+" );
-    btnMaisPeriodo.setBounds( 450, 20, 45, 21 );
-    btnMaisPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
-    btnMaisPeriodo.setFocusable( false );
-    btnMaisPeriodo.addActionListener(
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnMaisPeriodo();
-        }
-      }
-    );
-    
-    pnlResumoCaixa = new JPanel();
-    pnlResumoCaixa.setLayout( null );
-    pnlResumoCaixa.setBounds( 10, 10, 610, 210 );
-    pnlResumoCaixa.setBorder( BorderFactory.createEtchedBorder() );
-    
-    lblResumoCaixa = new JLabel( "Resumo Caixa (no Período)" );
-    lblResumoCaixa.setBounds( 215, 5, 180, 21 );
-    lblResumoCaixa.setHorizontalAlignment( JLabel.CENTER );
-    lblResumoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblResNomeCaixa = new JLabel( "Caixa:" );
-    lblResNomeCaixa.setBounds( 10, 35, 120, 21 );
-    lblResNomeCaixa.setHorizontalAlignment( JLabel.RIGHT );
-    lblResNomeCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    cbxResCaixa = new JComboBox();
-    cbxResCaixa.setBounds( 135, 35, 120, 21 );
-    cbxResCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    btnResCaixa = new JButton();
-    btnResCaixa.setIcon( new ImageIcon( Tela.class.getResource( "atualizar.png" ) ) );
-    btnResCaixa.setFocusable( false );
-    btnResCaixa.setContentAreaFilled( true );
-    btnResCaixa.setFocusPainted( true );
-    btnResCaixa.setBounds( 260, 35, 21, 21 );
-    btnResCaixa.addActionListener(
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnResCaixa();
-        }
-      }
-    );
-
-    lblResSaldoCaixa = new JLabel( "Saldo: " );
-    lblResSaldoCaixa.setBounds( 80, 66, 50, 21 ); // x = 130
-    lblResSaldoCaixa.setHorizontalAlignment( JLabel.RIGHT );
-    lblResSaldoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblResValorSaldoCaixa = new JLabel( "R$ 0,00" );
-    lblResValorSaldoCaixa.setBounds( 145, 66, 100, 21 );
-    lblResValorSaldoCaixa.setHorizontalAlignment( JLabel.RIGHT );
-    lblResValorSaldoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblResTotEntrCaixa = new JLabel( "Total de Entradas: " );
-    lblResTotEntrCaixa.setBounds( 0, 97, 130, 21 ); // x = 130
-    lblResTotEntrCaixa.setHorizontalAlignment( JLabel.RIGHT );
-    lblResTotEntrCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblResValTotEntrCaixa = new JLabel( "R$ 0,00" );
-    lblResValTotEntrCaixa.setBounds( 145, 97, 100, 21 );
-    lblResValTotEntrCaixa.setHorizontalAlignment( JLabel.RIGHT );
-    lblResValTotEntrCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblResTotSaidaCaixa = new JLabel( "Total de Saídas: " );
-    lblResTotSaidaCaixa.setBounds( 10, 128, 120, 21 ); // x = 130
-    lblResTotSaidaCaixa.setHorizontalAlignment( JLabel.RIGHT );
-    lblResTotSaidaCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblResValTotSaidaCaixa = new JLabel( "R$ 0,00" );
-    lblResValTotSaidaCaixa.setBounds( 145, 128, 100, 21 );
-    lblResValTotSaidaCaixa.setHorizontalAlignment( JLabel.RIGHT );
-    lblResValTotSaidaCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    ckbResumoCaixa = new JCheckBox( " Considerar provisões" );
-    ckbResumoCaixa.setBounds( 105, 159, 170, 21 );
-    ckbResumoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    pnlGrafico = new ChartPanel( null );
-    pnlGrafico.setLayout( null );
-    pnlGrafico.setBounds( 320, 35, 260, 160 );
-    //pnlGrafico.setBorder( BorderFactory.createEtchedBorder() );
-    
-    pnlResumoConta = new JPanel();
-    pnlResumoConta.setLayout( null );
-    pnlResumoConta.setBounds( 10, 230, 610, 120 );
-    pnlResumoConta.setBorder( BorderFactory.createEtchedBorder() );
-    
-    lblResumoConta = new JLabel( "Resumo Conta (no Período)" );
-    lblResumoConta.setBounds( 215, 5, 180, 21 );
-    lblResumoConta.setHorizontalAlignment( JLabel.CENTER );
-    lblResumoConta.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblResNomeConta = new JLabel( "Conta:" );
-    lblResNomeConta.setBounds( 30, 45, 50, 21 );
-    lblResNomeConta.setHorizontalAlignment( JLabel.RIGHT );
-    lblResNomeConta.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    cbxResConta = new JComboBox();
-    cbxResConta.setBounds( 85, 45, 180, 21 );
-    cbxResConta.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    btnResConta = new JButton( new ImageIcon( Tela.class.getResource( "atualizar.png" ) ) );
-    btnResConta.setBounds( 270, 45, 21, 21 );
-    btnResConta.setFocusable( false );
-    btnResConta.addActionListener(
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnResConta();
-        }
-      }
-    );
-    
-    ckbResumoConta = new JCheckBox( " Considerar provisões" );
-    ckbResumoConta.setBounds( 85, 76, 200, 21 );
-    ckbResumoConta.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblResMovContaPc = new JLabel( "Movimentou (%):" );
-    lblResMovContaPc.setBounds( 330, 25, 120, 21 ); // x = 450
-    lblResMovContaPc.setHorizontalAlignment( JLabel.RIGHT );
-    lblResMovContaPc.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblResValorMovContaPc = new JLabel( "0,00 %" );
-    lblResValorMovContaPc.setBounds( 455, 25, 100, 21 );
-    lblResValorMovContaPc.setHorizontalAlignment( JLabel.RIGHT );
-    lblResValorMovContaPc.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblResMovContaRs = new JLabel( "Movimentou (R$):" );
-    lblResMovContaRs.setBounds( 330, 55, 120, 21 ); // x = 450
-    lblResMovContaRs.setHorizontalAlignment( JLabel.RIGHT );
-    lblResMovContaRs.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblResValorMovContaRs = new JLabel( "R$ 0,00" );
-    lblResValorMovContaRs.setBounds( 455, 55, 100, 21 );
-    lblResValorMovContaRs.setHorizontalAlignment( JLabel.RIGHT );
-    lblResValorMovContaRs.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblResMovContaAno = new JLabel( "Movimentou no ano:" );
-    lblResMovContaAno.setBounds( 300, 85, 150, 21 ); // x = 450
-    lblResMovContaAno.setHorizontalAlignment( JLabel.RIGHT );
-    lblResMovContaAno.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblResValorMovContaAno = new JLabel( "R$ 0,00" );
-    lblResValorMovContaAno.setBounds( 455, 85, 100, 21 );
-    lblResValorMovContaAno.setHorizontalAlignment( JLabel.RIGHT );
-    lblResValorMovContaAno.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    pnlMovimento = new JPanel();
-    pnlMovimento.setLayout( null );
-    pnlMovimento.setBounds( new Rectangle( 0, 0, 640, 420 ) );
-    pnlMovimento.setName( "Lançamentos" );
-    pnlMovimento.setBorder( BorderFactory.createEtchedBorder() );
-    pnlMovimento.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    tbpMovimento = new JTabbedPane();
-    tbpMovimento.setBorder( BorderFactory.createEtchedBorder() );
-    tbpMovimento.setBounds( 10, 10, 260, 340 );
-    tbpMovimento.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    pnlCadastroMov = new JPanel();
-    pnlCadastroMov.setLayout( null );
-    pnlCadastroMov.setBounds( 10, 10, 260, 340 );
-    pnlCadastroMov.setBorder( BorderFactory.createEtchedBorder() );
-    pnlCadastroMov.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblMovDescricao = new JLabel( "Descrição:" );
-    lblMovDescricao.setBounds( 15, 40, 70, 21 );
-    lblMovDescricao.setFont( new Font( "Verdana", 0, 12 ) );
-    lblMovDescricao.setHorizontalAlignment( JLabel.RIGHT );
-    
-    txfMovDescricao = new JTextField( "" );
-    txfMovDescricao.setBounds( 90, 40, 150, 21 );
-    txfMovDescricao.setFont( new Font( "Verdana", 0, 12 ) );
-    txfMovDescricao.setToolTipText( "Descrição do lançamento" );
-    
-    lblMovData = new JLabel( "Data:" );
-    lblMovData.setBounds( 45, 71, 40, 21 );
-    lblMovData.setFont( new Font( "Verdana", 0, 12 ) );
-    lblMovData.setHorizontalAlignment( JLabel.RIGHT );
-    
-    dtcMovData = new JDateChooser();
-    dtcMovData.setDate( new Date() );
-    dtcMovData.setBounds( 90, 71, 100, 21 );
-    dtcMovData.setFont( new Font( "Verdana", 0, 12 ) );
-    dtcMovData.setToolTipText( "Data do lançameneto" );
-    
-    lblMovValor = new JLabel( "Valor:" );
-    lblMovValor.setBounds( 35, 102, 50, 21 );
-    lblMovValor.setFont( new Font( "Verdana", 0, 12 ) );
-    lblMovValor.setHorizontalAlignment( JLabel.RIGHT );
-    
-    dbfMovValor = new JDoubleField();
-    dbfMovValor.setBounds( 90, 102, 80, 21 );
-    dbfMovValor.setFont( new Font( "Verdana", 0, 12 ) );
-    dbfMovValor.setToolTipText( "Valor do lançamento" );
-    
-    lblMovConta = new JLabel( "Conta:" );
-    lblMovConta.setBounds( 35, 133, 50, 21 );
-    lblMovConta.setFont( new Font( "Verdana", 0, 12 ) );
-    lblMovConta.setHorizontalAlignment( JLabel.RIGHT );
-    
-    cbxMovConta = new JComboBox();
-    cbxMovConta.setBounds( 90, 133, 150, 21 );
-    cbxMovConta.setFont( new Font( "Verdana", 0, 12 ) );
-    cbxMovConta.setToolTipText( "Escolha uma conta" );
-    
-    lblMovCaixa = new JLabel( "Caixa:" );
-    lblMovCaixa.setBounds( 35, 164, 50, 21 );
-    lblMovCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    lblMovCaixa.setHorizontalAlignment( JLabel.RIGHT );
-    
-    cbxMovCaixa = new JComboBox();
-    cbxMovCaixa.setBounds( 90, 164, 150, 21 );
-    cbxMovCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    cbxMovCaixa.setToolTipText( "Escolha um caixa" );
-    cbxMovCaixa.addKeyListener(
-      new KeyAdapter()
-      {
-        @Override
-        public void keyPressed( KeyEvent e )
-        {
-          AOPRESSIONARcbxMovCaixa( e );
-        }
-      }
-    );
-    
-    ckbMovPago = new JCheckBox( "Pago/Recebido" );
-    ckbMovPago.setSelected( false );
-    ckbMovPago.setBounds( 86, 192, 130, 21 );
-    ckbMovPago.setFont( new Font( "Verdana", 0, 12 ) );
-    ckbMovPago.setToolTipText( "Deixe desmarcado para um lançamento futuro." );
-    
-    lblMovRecorrencia = new JLabel( "Recorrência:" );
-    lblMovRecorrencia.setBounds( 5, 216, 80, 21 );
-    lblMovRecorrencia.setFont( new Font( "Verdana", 0, 12 ) );
-    lblMovRecorrencia.setHorizontalAlignment( JLabel.RIGHT );
-    
-    rbtMovRecorrenciaSim = new JRadioButton( "Sim" );
-    rbtMovRecorrenciaSim.setSelected( false );
-    rbtMovRecorrenciaSim.setBounds( 86, 216, 50, 21 );
-    rbtMovRecorrenciaSim.setFont( new Font( "Verdana", 0, 12 ) );
-    rbtMovRecorrenciaSim.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed(ActionEvent e)
-        {
-          if( rbtMovRecorrenciaSim.isSelected() )
-            habilitarRecorrencia( rbtMovRecorrenciaSim.isSelected() );
-        }
-      }
-    );
-    
-    rbtMovRecorrenciaNao = new JRadioButton( "Não" );
-    rbtMovRecorrenciaNao.setSelected( true );
-    rbtMovRecorrenciaNao.setBounds( 140, 216, 50, 21 );
-    rbtMovRecorrenciaNao.setFont( new Font( "Verdana", 0, 12 ) );
-    rbtMovRecorrenciaNao.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          if( rbtMovRecorrenciaNao.isSelected() )
-            habilitarRecorrencia( !rbtMovRecorrenciaNao.isSelected() );
-        }
-      }
-    );
-    
-    ButtonGroup grupoMov = new ButtonGroup();
-    grupoMov.add( rbtMovRecorrenciaSim );
-    grupoMov.add( rbtMovRecorrenciaNao );
-    
-    lblRepetir = new JLabel( "Repetir" );
-    lblRepetir.setBounds( 10, 247, 50, 21 );
-    lblRepetir.setFont( new Font( "Verdana", 0, 12 ) );
-    lblRepetir.setHorizontalAlignment( JLabel.RIGHT );
-    
-    itfNumVezes = new JIntegerField();
-    itfNumVezes.setBounds( 65, 247, 40, 21 );
-    itfNumVezes.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblVezes = new JLabel( "vezes" );
-    lblVezes.setBounds( 110, 247, 40, 21 );
-    lblVezes.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblACada = new JLabel( "A cada");
-    lblACada.setBounds( 10, 278, 50, 21 );
-    lblACada.setFont( new Font( "Verdana", 0, 12 ) );
-    lblACada.setHorizontalAlignment( JLabel.CENTER );
-    
-    itfNumPeriodo = new JIntegerField();
-    itfNumPeriodo.setBounds( 65, 278, 40, 21 );
-    itfNumPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    cbxPeriodo = new JComboBox();
-    cbxPeriodo.setBounds( 110, 278, 110, 21 );
-    cbxPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
-    for( EnumPeriodo periodo : EnumPeriodo.values() )
-      cbxPeriodo.addItem( periodo );
-    
-
-    btnMovAdd = new JButton( new ImageIcon( Tela.class.getResource( "incluir.png" ) ) );
-    btnMovAdd.setBounds( 5, 5, 21, 21 );
-    btnMovAdd.setFont( new Font( "Verdana", 0, 12 ) );
-    btnMovAdd.setToolTipText( "Novo" );
-    btnMovAdd.setFocusable( false );
-    btnMovAdd.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnMovAdd();
-        }
-      }
-    );
-
-    btnMovEditar = new JButton( new ImageIcon( Tela.class.getResource( "editar.png" ) ) );
-    btnMovEditar.setBounds( 26, 5, 21, 21 );
-    btnMovEditar.setFont( new Font( "Verdana", 0, 12 ) );
-    btnMovEditar.setToolTipText( "Editar" );
-    btnMovEditar.setFocusable( false );
-    btnMovEditar.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnMovEditar();
-        }
-      }
-    );
-
-    btnMovExcluir = new JButton( new ImageIcon( Tela.class.getResource( "deletar.gif" ) ) );
-    btnMovExcluir.setBounds( 47, 5, 21, 21 );
-    btnMovExcluir.setFont( new Font( "Verdana", 0, 12 ) );
-    btnMovExcluir.setToolTipText( "Excluir" );
-    btnMovExcluir.setFocusable( false );
-    btnMovExcluir.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnMovExcluir();
-        }
-      }
-    );
-    
-    btnMovConfirmar = new JButton( new ImageIcon( Tela.class.getResource( "confirmar.png" ) ) );
-    btnMovConfirmar.setBounds( 68, 5, 21, 21 );
-    btnMovConfirmar.setFont( new Font( "Verdana", 0, 12 ) );
-    btnMovConfirmar.setToolTipText( "Confirmar" );
-    btnMovConfirmar.setFocusable( false );
-    btnMovConfirmar.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnMovConfirmar();
-        }
-      }
-    );
-
-    btnMovCancelar = new JButton( new ImageIcon( Tela.class.getResource( "cancelar.png" ) ) );
-    btnMovCancelar.setBounds( 89, 5, 21, 21 );
-    btnMovCancelar.setFont( new Font( "Verdana", 0, 12 ) );
-    btnMovCancelar.setToolTipText( "Cancelar" );
-    btnMovCancelar.setFocusable( false );
-    btnMovCancelar.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnMovCancelar();
-        }
-      }
-    );
-    
-    pnlTransferencia = new JPanel();
-    pnlTransferencia.setLayout( null );
-    
-    pnlLancamentoMov = new JPanel();
-    pnlLancamentoMov.setLayout( null );
-    pnlLancamentoMov.setBounds( 280, 10, 340, 340 );
-    pnlLancamentoMov.setBorder( BorderFactory.createEtchedBorder() );
-    pnlLancamentoMov.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    // movimento model inicio
-    String[] colunasMov = { "Data", "Tipo", "Descrição", "Valor", "Pg/Rc" };
-    Object[][] dadosMov = {};
-    
-    movimentoModel = new DefaultTableModel(dadosMov, colunasMov);
-    movimentoTable = new JTable(movimentoModel)
-    {
+    this.movimentoTable.addMouseListener(new MouseAdapter() {
       @Override
-      public boolean isCellEditable(int rowIndex, int colIndex)
-      {
-        return( false ); //Disallow the editing of any cell
-      }
-    };
-    movimentoTable.addMouseListener
-    (
-      new MouseAdapter()
-      {
-        @Override
-        public void mouseClicked( MouseEvent e )
-        {
-          AOCLICARpnlMovimento( e );
+      public void mouseClicked( MouseEvent e ) {
+        if( e.getClickCount() == 1 ) {
+          comando = "CARREGAR_LANCAMENTO_SELECIONADO";
         }
       }
-    );
-    movimentoTable.getColumnModel().getColumn(0).setPreferredWidth( 70 );  // data
-    movimentoTable.getColumnModel().getColumn(1).setPreferredWidth( 30 );  // tipo
-    movimentoTable.getColumnModel().getColumn(2).setPreferredWidth( 80 ); // descricao
-    movimentoTable.getColumnModel().getColumn(3).setPreferredWidth( 70 );  // valor
-    movimentoTable.getColumnModel().getColumn(4).setPreferredWidth( 30 );  // pago/recebido
+    });
+    this.movimentoTable.setShowGrid( false );
+    this.movimentoTable.getTableHeader().setReorderingAllowed( false );
+    this.movimentoTable.getTableHeader().setResizingAllowed( false );
+    this.movimentoTable.setBorder( BorderFactory.createEmptyBorder() );
+    this.movimentoTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
+    this.movimentoTable.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
+    this.movimentoTable.setModel( this.movimentoModel );
+    this.movimentoTable.setAutoCreateRowSorter( true );
     
-    pnlLancamentoMov.setLayout( new BorderLayout() );
-    pnlLancamentoMov.add( new JScrollPane( movimentoTable ) );
+    JScrollPane scroll = new JScrollPane();
+    scroll.setViewportView( this.movimentoTable );
+    scroll.setBorder( BorderFactory.createEmptyBorder() );
     
-    movimentoTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
-    // alinhar a direita um JTable - http://stackoverflow.com/questions/3467052/how-to-set-right-alignment-in-jtable-cell
-    DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-    rightRenderer.setHorizontalAlignment( JLabel.RIGHT );
-    movimentoTable.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
+    this.pnlLancamentoMov.setLayout( new BorderLayout() );
+    this.pnlLancamentoMov.add( scroll, BorderLayout.CENTER );
     
-    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-    centerRenderer.setHorizontalAlignment( JLabel.CENTER );
-    movimentoTable.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
-    movimentoTable.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
-    movimentoTable.getColumnModel().getColumn(4).setCellRenderer( centerRenderer );
-    // movimento model fim
+    this.movimentoTable.getColumnModel().getColumn(0).setPreferredWidth( 90 );  // data
+    this.movimentoTable.getColumnModel().getColumn(1).setPreferredWidth( 30 );  // tipo
+    this.movimentoTable.getColumnModel().getColumn(2).setPreferredWidth( 158 ); // descricao
+    this.movimentoTable.getColumnModel().getColumn(3).setPreferredWidth( 90 );  // valor
+    this.movimentoTable.getColumnModel().getColumn(4).setPreferredWidth( 50 );  // pago/recebido
     
-    pnlExtratos = new JPanel();
-    pnlExtratos.setLayout( null );
-    pnlExtratos.setBounds( new Rectangle( 0, 0, 640, 420 ) );
-    pnlExtratos.setName( "Extratos" );
-    pnlExtratos.setBorder( BorderFactory.createEtchedBorder() );
-    pnlExtratos.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    pnlExtrato = new JPanel();
-    pnlExtrato.setLayout( null );
-    pnlExtrato.setBounds( new Rectangle( 10, 10, 610, 340 ) );
-    pnlExtrato.setBorder( BorderFactory.createEtchedBorder() );
-    pnlExtrato.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblExtratoConta = new JLabel( "Conta:" );
-    lblExtratoConta.setBounds( 10, 15, 45, 21 );
-    lblExtratoConta.setFont( new Font( "Verdana", 0, 12 ) );
-    lblExtratoConta.setHorizontalAlignment( JLabel.RIGHT );
-    
-    cbxExtratoConta = new JComboBox();
-    cbxExtratoConta.setBounds( 60, 15, cbxMovConta.getWidth(), 21 );
-    cbxExtratoConta.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblExtratoPeriodo = new JLabel( "Período: " );
-    lblExtratoPeriodo.setBounds( 220, 15, 60, 21 );
-    lblExtratoPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
-    lblExtratoPeriodo.setHorizontalAlignment( JLabel.RIGHT );
-    
-    dtcExtratoIni = new JDateChooser();
-    dtcExtratoIni.setBounds( 290, 15, 110, 21 );
-    dtcExtratoIni.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblExtratoHifen = new JLabel( "-" );
-    lblExtratoHifen.setBounds( 410, 15, 15, 21 );
-    lblExtratoHifen.setFont( new Font( "Verdana", 0, 12 ) );
-    lblExtratoHifen.setHorizontalAlignment( JLabel.CENTER );
-    
-    dtcExtratoFim = new JDateChooser();
-    dtcExtratoFim.setBounds( 435, 15, 110, 21 );
-    dtcExtratoFim.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    btnExtrato = new JButton( new ImageIcon( Tela.class.getResource( "atualizar.png" ) ) );
-    btnExtrato.setBounds( 560, 15, 21, 21 );
-    btnExtrato.setFocusable( false );
-    btnExtrato.addActionListener(
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnExtrato();
-        }
-      }
-    );
-    
-    ckbExtratoProvisao = new JCheckBox( " Considerar provisões" );
-    ckbExtratoProvisao.setBounds( 220, 42, 200, 21 );
-    ckbExtratoProvisao.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    txtExtrato = new JTextPane();
-    txtExtrato.setFont( new Font( "Monospaced", 0, 12 ) );
-    txtExtrato.setEditable( false );
-    txtExtrato.setBackground( pnlSuperior.getBackground() );
-    
-    scbExtratoConta = new JScrollPane( txtExtrato );
-    scbExtratoConta.setBounds( 30, 70, 540, 230 );
-    
-    pnlCadastros = new JPanel();
-    pnlCadastros.setLayout( null );
-    pnlCadastros.setBounds( new Rectangle( 0, 0, 640, 420 ) );
-    pnlCadastros.setName( "Cadastros" );
-    pnlCadastros.setBorder( BorderFactory.createEtchedBorder() );
-    pnlCadastros.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    pnlCadConta = new JPanel();
-    pnlCadConta.setLayout( null );
-    pnlCadConta.setBounds( new Rectangle( 20, 20, pnlCadastros.getWidth()-50, (pnlCadastros.getHeight()/2)-70 ) );
-    pnlCadConta.setName( "pnlCadConta" );
-    pnlCadConta.setBorder( BorderFactory.createEtchedBorder() );
-    pnlCadConta.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblAddConta = new JLabel( "Contas Cadastradas:" );
-    lblAddConta.setBounds( 300, 5, 150, 21 );
-    lblAddConta.setName( "lblAddConta" );
-    lblAddConta.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblNomeConta = new JLabel( "Nome:" );
-    lblNomeConta.setBounds( 10, 40, 45, 21 );
-    lblNomeConta.setFont( new Font( "Verdana", 0, 12 ) );
-    lblNomeConta.setHorizontalAlignment( JLabel.RIGHT );
-    
-    txfNomeConta = new JTextField();
-    txfNomeConta.setBounds( 60, 40, 150, 21 );
-    txfNomeConta.setName( "txfNomeConta" );
-    txfNomeConta.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblTipoConta = new JLabel( "Tipo:" );
-    lblTipoConta.setBounds( 10, 70, 45, 21 );
-    lblTipoConta.setName( "lblTipoConta" );
-    lblTipoConta.setFont( new Font( "Verdana", 0, 12 ) );
-    lblTipoConta.setHorizontalAlignment( JLabel.RIGHT );
-    
-    cbxTipoConta = new JComboBox();
-    cbxTipoConta.setBounds( 60, 70, 100, 21 );
-    cbxTipoConta.setFont( new Font( "Verdana", 0, 12 ) );
-    for( EnumTipoConta tipo : EnumTipoConta.values() )
-      cbxTipoConta.addItem( tipo );
-    
+    class MyCellRenderer extends DefaultTableCellRenderer {
+    @Override
+      public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-    btnAddConta = new JButton( new ImageIcon( Tela.class.getResource( "incluir.png" ) ) );
-    btnAddConta.setBounds( 5, 5, 21, 21 );
-    btnAddConta.setFont( new Font( "Verdana", 0, 12 ) );
-    btnAddConta.setToolTipText( "Incluir conta" );
-    btnAddConta.setFocusable( false );
-    btnAddConta.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnAddConta();
+        if( row % 2 == 0 ) {
+          comp.setBackground(new Color(202, 225, 255));
         }
-      }
-    );
-    btnAddConta.addKeyListener
-    (
-      new KeyAdapter()
-      {
-        @Override
-        public void keyPressed( KeyEvent e )
-        {
-          if( e.getKeyCode() == KeyEvent.VK_ENTER )
-          {
-            AOPRESSIONARbtnAddConta( e );
-          }
+        else {
+          comp.setBackground(new Color(254, 254, 254));
         }
-      }
-    );
     
-    btnEditarConta = new JButton( new ImageIcon( Tela.class.getResource( "editar.png" ) ) );
-    btnEditarConta.setBounds( 26, 5, 21, 21 );
-    btnEditarConta.setFont( new Font( "Verdana", 0, 12 ) );
-    btnEditarConta.setToolTipText( "Editar conta" );
-    btnEditarConta.setFocusable( false );
-    btnEditarConta.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnEditarConta();
+        if( isSelected ) {
+          comp.setBackground(new Color(185, 235, 132));
         }
-      }
-    );
     
-    btnExcluirConta = new JButton( new ImageIcon( Tela.class.getResource( "deletar.gif" ) ) );
-    btnExcluirConta.setBounds( 47, 5, 21, 21 );
-    btnExcluirConta.setFont( new Font( "Verdana", 0, 12 ) );
-    btnExcluirConta.setToolTipText( "Excluir conta" );
-    btnExcluirConta.setFocusable( false );
-    btnExcluirConta.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnExcluirConta();
+        if( value instanceof Double ) {
+          ((JLabel) comp).setText(new DecimalFormat("#,##0.00").format((Double) value));
+          ((JLabel) comp).setHorizontalAlignment(SwingConstants.RIGHT);
         }
-      }
-    );
-    
-    btnConfirmarConta = new JButton( new ImageIcon( Tela.class.getResource( "confirmar.png" ) ) );
-    btnConfirmarConta.setBounds( 68, 5, 21, 21 );
-    btnConfirmarConta.setFont( new Font( "Verdana", 0, 12 ) );
-    btnConfirmarConta.setToolTipText( "Confirmar" );
-    btnConfirmarConta.setFocusable( false );
-    btnConfirmarConta.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnConfirmarConta();
+        else {
+          ((JLabel) comp).setHorizontalAlignment(SwingConstants.LEFT);
         }
-      }
-    );
-    
-    btnCancelarConta = new JButton( new ImageIcon( Tela.class.getResource( "cancelar.png" ) ) );
-    btnCancelarConta.setBounds( 89, 5, 21, 21 );
-    btnCancelarConta.setFont( new Font( "Verdana", 0, 12 ) );
-    btnCancelarConta.setToolTipText( "Cancelar" );
-    btnCancelarConta.setFocusable( false );
-    btnCancelarConta.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnCancelarConta();
-        }
-      }
-    );
-    
-    pnlContas = new JPanel();
-    pnlContas.setBounds( 300, 30, 270, 100 );
-    pnlContas.setBorder( BorderFactory.createEtchedBorder() );
-    
-    // contas model inicio
-    String[] colunas = {"Nome","Tipo"};
-    Object[][] dados = {};
-    
-    contasModel = new DefaultTableModel(dados, colunas);
-    contasTable = new JTable(contasModel)
-    {
-      @Override
-      public boolean isCellEditable(int rowIndex, int colIndex)
-      {
-        return( false ); //Disallow the editing of any cell
-      }
-    };
-    contasTable.addMouseListener
-    (
-      new MouseAdapter()
-      {
-        @Override
-        public void mouseClicked( MouseEvent e )
-        {
-          AOCLICARpnlContas( e );
-        }
-      }
-    );
-    // Fonte: http://www.java-forums.org/awt-swing/541-how-change-color-jtable-row-having-particular-value.html
-    contasTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer()
-    {
-      @Override
-      public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
-      {
-        final Component c = super.getTableCellRendererComponent(table,value,isSelected,hasFocus,row,column);
         
-        String tipoConta = contasTable.getModel().getValueAt( row, 1 ).toString();
-        
-        if( tipoConta.equals( "Débito" ) )
-            c.setForeground(new Color(255,69,0) );
-        else
-            c.setForeground( Color.BLUE );
+        if( value instanceof Integer )
+        {
+          ((JLabel) comp).setText( DateTools.formatDataIntToStringBR( (Integer) value ) );
+          ((JLabel) comp).setHorizontalAlignment(SwingConstants.LEFT);
+        }
 
-        return( c );
+        return( comp );
+      }
+    }
+      
+    this.movimentoTable.setDefaultRenderer( BigDecimal.class, new MyCellRenderer() );
+    this.movimentoTable.setDefaultRenderer( Double.class,     new MyCellRenderer() );
+    this.movimentoTable.setDefaultRenderer( String.class,     new MyCellRenderer() );
+    this.movimentoTable.setDefaultRenderer( Integer.class,    new MyCellRenderer() );
+    this.movimentoTable.setDefaultRenderer( Object.class,     new MyCellRenderer() );
+  }
+  
+  private void criarModelContas() {
+    this.contasModel = new ContaModel();
+    this.contasTable = new JTable();
+    this.contasTable.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked( MouseEvent e ) {
+        if( e.getClickCount() == 1 ) {
+          comando = "CARREGAR_CONTA_SELECIONADA";
+        }
       }
     });
     
-    pnlContas.setLayout( new BorderLayout() );
-    pnlContas.add( new JScrollPane( contasTable ) );
+    this.contasTable.setShowGrid( false );
+    this.contasTable.getTableHeader().setReorderingAllowed( false );
+    this.contasTable.getTableHeader().setResizingAllowed( false );
+    this.contasTable.setAutoCreateRowSorter( true );
+    this.contasTable.setBorder( BorderFactory.createEmptyBorder() );
+    this.contasTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
+    this.contasTable.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
+    this.contasTable.setModel( this.contasModel );
     
-    contasTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
-    // contas model fim
+    JScrollPane scroll = new JScrollPane();
+    scroll.setViewportView( this.contasTable );
+    scroll.setBorder( BorderFactory.createEmptyBorder() );
     
-    pnlCadCaixa = new JPanel();
-    pnlCadCaixa.setLayout( null );
-    pnlCadCaixa.setBounds( new Rectangle( 20, pnlCadConta.getHeight()+40, pnlCadastros.getWidth()-50, (pnlCadastros.getHeight()/2)-50 ) );
-    pnlCadCaixa.setName( "pnlCadCaixa" );
-    pnlCadCaixa.setBorder( BorderFactory.createEtchedBorder() );
-    pnlCadCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.pnlContas.setLayout( new BorderLayout() );
+    this.pnlContas.add( scroll, BorderLayout.CENTER );
     
-    lblAddCaixa = new JLabel( "Caixas cadastrados:" );
-    lblAddCaixa.setBounds( 300, 5, 150, 21 );
-    lblAddCaixa.setName( "lblAddCaixa" );
-    lblAddCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.contasTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 208 ); // nome
+    this.contasTable.getColumnModel().getColumn( 1 ).setPreferredWidth( 40 ); // tipo
     
-    lblNomeCaixa = new JLabel( "Nome:" );
-    lblNomeCaixa.setBounds( 10, 40, 45, 21 );
-    lblNomeCaixa.setName( "lblNomeCaixa" );
-    lblNomeCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    lblNomeCaixa.setHorizontalAlignment( JLabel.RIGHT );
-    
-    txfNomeCaixa = new JTextField();
-    txfNomeCaixa.setBounds( 60, 40, 150, 21 );
-    txfNomeCaixa.setName( "txfNomeCaixa" );
-    txfNomeCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblSaldoInicial = new JLabel( "Saldo:" );
-    lblSaldoInicial.setBounds( 10, 70, 45, 21 );
-    lblSaldoInicial.setName( "lblSaldoInicial" );
-    lblSaldoInicial.setFont( new Font( "Verdana", 0, 12 ) );
-    lblSaldoInicial.setHorizontalAlignment( JLabel.RIGHT );
-    
-    dbfSaldoInicialCaixa = new JDoubleField();
-    dbfSaldoInicialCaixa.setBounds( 60, 70, 100, 21 );
-    dbfSaldoInicialCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    btnAddCaixa = new JButton( new ImageIcon( Tela.class.getResource( "incluir.png" ) ) );
-    btnAddCaixa.setBounds( 5, 5, 21, 21 );
-    btnAddCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    btnAddCaixa.setToolTipText( "Incluir caixa" );
-    btnAddCaixa.setFocusable( false );
-    btnAddCaixa.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnAddCaixa();
-        }
-      }
-    );
-    btnAddCaixa.addKeyListener
-    (
-      new KeyAdapter()
-      {
-        @Override
-        public void keyPressed( KeyEvent e )
-        {
-          AOCLICARbtnAddCaixa();
-        }
-      }
-    );
-    
-    btnEditarCaixa = new JButton( new ImageIcon( Tela.class.getResource( "editar.png" ) ) );
-    btnEditarCaixa.setBounds( 26, 5, 21, 21 );
-    btnEditarCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    btnEditarCaixa.setToolTipText( "Alterar caixa" );
-    btnEditarCaixa.setFocusable( false );
-    btnEditarCaixa.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnEditarCaixa();
-        }
-      }
-    );
-    
-    btnExcluirCaixa = new JButton( new ImageIcon( Tela.class.getResource( "deletar.gif" ) ) );
-    btnExcluirCaixa.setBounds( 47, 5, 21, 21 );
-    btnExcluirCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    btnExcluirCaixa.setToolTipText( "Excluir caixa" );
-    btnExcluirCaixa.setFocusable( false );
-    btnExcluirCaixa.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnExcluirCaixa();
-        }
-      }
-    );
-    
-    btnConfirmarCaixa = new JButton( new ImageIcon( Tela.class.getResource( "confirmar.png" ) ) );
-    btnConfirmarCaixa.setBounds( 68, 5, 21, 21 );
-    btnConfirmarCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    btnConfirmarCaixa.setToolTipText( "Confirmar" );
-    btnConfirmarCaixa.setFocusable( false );
-    btnConfirmarCaixa.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnConfirmarCaixa();
-        }
-      }
-    );
-    
-    btnCancelarCaixa = new JButton( new ImageIcon( Tela.class.getResource( "cancelar.png" ) ) );
-    btnCancelarCaixa.setBounds( 89, 5, 21, 21 );
-    btnCancelarCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    btnCancelarCaixa.setToolTipText( "Cancelar" );
-    btnCancelarCaixa.setFocusable( false );
-    btnCancelarCaixa.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnCancelarCaixa();
-        }
-      }
-    );
-    
-    pnlCaixas = new JPanel();
-    pnlCaixas.setBounds( 300, 30, 270, 100 );
-    pnlCaixas.setBorder( BorderFactory.createEtchedBorder() );
-    
-    // caixas model inicio
-    String[] colunasCaixas = { "Nome", "Saldo" };
-    Object[][] dadosCaixas = {};
-    
-    caixasModel = new DefaultTableModel( dadosCaixas, colunasCaixas );
-    caixasTable = new JTable( caixasModel )
-    {
+    class MyRenderer extends DefaultTableCellRenderer {
       @Override
-      public boolean isCellEditable(int rowIndex, int colIndex)
-      {
-        return( false ); //Disallow the editing of any cell
-      }
-    };
-    caixasTable.addMouseListener
-    (
-      new MouseAdapter()
-      {
-        @Override
-        public void mouseClicked( MouseEvent e )
+      public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column ) {
+        Component comp = super.getTableCellRendererComponent(table, value, hasFocus, hasFocus, row, column);
+        
+        if( row % 2 == 0 ) {
+          comp.setBackground( new Color( 202, 225, 255 ) );
+        }
+        else {
+          comp.setBackground( new Color( 254, 254, 254 ) );
+        }
+        
+        if( isSelected )
         {
-          AOCLICARpnlCaixas( e );
+          comp.setBackground( new Color( 185, 235, 132 ) );
+        }
+        
+        return( comp );
+      }
+    }
+    
+    this.contasTable.setDefaultRenderer( String.class, new MyRenderer() );
+    this.contasTable.setDefaultRenderer( Object.class, new MyRenderer() );
+  }
+  
+  private void criarModelCaixas() {
+    this.caixasModel = new CaixaModel();
+    this.caixasTable = new JTable();
+    this.caixasTable.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked( MouseEvent e ) {
+        if( e.getClickCount() == 1 ) {
+          comando = "CARREGAR_CAIXA_SELECIONADO";
         }
       }
-    );
+    });
     
-    pnlCaixas.setLayout( new BorderLayout() );
-    pnlCaixas.add( new JScrollPane( caixasTable ) );
+    this.caixasTable.setShowGrid( false );
+    this.caixasTable.getTableHeader().setReorderingAllowed( false );
+    this.caixasTable.getTableHeader().setResizingAllowed( false );
+    this.caixasTable.setBorder( BorderFactory.createEmptyBorder() );
+    this.caixasTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
+    this.caixasTable.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
+    this.caixasTable.setModel( this.caixasModel );
+    this.caixasTable.setAutoCreateRowSorter( true );
     
-    caixasTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
-    // alinhar a direita um JTable - http://stackoverflow.com/questions/3467052/how-to-set-right-alignment-in-jtable-cell
-    caixasTable.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
-    // caixas model fim
+    JScrollPane scroll = new JScrollPane();
+    scroll.setViewportView( this.caixasTable );
+    scroll.setBorder( BorderFactory.createEmptyBorder() );
     
-    pnlConfig = new JPanel();
-    pnlConfig.setLayout( null );
-    pnlConfig.setBounds( new Rectangle( 0, 0, 640, 420 ) );
-    pnlConfig.setName( "Configurações" );
-    pnlConfig.setBorder( BorderFactory.createEtchedBorder() );
-    pnlConfig.setFont( new Font( "Verdana", 0, 12 ) );
+    this.pnlCaixas.setLayout( new BorderLayout() );
+    this.pnlCaixas.add( scroll, BorderLayout.CENTER );
     
-    pnlBD = new JPanel();
-    pnlBD.setLayout( null );
-    pnlBD.setBounds( 20, 20, 590, 120 );
-    pnlBD.setBorder( BorderFactory.createEtchedBorder() );
-    pnlBD.setFont( new Font( "Verdana", 0, 12 ) );
+    this.caixasTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 148 ); // nome
+    this.caixasTable.getColumnModel().getColumn( 1 ).setPreferredWidth( 80 ); // saldo
+    this.caixasTable.getColumnModel().getColumn( 2 ).setPreferredWidth( 80 ); // saldo
     
-    lblBD = new JLabel( "Banco de Dados" );
-    lblBD.setBounds( 10, 10, 110, 21 );
-    lblBD.setFont( new Font( "Verdana", 0, 12 ) );
+    class MyRenderer extends DefaultTableCellRenderer {
+      @Override
+      public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column ) {
+        Component comp = super.getTableCellRendererComponent(table, value, hasFocus, hasFocus, row, column);
+        
+        if( row % 2 == 0 ) {
+          comp.setBackground( new Color( 202, 225, 255 ) );
+        }
+        else {
+          comp.setBackground( new Color( 254, 254, 254 ) );
+        }
+        
+        if( isSelected ) {
+          comp.setBackground( new Color( 185, 235, 132 ) );
+        }
+        
+        if( value instanceof Double ) {
+          ((JLabel) comp).setText( new DecimalFormat( "#,##0.00" ).format( (Double) value) );
+          ((JLabel) comp).setHorizontalAlignment( SwingConstants.RIGHT );
+        }
+        else {
+          ((JLabel) comp).setHorizontalAlignment( SwingConstants.LEFT );
+        }
+        
+        return( comp );
+      }
+    }
     
-    lblDiretorioBD = new JLabel( "Diretório:" );
-    lblDiretorioBD.setBounds( 20, 40, 60, 21 );
-    lblDiretorioBD.setFont( new Font( "Verdana", 0, 12 ) );
-    lblDiretorioBD.setHorizontalAlignment( JLabel.RIGHT );
+    this.caixasTable.setDefaultRenderer( String.class, new MyRenderer() );
+    this.caixasTable.setDefaultRenderer( Object.class, new MyRenderer() );
+    this.caixasTable.setDefaultRenderer( Double.class, new MyRenderer() );
+  }
+  
+  private void obterImagemPrograma() {
+    try {
+      setIconImage( new ImageIcon( Tela.class.getResource( "money.png" ) ).getImage() );
+    }
+    catch( Exception ex ) {
+      ex.printStackTrace();
+    }
+  }
+  private void initComponents() {
+    this.comando = "";
+
+    this.addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized( ComponentEvent e ) {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        pnlSuperior.setBounds(0, 0, getSize().width, 60);
+        tbpPainelAbas.setBounds( 0, 60, getSize().width, (screenSize.height - 60) );
+      }
+    });
     
-    txfDiretorioBD = new JTextField();
-    txfDiretorioBD.setBounds( 85, 40, 300, 21 );
-    txfDiretorioBD.setFont( new Font( "Verdana", 0, 12 ) );
+    this.pnlSuperior = new JPanel();
+    this.pnlSuperior.setBounds( new Rectangle( 0, 0, 640 , 60 ) );
+    this.pnlSuperior.setEnabled( true );
+    this.pnlSuperior.setLayout( null );
+    this.pnlSuperior.setName( "pnlSuperior" );
     
-    btnPesquisarDir = new JButton( new ImageIcon( Tela.class.getResource( "folder.png" ) ) );
-    btnPesquisarDir.setBounds( 390, 35, 30, 30 );
-    btnPesquisarDir.setFont( new Font( "Verdana", 0, 12 ) );
-    btnPesquisarDir.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnPesquisarDir();
+    this.tbpPainelAbas = new JTabbedPane();
+    this.tbpPainelAbas.setBounds( 0,60, 640, 420 );
+    this.tbpPainelAbas.setBorder( BorderFactory.createEtchedBorder() );
+    this.tbpPainelAbas.setFont( new Font( "Verdana", 0, 12 ) );
+    this.tbpPainelAbas.setName( "tbpPainelAbas" );
+    
+    this.pnlHome = new JPanel();
+    this.pnlHome.setLayout( null );
+    this.pnlHome.setBounds( new Rectangle( 0, 0, 640, 420 ) );
+    this.pnlHome.setName( "Home" );
+    this.pnlHome.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlHome.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    this.lblPeriodo = new JLabel( "Período:" );
+    this.lblPeriodo.setBounds( 80, 20, 60, 21 );
+    this.lblPeriodo.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblPeriodo.setName( "lblPeriodo" );
+    
+    this.btnMenosPeriodo = new JButton( new ImageIcon( getClass().getResource( "seta_e.png" ) ) );
+    this.btnMenosPeriodo.setBounds( 145, 20, 45, 21 );
+    this.btnMenosPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnMenosPeriodo.setFocusable( false );
+    this.btnMenosPeriodo.setName( "btnMenosPeriodo" );
+    this.btnMenosPeriodo.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "PERIODO_MENOS";
+      }
+    });
+    
+    this.dtcPeriodoIni = new JDateChooser();
+    this.dtcPeriodoIni.setBounds( 200, 20, 130, 21 );
+    this.dtcPeriodoIni.setFont( new Font( "Verdana", 0, 12 ) );
+    this.dtcPeriodoIni.setName( "dtcPeriodoIni" );
+    this.dtcPeriodoIni.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "ATUALIZAR_PERIODO";
+      }
+    });
+    
+    this.lblPeriodoA = new JLabel( "à" );
+    this.lblPeriodoA.setBounds( 340, 20, 15, 21 );
+    this.lblPeriodoA.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblPeriodoA.setHorizontalAlignment( JLabel.CENTER );
+    this.lblPeriodoA.setName( "lblPeriodoA" );
+    
+    this.dtcPeriodoFim = new JDateChooser();
+    this.dtcPeriodoFim.setBounds( 365, 20, 130, 21 );
+    this.dtcPeriodoFim.setFont( new Font( "Verdana", 0, 12 ) );
+    this.dtcPeriodoFim.setName( "dtcPeriodoFim" );
+    this.dtcPeriodoFim.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "ATUALIZAR_PERIODO";
+      }
+    });
+    
+    this.btnMaisPeriodo = new JButton( new ImageIcon( getClass().getResource( "seta_d.png" ) ) );
+    this.btnMaisPeriodo.setBounds( 500, 20, 45, 21 );
+    this.btnMaisPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnMaisPeriodo.setFocusable( false );
+    this.btnMaisPeriodo.setName( "btnMaisPeriodo" );
+    this.btnMaisPeriodo.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "PERIODO_MAIS";
+      }
+    });
+    
+    this.pnlResumoCaixa = new JPanel();
+    this.pnlResumoCaixa.setLayout( null );
+    this.pnlResumoCaixa.setBounds( 10, 10, 710, 240 );
+    this.pnlResumoCaixa.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlResumoCaixa.setName( "pnlResumoCaixa" );
+    
+    this.lblResumoCaixa = new JLabel( "Resumo Caixa (no Período)" );
+    this.lblResumoCaixa.setBounds( 265, 5, 180, 21 );
+    this.lblResumoCaixa.setHorizontalAlignment( JLabel.CENTER );
+    this.lblResumoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblResumoCaixa.setName( "lblResumoCaixa" );
+    
+    this.lblResNomeCaixa = new JLabel( "Caixa:" );
+    this.lblResNomeCaixa.setBounds( 10, 35, 120, 21 );
+    this.lblResNomeCaixa.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblResNomeCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblResNomeCaixa.setName( "lblResNomeCaixa" );
+    
+    this.cbxResCaixa = new JComboBox();
+    this.cbxResCaixa.setBounds( 135, 35, 170, 21 );
+    this.cbxResCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.cbxResCaixa.setName( "cbxResCaixa" );
+    
+    this.btnResCaixa = new JButton();
+    this.btnResCaixa.setIcon( new ImageIcon( Tela.class.getResource( "atualizar.png" ) ) );
+    this.btnResCaixa.setFocusable( false );
+    this.btnResCaixa.setBounds( 310, 30, 30, 30 );
+    this.btnResCaixa.setName( "btnResCaixa" );
+    this.btnResCaixa.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "RESUMO_CAIXA";
+      }
+    });
+
+    this.lblResSaldoCaixa = new JLabel( "Saldo:" );
+    this.lblResSaldoCaixa.setBounds( 80, 66, 50, 21 ); // x = 130
+    this.lblResSaldoCaixa.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblResSaldoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblResSaldoCaixa.setName( "lblResSaldoCaixa" );
+    
+    this.txfResValorSaldoCaixa = new JTextField( ValueTools.formatToField( 0.0 ) );
+    this.txfResValorSaldoCaixa.setBounds( 135, 66, 120, 21 );
+    this.txfResValorSaldoCaixa.setHorizontalAlignment( JLabel.RIGHT );
+    this.txfResValorSaldoCaixa.setFont( new Font( "Monospaced", 0, 12 ) );
+    this.txfResValorSaldoCaixa.setEditable( false );
+    this.txfResValorSaldoCaixa.setName( "txfResValorSaldoCaixa" );
+    
+    this.lblResSaldoCaixaLimite = new JLabel( "Saldo (C/Limite):" );
+    this.lblResSaldoCaixaLimite.setBounds( 10, 97, 120, 21 );
+    this.lblResSaldoCaixaLimite.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblResSaldoCaixaLimite.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblResSaldoCaixaLimite.setName( "lblResSaldoCaixaLimite" );
+    
+    this.txfResSaldoCaixaLimite = new JTextField( ValueTools.formatToField( 0.0 ) );
+    this.txfResSaldoCaixaLimite.setBounds( 135, 97, 120, 21 );
+    this.txfResSaldoCaixaLimite.setHorizontalAlignment( JLabel.RIGHT );
+    this.txfResSaldoCaixaLimite.setFont( new Font( "Monospaced", 0, 12 ) );
+    this.txfResSaldoCaixaLimite.setEditable( false );
+    this.txfResSaldoCaixaLimite.setName( "txfResSaldoCaixaLimite" );
+    
+    this.lblResTotEntrCaixa = new JLabel( "Total de Entradas: " );
+    this.lblResTotEntrCaixa.setBounds( 0, 128, 130, 21 ); // x = 130 - 97
+    this.lblResTotEntrCaixa.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblResTotEntrCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblResTotEntrCaixa.setName( "lblResTotEntrCaixa" );
+    
+    this.txfResValTotEntrCaixa = new JTextField( ValueTools.formatToField( 0.0 ) );
+    this.txfResValTotEntrCaixa.setBounds( 135, 128, 120, 21 ); // 97
+    this.txfResValTotEntrCaixa.setHorizontalAlignment( JLabel.RIGHT );
+    this.txfResValTotEntrCaixa.setFont( new Font( "Monospaced", 0, 12 ) );
+    this.txfResValTotEntrCaixa.setEditable( false );
+    this.txfResValTotEntrCaixa.setName( "txfResValTotEntrCaixa" );
+    
+    this.lblResTotSaidaCaixa = new JLabel( "Total de Saídas: " );
+    this.lblResTotSaidaCaixa.setBounds( 10, 159, 120, 21 ); // x = 130 - 128
+    this.lblResTotSaidaCaixa.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblResTotSaidaCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblResTotSaidaCaixa.setName( "lblResTotSaidaCaixa" );
+    
+    this.txfResValTotSaidaCaixa = new JTextField( ValueTools.formatToField( 0.0 ) );
+    this.txfResValTotSaidaCaixa.setBounds( 135, 159, 120, 21 ); // 128
+    this.txfResValTotSaidaCaixa.setHorizontalAlignment( JLabel.RIGHT );
+    this.txfResValTotSaidaCaixa.setFont( new Font( "Monospaced", 0, 12 ) );
+    this.txfResValTotSaidaCaixa.setEditable( false );
+    this.txfResValTotSaidaCaixa.setName( "txfResValTotSaidaCaixa" );
+    
+    this.ckbResumoCaixa = new JCheckBox( " Considerar provisões" );
+    this.ckbResumoCaixa.setBounds( 135, 190, 170, 21 ); // 159
+    this.ckbResumoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.ckbResumoCaixa.setName( "ckbResumoCaixa" );
+    
+    this.pnlGrafico = new ChartPanel( null );
+    this.pnlGrafico.setLayout( null );
+    this.pnlGrafico.setBounds( 370, 35, 260, 160 );
+    this.pnlGrafico.setName( "pnlGrafico" );
+    
+    this.pnlResumoConta = new JPanel();
+    this.pnlResumoConta.setLayout( null );
+    this.pnlResumoConta.setBounds( 10, 260, 710, 120 );
+    this.pnlResumoConta.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlResumoConta.setName( "pnlResumoConta" );
+    
+    this.lblResumoConta = new JLabel( "Resumo Conta (no Período)" );
+    this.lblResumoConta.setBounds( 265, 5, 180, 21 );
+    this.lblResumoConta.setHorizontalAlignment( JLabel.CENTER );
+    this.lblResumoConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblResumoConta.setName( "lblResumoConta" );
+    
+    this.lblResNomeConta = new JLabel( "Conta:" );
+    this.lblResNomeConta.setBounds( 30, 45, 50, 21 );
+    this.lblResNomeConta.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblResNomeConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblResNomeConta.setName( "lblResNomeConta" );
+    
+    this.cbxResConta = new JComboBox();
+    this.cbxResConta.setBounds( 85, 45, 230, 21 );
+    this.cbxResConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.cbxResConta.setName( "cbxResConta" );
+    
+    this.btnResConta = new JButton( new ImageIcon( Tela.class.getResource( "atualizar.png" ) ) );
+    this.btnResConta.setBounds( 320, 40, 30, 30 );
+    this.btnResConta.setFocusable( false );
+    this.btnResConta.setName( "btnResConta" );
+    this.btnResConta.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "RESUMO_CONTA";
+      }
+    });
+    
+    this.ckbResumoConta = new JCheckBox( " Considerar provisões" );
+    this.ckbResumoConta.setBounds( 85, 76, 200, 21 );
+    this.ckbResumoConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.ckbResumoConta.setName( "ckbResumoConta" );
+    
+    this.lblResMovContaPc = new JLabel( "Movim. no período (%):" );
+    this.lblResMovContaPc.setBounds( 380, 25, 170, 21 ); // x = 450
+    this.lblResMovContaPc.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblResMovContaPc.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblResMovContaPc.setName( "lblResMovContaPc" );
+    
+    this.txfResValorMovContaPc = new JTextField( ValueTools.formatToFieldPerc( 0.0) );
+    this.txfResValorMovContaPc.setBounds( 555, 25, 120, 21 );
+    this.txfResValorMovContaPc.setHorizontalAlignment( JLabel.RIGHT );
+    this.txfResValorMovContaPc.setFont( new Font( "Monospaced", 0, 12 ) );
+    this.txfResValorMovContaPc.setEditable( false );
+    this.txfResValorMovContaPc.setName( "txfResValorMovContaPc" );
+    
+    this.lblResMovContaRs = new JLabel( "Movim. no período (R$):" );
+    this.lblResMovContaRs.setBounds( 380, 55, 170, 21 ); // x = 450
+    this.lblResMovContaRs.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblResMovContaRs.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblResMovContaRs.setName( "lblResMovContaRs" );
+    
+    this.txfResValorMovContaRs = new JTextField( ValueTools.formatToField( 0.0 ) );
+    this.txfResValorMovContaRs.setBounds( 555, 55, 120, 21 );
+    this.txfResValorMovContaRs.setHorizontalAlignment( JLabel.RIGHT );
+    this.txfResValorMovContaRs.setFont( new Font( "Monospaced", 0, 12 ) );
+    this.txfResValorMovContaRs.setEditable( false );
+    this.txfResValorMovContaRs.setName( "txfResValorMovContaRs" );
+    
+    this.lblResMovContaAno = new JLabel( "Movimentou no ano:" );
+    this.lblResMovContaAno.setBounds( 380, 85, 170, 21 ); // x = 450
+    this.lblResMovContaAno.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblResMovContaAno.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblResMovContaAno.setName( "lblResMovContaAno" );
+    
+    this.txfResValorMovContaAno = new JTextField( ValueTools.formatToField( 0.0 ) );
+    this.txfResValorMovContaAno.setBounds( 555, 85, 120, 21 );
+    this.txfResValorMovContaAno.setHorizontalAlignment( JLabel.RIGHT );
+    this.txfResValorMovContaAno.setFont( new Font( "Monospaced", 0, 12 ) );
+    this.txfResValorMovContaAno.setEditable( false );
+    this.txfResValorMovContaAno.setName( "txfResValorMovContaAno" );
+    
+    this.pnlMovimento = new JPanel();
+    this.pnlMovimento.setLayout( null );
+    this.pnlMovimento.setBounds( new Rectangle( 0, 0, 640, 420 ) );
+    this.pnlMovimento.setName( "Movimentos" );
+    this.pnlMovimento.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlMovimento.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    this.tbpMovimento = new JTabbedPane();
+    this.tbpMovimento.setBorder( BorderFactory.createEtchedBorder() );
+    this.tbpMovimento.setBounds( 10, 10, 260, 370 );
+    this.tbpMovimento.setFont( new Font( "Verdana", 0, 12 ) );
+    this.tbpMovimento.setName( "tbpMovimento" );
+    
+    this.pnlCadastroMov = new JPanel();
+    this.pnlCadastroMov.setLayout( null );
+    this.pnlCadastroMov.setBounds( 10, 10, 260, 370 );
+    this.pnlCadastroMov.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlCadastroMov.setFont( new Font( "Verdana", 0, 12 ) );
+    this.pnlCadastroMov.setName( "pnlCadastroMov" );
+    
+    this.lblMovDescricao = new JLabel( "Descrição:" );
+    this.lblMovDescricao.setBounds( 15, 40, 70, 21 );
+    this.lblMovDescricao.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblMovDescricao.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblMovDescricao.setName( "lblMovDescricao" );
+    
+    this.txfMovDescricao = new JTextField();
+    this.txfMovDescricao.setBounds( 90, 40, 150, 21 );
+    this.txfMovDescricao.setFont( new Font( "Verdana", 0, 12 ) );
+    this.txfMovDescricao.setToolTipText( "Descrição do lançamento" );
+    this.txfMovDescricao.setName( "txfMovDescricao" );
+    this.txfMovDescricao.addKeyListener( new KeyAdapter() {
+      @Override
+      public void keyPressed( KeyEvent k ) {
+        if( k.getKeyCode() == KeyEvent.VK_ENTER ) {
+          mudarFoco( dtcMovData );
         }
       }
-    );
+    });
+    this.txfMovDescricao.addFocusListener( new FocusAdapter() {
+      @Override
+      public void focusGained( FocusEvent f ) {
+        txfMovDescricao.setBorder( BorderFactory.createLineBorder( Color.gray ) );
+      }
+    });
     
-    lblNomeBD = new JLabel( "Nome:" );
-    lblNomeBD.setBounds( 30, 70, 50, 21 );
-    lblNomeBD.setFont( new Font( "Verdana", 0, 12 ) );
-    lblNomeBD.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblMovData = new JLabel( "Data:" );
+    this.lblMovData.setBounds( 45, 71, 40, 21 );
+    this.lblMovData.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblMovData.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblMovData.setName( "lblMovData" );
     
-    txfNomeBD = new JTextField( "MyGoodMoney.db" );
-    txfNomeBD.setBounds( 85, 70, 120, 21 );
-    txfNomeBD.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    pnlGerBD = new JPanel();
-    pnlGerBD.setLayout( null );
-    pnlGerBD.setBounds( 20, 160, 590, 90 );
-    pnlGerBD.setBorder( BorderFactory.createEtchedBorder() );
-    pnlGerBD.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblGerBD = new JLabel( "Gerenciamento da base de dados:" );
-    lblGerBD.setBounds( 10, 10, 400, 21 );
-    lblGerBD.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    btnCriarBD = new JButton( "Criar BD" );
-    btnCriarBD.setBounds( 10, 40, 100, 21 );
-    btnCriarBD.setFont( new Font( "Verdana", 0, 12 ) );
-    btnCriarBD.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnCriarBD();
+    this.dtcMovData = new JDateChooser();
+    this.dtcMovData.setDate( new Date() );
+    this.dtcMovData.setBounds( 90, 71, 100, 21 );
+    this.dtcMovData.setFont( new Font( "Verdana", 0, 12 ) );
+    this.dtcMovData.setToolTipText( "Data do lançameneto" );
+    this.dtcMovData.setName( "dtcMovData" );
+    this.dtcMovData.getField().addKeyListener( new KeyAdapter() {
+      @Override
+      public void keyPressed( KeyEvent k ) {
+        if( k.getKeyCode() == KeyEvent.VK_ENTER ) {
+          mudarFoco( dbfMovValor );
         }
       }
-    );
+    });
     
-    btnLimparBD = new JButton( "Limpar BD" );
-    btnLimparBD.setBounds( 120, 40, 100, 21 );
-    btnLimparBD.setFont( new Font( "Verdana", 0, 12 ) );
-    btnLimparBD.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnLimparBD();
+    this.lblInfoData = new JLabel( new ImageIcon( Tela.class.getResource( "infoiconn.png" ) ) );
+    this.lblInfoData.setName( "lblInfoData" );
+    this.lblInfoData.setBounds( 200, 71, 21, 21 );
+    String infoData =
+     "<html>" +
+     "Informação:<br>" +
+     "Para lançamento à vista, preencher a data do pagamento.<br>" +
+     "Para lançamento provisionado, preencher a data de vencimento." +
+     "</html>";
+    this.lblInfoData.setToolTipText( infoData );
+    
+    this.lblMovValor = new JLabel( "Valor:" );
+    this.lblMovValor.setBounds( 35, 102, 50, 21 );
+    this.lblMovValor.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblMovValor.setName( "lblMovValor" );
+    this.lblMovValor.setHorizontalAlignment( JLabel.RIGHT );
+
+    this.dbfMovValor = new JDoubleField();
+    this.dbfMovValor.setBounds( 90, 102, 120, 21 );
+    this.dbfMovValor.setFont( new Font( "Monospaced", 0, 12 ) );
+    this.dbfMovValor.setToolTipText( "Valor do lançamento" );
+    this.dbfMovValor.setName( "dbfMovValor" );
+    this.dbfMovValor.addKeyListener( new KeyAdapter() {
+      @Override
+      public void keyPressed( KeyEvent k ) {
+        if( k.getKeyCode() == KeyEvent.VK_ENTER ) {
+          mudarFoco( cbxMovConta );
         }
       }
-    );
+    });
     
-    btnExcluirBD = new JButton( "Excluir BD" );
-    btnExcluirBD.setBounds( 230, 40, 100, 21 );
-    btnExcluirBD.setFont( new Font( "Verdana", 0, 12 ) );
-    btnExcluirBD.addActionListener
-    (
-      new ActionListener()
-      {
-        @Override
-        public void actionPerformed( ActionEvent e )
-        {
-          AOCLICARbtnExcluirBD();
+    this.lblMovConta = new JLabel( "Conta:" );
+    this.lblMovConta.setBounds( 35, 133, 50, 21 );
+    this.lblMovConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblMovConta.setName( "lblMovConta" );
+    this.lblMovConta.setHorizontalAlignment( JLabel.RIGHT );
+    
+    this.cbxMovConta = new JComboBox();
+    this.cbxMovConta.setBounds( 90, 133, 150, 21 );
+    this.cbxMovConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.cbxMovConta.setToolTipText( "Escolha uma conta" );
+    this.cbxMovConta.setName( "cbxMovConta" );
+    this.cbxMovConta.addKeyListener( new KeyAdapter() {
+      @Override
+      public void keyPressed( KeyEvent k ) {
+        if( k.getKeyCode() == KeyEvent.VK_ENTER ) {
+          mudarFoco( cbxMovCaixa );
         }
       }
+    });
+    this.cbxMovConta.addFocusListener( new FocusAdapter() {
+      @Override
+      public void focusGained( FocusEvent f ) {
+        cbxMovConta.setBorder( BorderFactory.createLineBorder( Color.gray ) );
+      }
+    });
+    
+    this.lblMovCaixa = new JLabel( "Caixa:" );
+    this.lblMovCaixa.setBounds( 35, 164, 50, 21 );
+    this.lblMovCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblMovCaixa.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblMovCaixa.setName( "lblMovCaixa" );
+    
+    this.cbxMovCaixa = new JComboBox();
+    this.cbxMovCaixa.setBounds( 90, 164, 150, 21 );
+    this.cbxMovCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.cbxMovCaixa.setToolTipText( "Escolha um caixa" );
+    this.cbxMovCaixa.setName( "cbxMovCaixa" );
+    this.cbxMovCaixa.addKeyListener( new KeyAdapter() {
+      @Override
+      public void keyPressed( KeyEvent k ) {
+        if( k.getKeyCode() == KeyEvent.VK_ENTER ) {
+          mudarFoco( ckbMovPago );
+        }
+      }
+    });
+    this.cbxMovCaixa.addFocusListener( new FocusAdapter() {
+      @Override
+      public void focusGained( FocusEvent f ) {
+        cbxMovCaixa.setBorder( BorderFactory.createLineBorder( Color.gray ) );
+      }
+    });
+    
+    this.ckbMovPago = new JCheckBox( "Pago/Recebido" );
+    this.ckbMovPago.setSelected( false );
+    this.ckbMovPago.setBounds( 86, 192, 130, 21 );
+    this.ckbMovPago.setFont( new Font( "Verdana", 0, 12 ) );
+    this.ckbMovPago.setToolTipText( "Desmarcar para um lançamento futuro" );
+    this.ckbMovPago.setName( "ckbMovPago" );
+    this.ckbMovPago.addKeyListener( new KeyAdapter() {
+      @Override
+      public void keyPressed( KeyEvent k ) {
+        if( k.getKeyCode() == KeyEvent.VK_ENTER ) {
+          mudarFoco( rbtMovRecorrenciaNao );
+        }
+      }
+    });
+    
+    this.lblMovRecorrencia = new JLabel( "Recorrência:" );
+    this.lblMovRecorrencia.setBounds( 5, 216, 80, 21 );
+    this.lblMovRecorrencia.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblMovRecorrencia.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblMovRecorrencia.setName( "lblMovRecorrencia" );
+    
+    this.rbtMovRecorrenciaSim = new JRadioButton( "Sim" );
+    this.rbtMovRecorrenciaSim.setSelected( false );
+    this.rbtMovRecorrenciaSim.setBounds( 86, 216, 50, 21 );
+    this.rbtMovRecorrenciaSim.setFont( new Font( "Verdana", 0, 12 ) );
+    this.rbtMovRecorrenciaSim.setName( "rbtMovRecorrenciaSim" );
+    this.rbtMovRecorrenciaSim.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if( rbtMovRecorrenciaSim.isSelected() )
+          habilitarRecorrencia( rbtMovRecorrenciaSim.isSelected() );
+      }
+    });
+    
+    this.rbtMovRecorrenciaNao = new JRadioButton( "Não" );
+    this.rbtMovRecorrenciaNao.setSelected( true );
+    this.rbtMovRecorrenciaNao.setBounds( 140, 216, 50, 21 );
+    this.rbtMovRecorrenciaNao.setFont( new Font( "Verdana", 0, 12 ) );
+    this.rbtMovRecorrenciaNao.setName( "rbtMovRecorrenciaNao" );
+    this.rbtMovRecorrenciaNao.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        if( rbtMovRecorrenciaNao.isSelected() ) {
+          habilitarRecorrencia( !rbtMovRecorrenciaNao.isSelected() );
+        }
+      }
+    });
+    this.rbtMovRecorrenciaNao.addKeyListener( new KeyAdapter() {
+      @Override
+      public void keyPressed( KeyEvent e ) {
+        if( e.getKeyCode() == KeyEvent.VK_ENTER ) {
+          btnMovConfirmar.doClick();
+        }
+      }
+    });
+    
+    ButtonGroup grupoMov = new ButtonGroup();
+    grupoMov.add( this.rbtMovRecorrenciaSim );
+    grupoMov.add( this.rbtMovRecorrenciaNao );
+    
+    this.lblRepetir = new JLabel( "Repetir" );
+    this.lblRepetir.setBounds( 10, 247, 50, 21 );
+    this.lblRepetir.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblRepetir.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblRepetir.setName( "lblRepetir" );
+    
+    this.itfNumVezes = new JIntegerField();
+    this.itfNumVezes.setBounds( 65, 247, 40, 21 );
+    this.itfNumVezes.setFont( new Font( "Verdana", 0, 12 ) );
+    this.itfNumVezes.setName( "itfNumVezes" );
+    
+    this.lblVezes = new JLabel( "vezes" );
+    this.lblVezes.setBounds( 110, 247, 40, 21 );
+    this.lblVezes.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblVezes.setName( "lblVezes" );
+    
+    this.lblACada = new JLabel( "A cada");
+    this.lblACada.setBounds( 10, 278, 50, 21 );
+    this.lblACada.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblACada.setHorizontalAlignment( JLabel.CENTER );
+    this.lblACada.setName( "lblACada" );
+    
+    this.itfNumPeriodo = new JIntegerField();
+    this.itfNumPeriodo.setBounds( 65, 278, 40, 21 );
+    this.itfNumPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
+    this.itfNumPeriodo.setName( "itfNumPeriodo" );
+
+    this.cbxPeriodo = new JComboBox();
+    this.cbxPeriodo.setBounds( 110, 278, 110, 21 );
+    this.cbxPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
+    this.cbxPeriodo.setName( "cbxPeriodo" );
+    for( EnumPeriodo periodo : EnumPeriodo.values() ) {
+      this.cbxPeriodo.addItem( periodo );
+    }
+
+    this.btnMovAdd = new JButton( new ImageIcon( Tela.class.getResource( "incluir.png" ) ) );
+    this.btnMovAdd.setBounds( 5, 5, 30, 30 );
+    this.btnMovAdd.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnMovAdd.setToolTipText( "Novo" );
+    this.btnMovAdd.setFocusable( false );
+    this.btnMovAdd.setName( "btnMovAdd" );
+    this.btnMovAdd.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "INCLUIR_LANCAMENTO";
+      }
+    });
+
+    this.btnMovEditar = new JButton( new ImageIcon( Tela.class.getResource( "editar.png" ) ) );
+    this.btnMovEditar.setBounds( 35, 5, 30, 30 );
+    this.btnMovEditar.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnMovEditar.setToolTipText( "Alterar" );
+    this.btnMovEditar.setFocusable( false );
+    this.btnMovEditar.setName( "btnMovEditar" );
+    this.btnMovEditar.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "ALTERAR_LANCAMENTO";
+      }
+    });
+
+    this.btnMovExcluir = new JButton( new ImageIcon( Tela.class.getResource( "deletar.gif" ) ) );
+    this.btnMovExcluir.setBounds( 65, 5, 30, 30 );
+    this.btnMovExcluir.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnMovExcluir.setToolTipText( "Excluir" );
+    this.btnMovExcluir.setFocusable( false );
+    this.btnMovExcluir.setName( "btnMovExcluir" );
+    this.btnMovExcluir.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "EXCLUIR_LANCAMENTO";
+      }
+    });
+    
+    this.btnMovConfirmar = new JButton( new ImageIcon( Tela.class.getResource( "confirmar.png" ) ) );
+    this.btnMovConfirmar.setBounds( 95, 5, 30, 30 );
+    this.btnMovConfirmar.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnMovConfirmar.setToolTipText( "Confirmar" );
+    this.btnMovConfirmar.setFocusable( false );
+    this.btnMovConfirmar.setName( "btnMovConfirmar" );
+    this.btnMovConfirmar.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "CONFIRMAR_LANCAMENTO";
+      }
+    });
+
+    this.btnMovCancelar = new JButton( new ImageIcon( Tela.class.getResource( "cancelar.png" ) ) );
+    this.btnMovCancelar.setBounds( 125, 5, 30, 30 );
+    this.btnMovCancelar.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnMovCancelar.setToolTipText( "Cancelar" );
+    this.btnMovCancelar.setFocusable( false );
+    this.btnMovCancelar.setName( "btnMovCancelar" );
+    this.btnMovCancelar.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "CANCELAR_LANCAMENTO_SELECIONADO";
+      }
+    });
+    
+    this.pnlTransferencia = new JPanel();
+    this.pnlTransferencia.setLayout( null );
+    this.pnlTransferencia.setName( "pnlTransferencia" );
+    
+    this.btnTransfAdd = new JButton( new ImageIcon( Tela.class.getResource( "incluir.png" ) ) );
+    this.btnTransfAdd.setBounds( 5, 5, 30, 30 );
+    this.btnTransfAdd.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnTransfAdd.setToolTipText( "Novo" );
+    this.btnTransfAdd.setFocusable( false );
+    this.btnTransfAdd.setName( "btnTransfAdd" );
+    this.btnTransfAdd.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "INCLUIR_TRANSFERENCIA";
+      }
+    });
+    
+    this.btnTransfConfirmar = new JButton( new ImageIcon( Tela.class.getResource( "confirmar.png" ) ) );
+    this.btnTransfConfirmar.setBounds( 35, 5, 30, 30 );
+    this.btnTransfConfirmar.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnTransfConfirmar.setToolTipText( "Confirmar" );
+    this.btnTransfConfirmar.setFocusable( false );
+    this.btnTransfConfirmar.setName( "btnTransfConfirmar" );
+    this.btnTransfConfirmar.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "CONFIRMAR_TRANSFERENCIA";
+      }
+    });
+
+    this.btnTransfCancelar = new JButton( new ImageIcon( Tela.class.getResource( "cancelar.png" ) ) );
+    this.btnTransfCancelar.setBounds( 65, 5, 30, 30 );
+    this.btnTransfCancelar.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnTransfCancelar.setToolTipText( "Cancelar" );
+    this.btnTransfCancelar.setFocusable( false );
+    this.btnTransfCancelar.setName( "btnTransfCancelar" );
+    this.btnTransfCancelar.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "CANCELAR_TRANSFERENCIA";
+      }
+    });
+    
+    this.lblTransfCaixaOrigem = new JLabel( "Origem:" );
+    this.lblTransfCaixaOrigem.setBounds( 15, 40, 70, 21 );
+    this.lblTransfCaixaOrigem.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblTransfCaixaOrigem.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblTransfCaixaOrigem.setName( "lblTransfCaixaOrigem" );
+
+    this.cbxTransfCaixaOrigem = new JComboBox();
+    this.cbxTransfCaixaOrigem.setBounds( 90, 40, 150, 21 );
+    this.cbxTransfCaixaOrigem.setFont( new Font( "Verdana", 0, 12 ) );
+    this.cbxTransfCaixaOrigem.setEditable( false );
+    this.cbxTransfCaixaOrigem.setName( "cbxTransfCaixaOrigem" );
+    
+    this.lblTransfCaixaDestino = new JLabel( "Destino:" );
+    this.lblTransfCaixaDestino.setBounds( 25, 71, 60, 21 );
+    this.lblTransfCaixaDestino.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblTransfCaixaDestino.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblTransfCaixaDestino.setName( "lblTransfCaixaDestino" );
+    
+    this.cbxTransfCaixaDestino = new JComboBox();
+    this.cbxTransfCaixaDestino.setBounds( 90, 71, 150, 21 );
+    this.cbxTransfCaixaDestino.setFont( new Font( "Verdana", 0, 12 ) );
+    this.cbxTransfCaixaDestino.setEditable( false );
+    this.cbxTransfCaixaDestino.setName( "cbxTransfCaixaDestino" );
+    
+    this.lblTransfDescricao = new JLabel( "Descrição:" );
+    this.lblTransfDescricao.setBounds( 15, 102, 70, 21 );
+    this.lblTransfDescricao.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblTransfDescricao.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblTransfDescricao.setName( "lblTransfDescricao" );
+    
+    this.txfTransfDescricao = new JTextField();
+    this.txfTransfDescricao.setBounds( 90, 102, 150, 21 );
+    this.txfTransfDescricao.setFont( new Font( "Verdana", 0, 12 ) );
+    this.txfTransfDescricao.setName( "txfTransfDescricao" );
+    
+    this.lblTransfData = new JLabel( "Data:" );
+    this.lblTransfData.setBounds( 25, 133, 60, 21 );
+    this.lblTransfData.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblTransfData.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblTransfData.setName( "lblTransfData" );
+    
+    this.dtcTransfData = new JDateChooser();
+    this.dtcTransfData.setBounds( 90, 133, 100, 21 );
+    this.dtcTransfData.setFont( new Font( "Verdana", 0, 12 ) );
+    this.dtcTransfData.setName( "dtcTransfData" );
+    
+    this.lblTransfValor = new JLabel( "Valor:" );
+    this.lblTransfValor.setBounds( 45, 164, 40, 21 );
+    this.lblTransfValor.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblTransfValor.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblTransfValor.setName( "lblTransfValor" );
+    
+    this.dbfTransfValor = new JDoubleField();
+    this.dbfTransfValor.setBounds( 90, 164, 120, 21 );
+    this.dbfTransfValor.setFont( new Font( "Monospaced", 0, 12 ) );
+    this.dbfTransfValor.setName( "dbfTransfValor" );
+    
+    this.ckbTransf = new JCheckBox( "Transferido" );
+    this.ckbTransf.setBounds( 86, 195, 120, 21 );
+    this.ckbTransf.setFont( new Font( "Verdana", 0, 12 ) );
+    this.ckbTransf.setName( "ckbTransf" );
+    
+    this.pnlLancamentoMov = new JPanel();
+    this.pnlLancamentoMov.setLayout( null );
+    this.pnlLancamentoMov.setBounds( 280, 10, 440, 370 );
+    this.pnlLancamentoMov.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlLancamentoMov.setFont( new Font( "Verdana", 0, 12 ) );
+    this.pnlLancamentoMov.setName( "pnlLancamentoMov" );
+    
+    this.pnlExtratos = new JPanel();
+    this.pnlExtratos.setLayout( null );
+    this.pnlExtratos.setBounds( new Rectangle( 0, 0, 640, 420 ) );
+    this.pnlExtratos.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlExtratos.setFont( new Font( "Verdana", 0, 12 ) );
+    this.pnlExtratos.setName( "Extratos" );
+    
+    this.pnlExtrato = new JPanel();
+    this.pnlExtrato.setLayout( null );
+    this.pnlExtrato.setBounds( new Rectangle( 10, 10, 710, 370 ) );
+    this.pnlExtrato.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlExtrato.setFont( new Font( "Verdana", 0, 12 ) );
+    this.pnlExtrato.setName( "pnlExtrato" );
+    
+    this.lblExtratoConta = new JLabel( "Conta:" );
+    this.lblExtratoConta.setBounds( 60, 15, 45, 21 );
+    this.lblExtratoConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblExtratoConta.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblExtratoConta.setName( "lblExtratoConta" );
+    
+    this.cbxExtratoConta = new JComboBox();
+    this.cbxExtratoConta.setBounds( 110, 15, cbxMovConta.getWidth(), 21 );
+    this.cbxExtratoConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.cbxExtratoConta.setName( "cbxExtratoConta" );
+    
+    this.lblExtratoPeriodo = new JLabel( "Período: " );
+    this.lblExtratoPeriodo.setBounds( 270, 15, 60, 21 );
+    this.lblExtratoPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblExtratoPeriodo.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblExtratoPeriodo.setName( "lblExtratoPeriodo" );
+    
+    this.dtcExtratoIni = new JDateChooser();
+    this.dtcExtratoIni.setBounds( 340, 15, 110, 21 );
+    this.dtcExtratoIni.setFont( new Font( "Verdana", 0, 12 ) );
+    this.dtcExtratoIni.setDate( new Date() );
+    this.dtcExtratoIni.setName( "dtcExtratoIni" );
+    
+    this.lblExtratoHifen = new JLabel( "-" );
+    this.lblExtratoHifen.setBounds( 460, 15, 15, 21 );
+    this.lblExtratoHifen.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblExtratoHifen.setHorizontalAlignment( JLabel.CENTER );
+    this.lblExtratoHifen.setName( "lblExtratoHifen" );
+    
+    this.dtcExtratoFim = new JDateChooser();
+    this.dtcExtratoFim.setBounds( 485, 15, 110, 21 );
+    this.dtcExtratoFim.setFont( new Font( "Verdana", 0, 12 ) );
+    this.dtcExtratoFim.setDate( new Date() );
+    this.dtcExtratoFim.setName( "dtcExtratoFim" );
+    
+    this.btnExtrato = new JButton( new ImageIcon( Tela.class.getResource( "confirmar.png" ) ) );
+    this.btnExtrato.setBounds( 610, 10, 30, 30 );
+    this.btnExtrato.setFocusable( false );
+    this.btnExtrato.setName( "btnExtrato" );
+    this.btnExtrato.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "SOLICITAR_EXTRATO";
+      }
+    });
+    
+    this.ckbExtratoProvisao = new JCheckBox( " Considerar provisões" );
+    this.ckbExtratoProvisao.setBounds( 270, 42, 200, 21 );
+    this.ckbExtratoProvisao.setFont( new Font( "Verdana", 0, 12 ) );
+    this.ckbExtratoProvisao.setName( "ckbExtratoProvisao" );
+    
+    this.txtExtrato = new JTextPane();
+    this.txtExtrato.setFont( new Font( "Monospaced", 0, 12 ) );
+    this.txtExtrato.setEditable( false );
+    this.txtExtrato.setBackground( pnlSuperior.getBackground() );
+    this.txtExtrato.setName( "txtExtrato" );
+    
+    this.scbExtratoConta = new JScrollPane( txtExtrato );
+    this.scbExtratoConta.setBounds( 30, 70, 640, 260 );
+    this.scbExtratoConta.setName( "scbExtratoConta" );
+    
+    this.pnlCadastros = new JPanel();
+    this.pnlCadastros.setLayout( null );
+    this.pnlCadastros.setBounds( new Rectangle( 0, 0, 740, 420 ) );
+    this.pnlCadastros.setName( "Cadastros" );
+    this.pnlCadastros.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlCadastros.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    this.pnlCadConta = new JPanel();
+    this.pnlCadConta.setLayout( null );
+    this.pnlCadConta.setBounds( new Rectangle( 20, 20, pnlCadastros.getWidth()-50, (pnlCadastros.getHeight()/2)-30 ) );
+    this.pnlCadConta.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlCadConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.pnlCadConta.setName( "pnlCadConta" );
+    
+    this.lblAddConta = new JLabel( "Contas Cadastradas:" );
+    this.lblAddConta.setBounds( 350, 5, 150, 21 );
+    this.lblAddConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblAddConta.setName( "lblAddConta" );
+    
+    this.lblNomeConta = new JLabel( "Nome:" );
+    this.lblNomeConta.setBounds( 10, 40, 45, 21 );
+    this.lblNomeConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblNomeConta.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblNomeConta.setName( "lblNomeConta" );
+    
+    this.txfNomeConta = new JTextField();
+    this.txfNomeConta.setBounds( 60, 40, 150, 21 );
+    this.txfNomeConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.txfNomeConta.setName( "txfNomeConta" );
+    
+    this.lblTipoConta = new JLabel( "Tipo:" );
+    this.lblTipoConta.setBounds( 10, 70, 45, 21 );
+    this.lblTipoConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblTipoConta.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblTipoConta.setName( "lblTipoConta" );
+    
+    this.cbxTipoConta = new JComboBox();
+    this.cbxTipoConta.setBounds( 60, 70, 100, 21 );
+    this.cbxTipoConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.cbxTipoConta.setName( "cbxTipoConta" );
+    for( EnumTipoConta tipo : EnumTipoConta.values() ) {
+      cbxTipoConta.addItem( tipo );
+    }
+
+    this.btnAddConta = new JButton( new ImageIcon( Tela.class.getResource( "incluir.png" ) ) );
+    this.btnAddConta.setBounds( 5, 5, 30, 30 );
+    this.btnAddConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnAddConta.setToolTipText( "Novo" );
+    this.btnAddConta.setFocusable( false );
+    this.btnAddConta.setName( "btnAddConta" );
+    this.btnAddConta.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "INCLUIR_CONTA";
+      }
+    });
+    
+    this.btnEditarConta = new JButton( new ImageIcon( Tela.class.getResource( "editar.png" ) ) );
+    this.btnEditarConta.setBounds( 35, 5, 30, 30 );
+    this.btnEditarConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnEditarConta.setToolTipText( "Alterar" );
+    this.btnEditarConta.setFocusable( false );
+    this.btnEditarConta.setName( "btnEditarConta" );
+    this.btnEditarConta.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "ALTERAR_CONTA";
+      }
+    });
+    
+    this.btnExcluirConta = new JButton( new ImageIcon( Tela.class.getResource( "deletar.gif" ) ) );
+    this.btnExcluirConta.setBounds( 65, 5, 30, 30 );
+    this.btnExcluirConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnExcluirConta.setToolTipText( "Excluir" );
+    this.btnExcluirConta.setFocusable( false );
+    this.btnExcluirConta.setName( "btnExcluirConta" );
+    this.btnExcluirConta.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "EXCLUIR_CONTA";
+      }
+    });
+    
+    this.btnConfirmarConta = new JButton( new ImageIcon( Tela.class.getResource( "confirmar.png" ) ) );
+    this.btnConfirmarConta.setBounds( 95, 5, 30, 30 );
+    this.btnConfirmarConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnConfirmarConta.setToolTipText( "Confirmar" );
+    this.btnConfirmarConta.setFocusable( false );
+    this.btnConfirmarConta.setName( "btnConfirmarConta" );
+    this.btnConfirmarConta.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "CONFIRMAR_CONTA";
+      }
+    });
+    
+    this.btnCancelarConta = new JButton( new ImageIcon( Tela.class.getResource( "cancelar.png" ) ) );
+    this.btnCancelarConta.setBounds( 125, 5, 30, 30 );
+    this.btnCancelarConta.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnCancelarConta.setToolTipText( "Cancelar" );
+    this.btnCancelarConta.setFocusable( false );
+    this.btnCancelarConta.setName( "btnCancelarConta" );
+    this.btnCancelarConta.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "CANCELAR_CONTA";
+      }
+    });
+    
+    this.pnlContas = new JPanel();
+    this.pnlContas.setBounds( 350, 30, 270, 130 );
+    this.pnlContas.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlContas.setName( "pnlContas" );
+    
+    this.pnlCadCaixa = new JPanel();
+    this.pnlCadCaixa.setLayout( null );
+    this.pnlCadCaixa.setBounds( new Rectangle( 20, pnlCadConta.getHeight()+40, pnlCadastros.getWidth()-50, (pnlCadastros.getHeight()/2)-50 ) );
+    this.pnlCadCaixa.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlCadCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.pnlCadCaixa.setName( "pnlCadCaixa" );
+    
+    this.lblAddCaixa = new JLabel( "Caixas cadastrados:" );
+    this.lblAddCaixa.setBounds( 350, 5, 150, 21 );
+    this.lblAddCaixa.setName( "lblAddCaixa" );
+    this.lblAddCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    this.lblNomeCaixa = new JLabel( "Nome:" );
+    this.lblNomeCaixa.setBounds( 10, 40, 45, 21 );
+    this.lblNomeCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblNomeCaixa.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblNomeCaixa.setName( "lblNomeCaixa" );
+    
+    this.txfNomeCaixa = new JTextField();
+    this.txfNomeCaixa.setBounds( 60, 40, 150, 21 );
+    this.txfNomeCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.txfNomeCaixa.setName( "txfNomeCaixa" );
+    
+    this.lblSaldoInicial = new JLabel( "Saldo:" );
+    this.lblSaldoInicial.setBounds( 10, 70, 45, 21 );
+    this.lblSaldoInicial.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblSaldoInicial.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblSaldoInicial.setName( "lblSaldoInicial" );
+
+    this.dbfSaldoInicialCaixa = new JDoubleField();
+    this.dbfSaldoInicialCaixa.setBounds( 60, 70, 100, 21 );
+    this.dbfSaldoInicialCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.dbfSaldoInicialCaixa.setName( "dbfSaldoInicialCaixa" );
+    
+    this.lblTipoCaixa = new JLabel( "Tipo:" );
+    this.lblTipoCaixa.setBounds( 10, 100, 45, 21 );
+    this.lblTipoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblTipoCaixa.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblTipoCaixa.setName( "lblTipoCaixa" );
+    
+    this.rbtTipoCaixaCartao = new JRadioButton( "Cartão/Banco" );
+    this.rbtTipoCaixaCartao.setBounds( 60, 100, 120, 21 );
+    this.rbtTipoCaixaCartao.setFont( new Font( "Verdana", 0, 12 ) );
+    this.rbtTipoCaixaCartao.setToolTipText( "Tipo cartão de crédito ou conta bancária." );
+    this.rbtTipoCaixaCartao.setSelected( false );
+    this.rbtTipoCaixaCartao.setName( "rbtTipoCaixaCartao" );
+    this.rbtTipoCaixaCartao.addActionListener( new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent ae ) {
+        dbfValorLimite.setEnabled( true );
+      }
+    });
+    
+    this.rbtTipoCaixaNormal = new JRadioButton( "Normal" );
+    this.rbtTipoCaixaNormal.setBounds( 185, 100, 70, 21 );
+    this.rbtTipoCaixaNormal.setFont( new Font( "Verdana", 0, 12 ) );
+    this.rbtTipoCaixaNormal.setToolTipText( "Tipo caixa normal." );
+    this.rbtTipoCaixaNormal.setSelected( true );
+    this.rbtTipoCaixaNormal.setName( "rbtTipoCaixaNormal" );
+    this.rbtTipoCaixaNormal.addActionListener( new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent ae ) {
+        dbfValorLimite.setValue( 0.0 );
+        dbfValorLimite.setEnabled( false );
+      }
+    });
+    
+    ButtonGroup bgroup = new ButtonGroup();
+    bgroup.add( this.rbtTipoCaixaCartao );
+    bgroup.add( this.rbtTipoCaixaNormal );
+    
+    this.lblValorLimite = new JLabel( "Limite:" );
+    this.lblValorLimite.setBounds( 5, 130, 50, 21 );
+    this.lblValorLimite.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblValorLimite.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblValorLimite.setName( "lblValorLimite" );
+    
+    this.dbfValorLimite = new JDoubleField();
+    this.dbfValorLimite.setBounds( 60, 130, 100, 21 );
+    this.dbfValorLimite.setFont( new Font( "Verdana", 0, 12 ) );
+    this.dbfValorLimite.setName( "dbfValorLimite" );
+    
+    this.btnAddCaixa = new JButton( new ImageIcon( Tela.class.getResource( "incluir.png" ) ) );
+    this.btnAddCaixa.setBounds( 5, 5, 30, 30 );
+    this.btnAddCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnAddCaixa.setToolTipText( "Novo" );
+    this.btnAddCaixa.setFocusable( false );
+    this.btnAddCaixa.setName( "btnAddCaixa" );
+    this.btnAddCaixa.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "INCLUIR_CAIXA";
+      }
+    });
+    
+    this.btnEditarCaixa = new JButton( new ImageIcon( Tela.class.getResource( "editar.png" ) ) );
+    this.btnEditarCaixa.setBounds( 35, 5, 30, 30 );
+    this.btnEditarCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnEditarCaixa.setToolTipText( "Alterar" );
+    this.btnEditarCaixa.setFocusable( false );
+    this.btnEditarCaixa.setName( "btnEditarCaixa" );
+    this.btnEditarCaixa.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "ALTERAR_CAIXA";
+      }
+    });
+    
+    this.btnExcluirCaixa = new JButton( new ImageIcon( Tela.class.getResource( "deletar.gif" ) ) );
+    this.btnExcluirCaixa.setBounds( 65, 5, 30, 30 );
+    this.btnExcluirCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnExcluirCaixa.setToolTipText( "Excluir" );
+    this.btnExcluirCaixa.setFocusable( false );
+    this.btnExcluirCaixa.setName( "btnExcluirCaixa" );
+    this.btnExcluirCaixa.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "EXCLUIR_CAIXA";
+      }
+    });
+    
+    this.btnConfirmarCaixa = new JButton( new ImageIcon( Tela.class.getResource( "confirmar.png" ) ) );
+    this.btnConfirmarCaixa.setBounds( 95, 5, 30, 30 );
+    this.btnConfirmarCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnConfirmarCaixa.setToolTipText( "Confirmar" );
+    this.btnConfirmarCaixa.setFocusable( false );
+    this.btnConfirmarCaixa.setName( "btnConfirmarCaixa" );
+    this.btnConfirmarCaixa.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "CONFIRMAR_CAIXA";
+      }
+    });
+    
+    this.btnCancelarCaixa = new JButton( new ImageIcon( Tela.class.getResource( "cancelar.png" ) ) );
+    this.btnCancelarCaixa.setBounds( 125, 5, 30, 30 );
+    this.btnCancelarCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+    this.btnCancelarCaixa.setToolTipText( "Cancelar" );
+    this.btnCancelarCaixa.setFocusable( false );
+    this.btnCancelarCaixa.setName( "btnCancelarCaixa" );
+    this.btnCancelarCaixa.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed( ActionEvent e ) {
+        comando = "CANCELAR_CAIXA";
+      }
+    });
+    
+    this.pnlCaixas = new JPanel();
+    this.pnlCaixas.setBounds( 320, 30, 330, 100 );
+    this.pnlCaixas.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlCaixas.setName( "pnlCaixas" );
+    
+    this.pnlConfig = new JPanel();
+    this.pnlConfig.setLayout( null );
+    this.pnlConfig.setBounds( new Rectangle( 0, 0, 740, 420 ) );
+    this.pnlConfig.setName( "Configurações" );
+    this.pnlConfig.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlConfig.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    this.pnlBD = new JPanel();
+    this.pnlBD.setLayout( null );
+    this.pnlBD.setBounds( 20, 20, 690, 120 );
+    this.pnlBD.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlBD.setFont( new Font( "Verdana", 0, 12 ) );
+    this.pnlBD.setName( "pnlBD" );
+    
+    this.lblBD = new JLabel( "Banco de Dados" );
+    this.lblBD.setBounds( 10, 10, 110, 21 );
+    this.lblBD.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblBD.setName( "lblBD" );
+    
+    this.lblDiretorioBD = new JLabel( "Diretório:" );
+    this.lblDiretorioBD.setBounds( 20, 40, 60, 21 );
+    this.lblDiretorioBD.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblDiretorioBD.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblDiretorioBD.setName( "lblDiretorioBD" );
+    
+    String caminho = new File( System.getenv( "APPDATA" ) ).getAbsolutePath();
+    this.txfDiretorioBD = new JTextField( caminho + "\\" );
+    this.txfDiretorioBD.setBounds( 85, 40, 600, 21 );
+    this.txfDiretorioBD.setFont( new Font( "Verdana", 0, 12 ) );
+    this.txfDiretorioBD.setEditable( false );
+    this.txfDiretorioBD.setName( "txfDiretorioBD" );
+    
+    this.lblNomeBD = new JLabel( "Nome:" );
+    this.lblNomeBD.setBounds( 30, 70, 50, 21 );
+    this.lblNomeBD.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblNomeBD.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblNomeBD.setName( "lblNomeBD" );
+    
+    this.txfNomeBD = new JTextField( "MyGoodMoney.db" );
+    this.txfNomeBD.setBounds( 85, 70, 120, 21 );
+    this.txfNomeBD.setFont( new Font( "Verdana", 0, 12 ) );
+    this.txfNomeBD.setEditable( false );
+    this.txfNomeBD.setName( "txfNomeBD" );
+    
+    this.pnlSobre = new JPanel();
+    this.pnlSobre.setLayout( null );
+    this.pnlSobre.setBounds( new Rectangle( 0, 0, 740, 420 ) );
+    this.pnlSobre.setName( "Sobre" );
+    this.pnlSobre.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlSobre.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    this.pnlAutor = new JPanel();
+    this.pnlAutor.setLayout( null );
+    this.pnlAutor.setBounds( 20, 20, 690, 120 );
+    this.pnlAutor.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlAutor.setName( "pnlAutor" );
+    
+    this.lblNomeAutor = new JLabel( "Autor: Ricardo Montania Prado de Campos" );
+    this.lblNomeAutor.setBounds( 20, 10, 400, 21 );
+    this.lblNomeAutor.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblNomeAutor.setName( "lblNomeAutor" );
+    
+    this.lblEmailAutor = new JLabel( "E-mail: ricardo@linuxafundo.com.br" );
+    this.lblEmailAutor.setBounds( 20, 35, 400, 21 );
+    this.lblEmailAutor.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblEmailAutor.setName( "lblEmailAutor" );
+    
+    this.lblContatoAutor = new JLabel(
+      "<HTML>Contato: <FONT color=\"#000099\"><U>http://www.linuxafundo.com.br/contato</U></FONT></HTML>"
     );
+    this.lblContatoAutor.setBounds( 20, 60, 310, 21 );
+    this.lblContatoAutor.setToolTipText( "Clique para abrir" );
+    this.lblContatoAutor.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblContatoAutor.setName( "lblContatoAutor" );
+    this.lblContatoAutor.addMouseListener( new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e){
+        abrirLink( "contato" );
+      }
+      @Override
+      public void mouseEntered(MouseEvent e){
+        setCursor( new Cursor( Cursor.HAND_CURSOR ) );
+      }
+      @Override
+      public void mouseExited(MouseEvent e){
+        setCursor( new Cursor( Cursor.DEFAULT_CURSOR ) );
+      }
+    });
     
-    pnlSobre = new JPanel();
-    pnlSobre.setLayout( null );
-    pnlSobre.setBounds( new Rectangle( 0, 0, 640, 420 ) );
-    pnlSobre.setName( "Sobre" );
-    pnlSobre.setBorder( BorderFactory.createEtchedBorder() );
-    pnlSobre.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblPaginaOficial = new JLabel(
+      "<HTML>Site oficial: <FONT color=\"#000099\"><U>http://www.linuxafundo.com.br/mygoodmoney</U></FONT></HTML>"
+    );
+    this.lblPaginaOficial.setBounds( 20, 85, 370, 21 );
+    this.lblPaginaOficial.setToolTipText( "Clique para abrir" );
+    this.lblPaginaOficial.setFont( new Font( "Verdana", 0, 12 ) );
+    this.lblPaginaOficial.addMouseListener( new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e){
+        abrirLink( "mygoodmoney" );
+      }
+      @Override
+      public void mouseEntered(MouseEvent e){
+        setCursor( new Cursor( Cursor.HAND_CURSOR ) );
+      }
+      @Override
+      public void mouseExited(MouseEvent e){
+        setCursor( new Cursor( Cursor.DEFAULT_CURSOR ) );
+      }
+    });
     
-    pnlAutor = new JPanel();
-    pnlAutor.setLayout( null );
-    pnlAutor.setBounds( 20, 20, 590, 120 );
-    pnlAutor.setBorder( BorderFactory.createEtchedBorder() );
-    
-    lblNomeAutor = new JLabel( "Autor: Ricardo Montania Prado de Campos" );
-    lblNomeAutor.setBounds( 20, 15, 400, 21 );
-    lblNomeAutor.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblEmailAutor = new JLabel( "E-mail: ricardo@linuxafundo.com.br" );
-    lblEmailAutor.setBounds( 20, 45, 400, 21 );
-    lblEmailAutor.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    lblContatoAutor = new JLabel( "Contato: http://www.linuxafundo.com.br/contato" );
-    lblContatoAutor.setBounds( 20, 75, 400, 21 );
-    lblContatoAutor.setFont( new Font( "Verdana", 0, 12 ) );
-    
-    pnlTexto = new JPanel();
-    pnlTexto.setLayout( null );
-    pnlTexto.setBounds( 20, 160, 590, 180 );
-    pnlTexto.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlTexto = new JPanel();
+    this.pnlTexto.setLayout( null );
+    this.pnlTexto.setBounds( 20, 160, 690, 220 );
+    this.pnlTexto.setBorder( BorderFactory.createEtchedBorder() );
+    this.pnlTexto.setName( "pnlTexto" );
     
     String texto =
       "   O QUE ESTE PROGRAMA OFERECE:\n\n" +
@@ -1343,7 +1623,7 @@ public class Tela extends JFrame
       "  O uso, incluindo exemplos, está demonstrado no manual do programa.\n" +
       "Para obter o manual de uso do programa, acesse o website\n" +
       "http://www.linuxafundo.com.br/mygoodmoney. O manual está disponível\n" +
-      "na versão online e também pode ser baixado em PDF.\n\n" +
+      "na versão online e futuramente poderá ser baixado em PDF.\n\n" +
       "   Este software encontra-se sob a licença GPL v3, a qual lhe permite\n" +
       "executar para qualquer propósito, estudar o funcionamento, redistri-\n" +
       "buir e aperfeiçoar da maneira que melhor julgar.\n" +
@@ -1356,152 +1636,174 @@ public class Tela extends JFrame
     txtTexto.setBackground( pnlSobre.getBackground() );
     
     JScrollPane textoJ = new JScrollPane( txtTexto );
-    textoJ.setBounds( 20, 20, 550, 140 );
+    textoJ.setBounds( 20, 20, 650, 180 );
     
     // Adicao dos componentes ao frame
-    this.getContentPane().add( pnlSuperior );
-       pnlSuperior.add( lblPeriodo );
-       pnlSuperior.add( btnMenosPeriodo );
-       pnlSuperior.add( dtcPeriodoIni );
-       pnlSuperior.add( lblPeriodoA );
-       pnlSuperior.add( dtcPeriodoFim );
-       pnlSuperior.add( btnMaisPeriodo );
-    this.getContentPane().add( tbpPainelAbas );
-       tbpPainelAbas.add( pnlHome );
-          pnlHome.add( pnlResumoCaixa );
-             pnlResumoCaixa.add( lblResumoCaixa );
-             pnlResumoCaixa.add( lblResNomeCaixa );
-             pnlResumoCaixa.add( cbxResCaixa );
-             pnlResumoCaixa.add( btnResCaixa );
-             pnlResumoCaixa.add( lblResSaldoCaixa );
-             pnlResumoCaixa.add( lblResValorSaldoCaixa );
-             pnlResumoCaixa.add( lblResTotEntrCaixa );
-             pnlResumoCaixa.add( lblResValTotEntrCaixa );
-             pnlResumoCaixa.add( lblResTotSaidaCaixa );
-             pnlResumoCaixa.add( lblResValTotSaidaCaixa );
-             pnlResumoCaixa.add( ckbResumoCaixa );
-             pnlResumoCaixa.add( pnlGrafico );
-          pnlHome.add( pnlResumoConta );
-             pnlResumoConta.add( lblResumoConta );
-             pnlResumoConta.add( lblResNomeConta );
-             pnlResumoConta.add( cbxResConta );
-             pnlResumoConta.add( ckbResumoConta );
-             pnlResumoConta.add( btnResConta );
-             pnlResumoConta.add( lblResMovContaPc );
-             pnlResumoConta.add( lblResValorMovContaPc );
-             pnlResumoConta.add( lblResMovContaRs );
-             pnlResumoConta.add( lblResValorMovContaRs );
-             pnlResumoConta.add( lblResMovContaAno );
-             pnlResumoConta.add( lblResValorMovContaAno );
-       tbpPainelAbas.add( pnlMovimento );
-          pnlMovimento.add( tbpMovimento );
-             tbpMovimento.add( pnlCadastroMov );
-                pnlCadastroMov.add( lblMovDescricao );
-                pnlCadastroMov.add( txfMovDescricao );
-                pnlCadastroMov.add( lblMovData );
-                pnlCadastroMov.add( dtcMovData );
-                pnlCadastroMov.add( lblMovValor );
-                pnlCadastroMov.add( dbfMovValor );
-                pnlCadastroMov.add( lblMovConta );
-                pnlCadastroMov.add( cbxMovConta );
-                pnlCadastroMov.add( lblMovCaixa );
-                pnlCadastroMov.add( cbxMovCaixa );
-                pnlCadastroMov.add( ckbMovPago );
-                pnlCadastroMov.add( lblMovRecorrencia );
-                pnlCadastroMov.add( rbtMovRecorrenciaSim );
-                pnlCadastroMov.add( rbtMovRecorrenciaNao );
-                pnlCadastroMov.add( lblRepetir );
-                pnlCadastroMov.add( itfNumVezes );
-                pnlCadastroMov.add( lblVezes );
-                pnlCadastroMov.add( lblACada );
-                pnlCadastroMov.add( itfNumPeriodo );
-                pnlCadastroMov.add( cbxPeriodo );
-                pnlCadastroMov.add( btnMovAdd );
-                pnlCadastroMov.add( btnMovEditar );
-                pnlCadastroMov.add( btnMovExcluir );
-                pnlCadastroMov.add( btnMovConfirmar );
-                pnlCadastroMov.add( btnMovCancelar );
-             tbpMovimento.add( pnlTransferencia );
-          pnlMovimento.add( pnlLancamentoMov );
-       tbpPainelAbas.add( pnlExtratos );
-          pnlExtratos.add( pnlExtrato );
-             pnlExtrato.add( lblExtratoConta );
-             pnlExtrato.add( cbxExtratoConta );
-             pnlExtrato.add( lblExtratoPeriodo );
-             pnlExtrato.add( dtcExtratoIni );
-             pnlExtrato.add( lblExtratoHifen );
-             pnlExtrato.add( dtcExtratoFim );
-             pnlExtrato.add( btnExtrato );
-             pnlExtrato.add( ckbExtratoProvisao );
-             pnlExtrato.add( scbExtratoConta );
-       tbpPainelAbas.add( pnlCadastros );
-          pnlCadastros.add( pnlCadConta );
-             pnlCadConta.add( lblAddConta );
-             pnlCadConta.add( lblNomeConta );
-             pnlCadConta.add( txfNomeConta );
-             pnlCadConta.add( lblTipoConta );
-             pnlCadConta.add( cbxTipoConta );
-             pnlCadConta.add( btnAddConta );
-             pnlCadConta.add( btnEditarConta );
-             pnlCadConta.add( btnExcluirConta );
-             pnlCadConta.add( btnConfirmarConta );
-             pnlCadConta.add( btnCancelarConta );
-             pnlCadConta.add( pnlContas );
-          pnlCadastros.add( pnlCadCaixa );
-             pnlCadCaixa.add( lblAddCaixa );
-             pnlCadCaixa.add( lblNomeCaixa );
-             pnlCadCaixa.add( txfNomeCaixa );
-             pnlCadCaixa.add( lblSaldoInicial );
-             pnlCadCaixa.add( dbfSaldoInicialCaixa );
-             pnlCadCaixa.add( btnAddCaixa );
-             pnlCadCaixa.add( btnEditarCaixa );
-             pnlCadCaixa.add( btnExcluirCaixa );
-             pnlCadCaixa.add( btnConfirmarCaixa );
-             pnlCadCaixa.add( btnCancelarCaixa );
-             pnlCadCaixa.add( pnlCaixas );
-       tbpPainelAbas.add( pnlConfig );
-          pnlConfig.add( pnlBD );
-             pnlBD.add( lblBD );
-             pnlBD.add( lblDiretorioBD );
-             pnlBD.add( txfDiretorioBD );
-             pnlBD.add( btnPesquisarDir );
-             pnlBD.add( lblNomeBD );
-             pnlBD.add( txfNomeBD );
-          pnlConfig.add( pnlGerBD );
-             pnlGerBD.add( lblGerBD );
-             pnlGerBD.add( btnCriarBD );
-             pnlGerBD.add( btnLimparBD );
-             pnlGerBD.add( btnExcluirBD );
-       tbpPainelAbas.add( pnlSobre );
-          pnlSobre.add( pnlAutor );
-             pnlAutor.add( lblNomeAutor );
-             pnlAutor.add( lblEmailAutor );
-             pnlAutor.add( lblContatoAutor );
-          pnlSobre.add( pnlTexto );
-             pnlTexto.add( textoJ );
+    this.getContentPane().add( this.pnlSuperior );
+       this.pnlSuperior.add( this.lblPeriodo );
+       this.pnlSuperior.add( this.btnMenosPeriodo );
+       this.pnlSuperior.add( this.dtcPeriodoIni );
+       this.pnlSuperior.add( this.lblPeriodoA );
+       this.pnlSuperior.add( this.dtcPeriodoFim );
+       this.pnlSuperior.add( this.btnMaisPeriodo );
+    this.getContentPane().add( this.tbpPainelAbas );
+       this.tbpPainelAbas.add( this.pnlHome );
+          this.pnlHome.add( this.pnlResumoCaixa );
+             this.pnlResumoCaixa.add( this.lblResumoCaixa );
+             this.pnlResumoCaixa.add( this.lblResNomeCaixa );
+             this.pnlResumoCaixa.add( this.cbxResCaixa );
+             this.pnlResumoCaixa.add( this.btnResCaixa );
+             this.pnlResumoCaixa.add( this.lblResSaldoCaixa );
+             this.pnlResumoCaixa.add( this.txfResValorSaldoCaixa );
+             this.pnlResumoCaixa.add( this.lblResSaldoCaixaLimite );
+             this.pnlResumoCaixa.add( this.txfResSaldoCaixaLimite );
+             this.pnlResumoCaixa.add( this.lblResTotEntrCaixa );
+             this.pnlResumoCaixa.add( this.txfResValTotEntrCaixa );
+             this.pnlResumoCaixa.add( this.lblResTotSaidaCaixa );
+             this.pnlResumoCaixa.add( this.txfResValTotSaidaCaixa );
+             this.pnlResumoCaixa.add( this.ckbResumoCaixa );
+             this.pnlResumoCaixa.add( this.pnlGrafico );
+          this.pnlHome.add( this.pnlResumoConta );
+             this.pnlResumoConta.add( this.lblResumoConta );
+             this.pnlResumoConta.add( this.lblResNomeConta );
+             this.pnlResumoConta.add( this.cbxResConta );
+             this.pnlResumoConta.add( this.ckbResumoConta );
+             this.pnlResumoConta.add( this.btnResConta );
+             this.pnlResumoConta.add( this.lblResMovContaPc );
+             this.pnlResumoConta.add( this.txfResValorMovContaPc );
+             this.pnlResumoConta.add( this.lblResMovContaRs );
+             this.pnlResumoConta.add( this.txfResValorMovContaRs );
+             this.pnlResumoConta.add( this.lblResMovContaAno );
+             this.pnlResumoConta.add( this.txfResValorMovContaAno );
+       this.tbpPainelAbas.add( this.pnlMovimento );
+          this.pnlMovimento.add( this.tbpMovimento );
+             this.tbpMovimento.add( this.pnlCadastroMov );
+                this.pnlCadastroMov.add( this.lblMovDescricao );
+                this.pnlCadastroMov.add( this.txfMovDescricao );
+                this.pnlCadastroMov.add( this.lblMovData );
+                this.pnlCadastroMov.add( this.dtcMovData );
+                this.pnlCadastroMov.add( this.lblInfoData );
+                this.pnlCadastroMov.add( this.lblMovValor );
+                this.pnlCadastroMov.add( this.dbfMovValor );
+                this.pnlCadastroMov.add( this.lblMovConta );
+                this.pnlCadastroMov.add( this.cbxMovConta );
+                this.pnlCadastroMov.add( this.lblMovCaixa );
+                this.pnlCadastroMov.add( this.cbxMovCaixa );
+                this.pnlCadastroMov.add( this.ckbMovPago );
+                this.pnlCadastroMov.add( this.lblMovRecorrencia );
+                this.pnlCadastroMov.add( this.rbtMovRecorrenciaSim );
+                this.pnlCadastroMov.add( this.rbtMovRecorrenciaNao );
+                this.pnlCadastroMov.add( this.lblRepetir );
+                this.pnlCadastroMov.add( this.itfNumVezes );
+                this.pnlCadastroMov.add( this.lblVezes );
+                this.pnlCadastroMov.add( this.lblACada );
+                this.pnlCadastroMov.add( this.itfNumPeriodo );
+                this.pnlCadastroMov.add( this.cbxPeriodo );
+                this.pnlCadastroMov.add( this.btnMovAdd );
+                this.pnlCadastroMov.add( this.btnMovEditar );
+                this.pnlCadastroMov.add( this.btnMovExcluir );
+                this.pnlCadastroMov.add( this.btnMovConfirmar );
+                this.pnlCadastroMov.add( this.btnMovCancelar );
+             this.tbpMovimento.add( this.pnlTransferencia );
+                this.pnlTransferencia.add( this.btnTransfAdd );
+                this.pnlTransferencia.add( this.btnTransfConfirmar );
+                this.pnlTransferencia.add( this.btnTransfCancelar );
+                this.pnlTransferencia.add( this.lblTransfCaixaOrigem );
+                this.pnlTransferencia.add( this.cbxTransfCaixaOrigem );
+                this.pnlTransferencia.add( this.lblTransfCaixaDestino );
+                this.pnlTransferencia.add( this.cbxTransfCaixaDestino );
+                this.pnlTransferencia.add( this.lblTransfDescricao );
+                this.pnlTransferencia.add( this.txfTransfDescricao );
+                this.pnlTransferencia.add( this.lblTransfData );
+                this.pnlTransferencia.add( this.dtcTransfData );
+                this.pnlTransferencia.add( this.lblTransfValor );
+                this.pnlTransferencia.add( this.dbfTransfValor );
+                this.pnlTransferencia.add( this.ckbTransf );
+          this.pnlMovimento.add( this.pnlLancamentoMov );
+       this.tbpPainelAbas.add( this.pnlExtratos );
+          this.pnlExtratos.add( this.pnlExtrato );
+             this.pnlExtrato.add( this.lblExtratoConta );
+             this.pnlExtrato.add( this.cbxExtratoConta );
+             this.pnlExtrato.add( this.lblExtratoPeriodo );
+             this.pnlExtrato.add( this.dtcExtratoIni );
+             this.pnlExtrato.add( this.lblExtratoHifen );
+             this.pnlExtrato.add( this.dtcExtratoFim );
+             this.pnlExtrato.add( this.btnExtrato );
+             this.pnlExtrato.add( this.ckbExtratoProvisao );
+             this.pnlExtrato.add( this.scbExtratoConta );
+       this.tbpPainelAbas.add( this.pnlCadastros );
+          this.pnlCadastros.add( this.pnlCadConta );
+             this.pnlCadConta.add( this.lblAddConta );
+             this.pnlCadConta.add( this.lblNomeConta );
+             this.pnlCadConta.add( this.txfNomeConta );
+             this.pnlCadConta.add( this.lblTipoConta );
+             this.pnlCadConta.add( this.cbxTipoConta );
+             this.pnlCadConta.add( this.btnAddConta );
+             this.pnlCadConta.add( this.btnEditarConta );
+             this.pnlCadConta.add( this.btnExcluirConta );
+             this.pnlCadConta.add( this.btnConfirmarConta );
+             this.pnlCadConta.add( this.btnCancelarConta );
+             this.pnlCadConta.add( this.pnlContas );
+          this.pnlCadastros.add( this.pnlCadCaixa );
+             this.pnlCadCaixa.add( this.lblAddCaixa );
+             this.pnlCadCaixa.add( this.lblNomeCaixa );
+             this.pnlCadCaixa.add( this.txfNomeCaixa );
+             this.pnlCadCaixa.add( this.lblSaldoInicial );
+             this.pnlCadCaixa.add( this.dbfSaldoInicialCaixa );
+             this.pnlCadCaixa.add( this.lblTipoCaixa );
+             this.pnlCadCaixa.add( this.rbtTipoCaixaCartao );
+             this.pnlCadCaixa.add( this.rbtTipoCaixaNormal );
+             this.pnlCadCaixa.add( this.lblValorLimite );
+             this.pnlCadCaixa.add( this.dbfValorLimite );
+             this.pnlCadCaixa.add( this.btnAddCaixa );
+             this.pnlCadCaixa.add( this.btnEditarCaixa );
+             this.pnlCadCaixa.add( this.btnExcluirCaixa );
+             this.pnlCadCaixa.add( this.btnConfirmarCaixa );
+             this.pnlCadCaixa.add( this.btnCancelarCaixa );
+             this.pnlCadCaixa.add( this.pnlCaixas );
+       this.tbpPainelAbas.add( this.pnlConfig );
+          this.pnlConfig.add( this.pnlBD );
+             this.pnlBD.add( this.lblBD );
+             this.pnlBD.add( this.lblDiretorioBD );
+             this.pnlBD.add( this.txfDiretorioBD );
+             this.pnlBD.add( this.lblNomeBD );
+             this.pnlBD.add( this.txfNomeBD );
+       this.tbpPainelAbas.add( this.pnlSobre );
+          this.pnlSobre.add( this.pnlAutor );
+             this.pnlAutor.add( this.lblNomeAutor );
+             this.pnlAutor.add( this.lblEmailAutor );
+             this.pnlAutor.add( this.lblContatoAutor );
+             this.pnlAutor.add( this.lblPaginaOficial );
+          this.pnlSobre.add( this.pnlTexto );
+             this.pnlTexto.add( textoJ );
              
-    tbpMovimento.setTitleAt( 0, "Déb/Créd/Provisão" );
-    tbpMovimento.setTitleAt( 1, "Transferência" );
+    this.tbpMovimento.setTitleAt( 0, "Lançamentos" );
+    this.tbpMovimento.setTitleAt( 1, "Transferência" );
   }
-  public void acessar()
-  {
-    try
-    {
-      comando = "";
-
-      while( comando.isEmpty() )
-      {
+  public void abrirLink( String dest ) {
+    try{
+      final URI uri = new URI( "http://www.linuxafundo.com.br/" + dest );
+      if( Desktop.isDesktopSupported() ) {
+        try {
+          Desktop.getDesktop().browse(uri);
+        }
+        catch( IOException ie ) {}
+      }
+    }catch(URISyntaxException ex){
+      Logger.getLogger(Tela.class.getName()).log(Level.SEVERE,null,ex);
+    }
+  }
+  public void acessar() {
+    comando = "";
+    
+    while( comando.isEmpty() ) {
+      try {
         Thread.sleep(50);
       }
+      catch( InterruptedException ie ) {
+        System.out.println( "InterruptedException: " + ie.getLocalizedMessage() );
+      }
     }
-    catch( InterruptedException e )
-    {
-      e.printStackTrace();
-    }
-  }
-  public void selecionarAba( int indexParam )
-  {
-    tbpPainelAbas.setSelectedIndex( indexParam );
   }
   public String getComandoTela()
   {
@@ -1509,299 +1811,111 @@ public class Tela extends JFrame
   }
   public void limparCamposConta()
   {
-    setTxfNomeConta( "" );
-    setCbxTipoConta( null );
+    this.txfNomeConta.setText( "" );
+    this.cbxTipoConta.setSelectedItem( null );
   }
   public void limparCamposCaixa()
   {
-    setTxfNomeCaixa( "" );
-    setDbfSaldoInicialCaixa( Double.NaN );
+    this.txfNomeCaixa.setText( "" );
+    this.dbfSaldoInicialCaixa.setValue( 0.0 );
+    this.rbtTipoCaixaCartao.setSelected( false );
+    this.rbtTipoCaixaNormal.setSelected( true );
+    this.dbfValorLimite.setValue( 0.0 );
   }
   public void limparCamposLancamento()
   {
     this.txfMovDescricao.setText( "" );
     this.dtcMovData.setDate( new Date() );
-    this.dbfMovValor.setValue( Double.NaN );
+    this.dbfMovValor.setValue( 0.0 );
     this.cbxMovConta.setSelectedIndex( -1 );
     this.cbxMovCaixa.setSelectedIndex( -1 );
     this.ckbMovPago.setSelected( false );
     this.rbtMovRecorrenciaNao.setSelected( true );
     this.rbtMovRecorrenciaSim.setSelected( false );
-    setModoBotoesMovimento( "NOVO" );
+    this.itfNumPeriodo.setValue( 0 );
+    this.itfNumVezes.setValue( 0 );
     habilitarRecorrencia( false );
   }
-  public void setModoBotoesConta( String modoParam )
+  public void mudarEstado( String pDestino, String pEstado )
   {
-    switch( modoParam )
+    boolean estado = pEstado.equals( "NAVEGACAO" );
+
+    if( pDestino.equals( "Conta" ) || pDestino.isEmpty() )
     {
-      case "NAVEGACAO":
-      {
-        this.btnAddConta.setEnabled( true );
-        this.btnEditarConta.setEnabled( true );
-        this.btnExcluirConta.setEnabled( true );
-        this.btnConfirmarConta.setEnabled( false );
-        this.btnCancelarConta.setEnabled( false );
-        this.txfNomeConta.setEditable( false );
-        this.cbxTipoConta.setEnabled( false );
-        break;
-      }
-      case "EDICAO":
-      {
-        this.btnAddConta.setEnabled( false );
-        this.btnEditarConta.setEnabled( false );
-        this.btnExcluirConta.setEnabled( false );
-        this.btnConfirmarConta.setEnabled( true );
-        this.btnCancelarConta.setEnabled( true );
-        this.txfNomeConta.setEditable( true );
-        this.cbxTipoConta.setEnabled( true );
+      this.btnAddConta.setEnabled( estado );
+      this.btnEditarConta.setEnabled( estado );
+      this.btnExcluirConta.setEnabled( estado );
+      this.btnConfirmarConta.setEnabled( !estado );
+      this.btnCancelarConta.setEnabled( !estado );
+      this.txfNomeConta.setEditable( !estado );
+      this.cbxTipoConta.setEnabled( !estado ); // estava !
+    }
+    if( pDestino.equals( "Caixa" ) || pDestino.isEmpty() )
+    {
+      this.btnAddCaixa.setEnabled( estado );
+      this.btnEditarCaixa.setEnabled( estado );
+      this.btnExcluirCaixa.setEnabled( estado );
+      this.btnConfirmarCaixa.setEnabled( !estado );
+      this.btnCancelarCaixa.setEnabled( !estado );
+      this.txfNomeCaixa.setEditable( !estado );
+      this.dbfSaldoInicialCaixa.setEditable( !estado ); // estava !
+      this.rbtTipoCaixaCartao.setEnabled( !estado );
+      this.rbtTipoCaixaNormal.setEnabled( !estado );
+      this.dbfValorLimite.setEnabled( !estado );
+    }
+    if( pDestino.equals( "Lancamento" ) || pDestino.isEmpty() )
+    {
+      this.btnMovAdd.setEnabled( estado );
+      this.btnMovEditar.setEnabled( estado );
+      this.btnMovExcluir.setEnabled( estado );
+      this.btnMovCancelar.setEnabled( !estado );
+      this.btnMovConfirmar.setEnabled( !estado );
+      this.txfMovDescricao.setEditable( !estado );
+      this.dtcMovData.setEditable( !estado );  // estava com !
+      this.dbfMovValor.setEditable( !estado );
+      this.cbxMovConta.setEnabled( !estado ); // estava com !
+      this.cbxMovCaixa.setEnabled( !estado ); // estava com !
+      this.ckbMovPago.setEnabled( !estado );
+      this.rbtMovRecorrenciaSim.setEnabled( !estado );
+      this.rbtMovRecorrenciaNao.setEnabled( !estado );
+      
+      if( pEstado.equals( "NAVEGACAO" ) ) {
+        limparCamposLancamento();
+        habilitarRecorrencia( false );
       }
     }
-  }
-  public void setModoBotoesCaixa( String modoParam )
-  {
-    switch( modoParam )
+    if( pDestino.equals( "Transferencia" ) || pDestino.isEmpty() )
     {
-      case "NAVEGACAO":
-      {
-        this.btnAddCaixa.setEnabled( true );
-        this.btnEditarCaixa.setEnabled( true );
-        this.btnExcluirCaixa.setEnabled( true );
-        this.btnConfirmarCaixa.setEnabled( false );
-        this.btnCancelarCaixa.setEnabled( false );
-        this.txfNomeCaixa.setEditable( false );
-        this.dbfSaldoInicialCaixa.setEditable( false );
-        break;
-      }
-      case "EDICAO":
-      {
-        this.btnAddCaixa.setEnabled( false );
-        this.btnEditarCaixa.setEnabled( false );
-        this.btnExcluirCaixa.setEnabled( false );
-        this.btnConfirmarCaixa.setEnabled( true );
-        this.btnCancelarCaixa.setEnabled( true );
-        this.txfNomeCaixa.setEditable( true );
-        this.dbfSaldoInicialCaixa.setEditable( true );
-      }
+      this.btnTransfAdd.setEnabled( estado );
+      this.btnTransfCancelar.setEnabled( !estado );
+      this.btnTransfConfirmar.setEnabled( !estado );
+      this.cbxTransfCaixaOrigem.setEnabled( !estado );
+      this.cbxTransfCaixaDestino.setEnabled( !estado );
+      this.txfTransfDescricao.setEnabled( !estado );
+      this.dtcTransfData.setEditable( !estado );
+      this.dbfTransfValor.setEnabled( !estado );
+      this.ckbTransf.setEnabled( !estado );
     }
-  }
-  public void setModoBotoesMovimento( String modoParam )
-  {
-    switch( modoParam )
-    {
-      case "NAVEGACAO":
-      {
-        this.btnMovAdd.setEnabled( true );
-        this.btnMovEditar.setEnabled( true );
-        this.btnMovExcluir.setEnabled( true );
-        this.btnMovCancelar.setEnabled( false );
-        this.btnMovConfirmar.setEnabled( false );
-        this.txfMovDescricao.setEditable( false );
-        this.dtcMovData.setEditable( false );
-        this.dbfMovValor.setEditable( false );
-        this.cbxMovConta.setEnabled( false );
-        this.cbxMovCaixa.setEnabled( false );
-        this.ckbMovPago.setEnabled( false );
-        this.rbtMovRecorrenciaSim.setEnabled( false );
-        this.rbtMovRecorrenciaNao.setEnabled( false );
-        break;
-      }
-      case "EDICAO":
-      {
-        this.btnMovAdd.setEnabled( false );
-        this.btnMovEditar.setEnabled( false );
-        this.btnMovExcluir.setEnabled( false );
-        this.btnMovCancelar.setEnabled( true );
-        this.btnMovConfirmar.setEnabled( true );
-        this.txfMovDescricao.setEditable( true );
-        this.dtcMovData.setEditable( true );
-        this.dbfMovValor.setEditable( true );
-        this.cbxMovConta.setEnabled( true );
-        this.cbxMovCaixa.setEnabled( true );
-        this.ckbMovPago.setEnabled( true );
-        this.rbtMovRecorrenciaSim.setEnabled( true );
-        this.rbtMovRecorrenciaNao.setEnabled( true );
-        break;
-      }
-    }
-  }
-  public void AOCLICARbtnResCaixa()
-  {
-    this.comando = "CARREGAR_CAIXA_HOME";
-  }
-  public void AOCLICARbtnResConta()
-  {
-    this.comando = "CARREGAR_CONTA_HOME";
-  }
-  public void AOCLICARbtnAddConta()
-  {
-    this.comando = "INCLUIR_CONTA";
-  }
-  public void AOPRESSIONARbtnAddConta( KeyEvent e )
-  {
-    if( e.getKeyCode() == KeyEvent.VK_ENTER )
-      this.comando = "ADICIONAR_CONTA";
-  }
-  public void AOPRESSIONARcbxMovCaixa( KeyEvent e )
-  {
-    if( e.getKeyCode() == KeyEvent.VK_ENTER )
-      this.comando = "ADICIONAR_LANCAMENTO";
-  }
-  public void AOCLICARbtnAddCaixa()
-  {
-    this.comando = "ADICIONAR_CAIXA";
-  }
-  public void AOCLICARbtnEditarConta()
-  {
-    this.comando = "ALTERAR_CONTA";
-  }
-  public void AOCLICARbtnEditarCaixa()
-  {
-    this.comando = "EDITAR_CAIXA";
-  }
-  public void AOCLICARbtnExcluirConta()
-  {
-    this.comando = "EXCLUIR_CONTA";
-  }
-  public void AOCLICARbtnExcluirCaixa()
-  {
-    this.comando = "EXCLUIR_CAIXA";
-  }
-  public void AOCLICARpnlContas( MouseEvent e )
-  {
-    if( e.getClickCount() == 1 )
-      this.comando = "CARREGAR_CONTA_SELECIONADA";
-  }
-  public void AOCLICARpnlCaixas( MouseEvent e )
-  {
-    if( e.getClickCount() == 1 )
-      this.comando = "CARREGAR_CAIXA_SELECIONADO";
-  }
-  public void AOCLICARpnlMovimento( MouseEvent e )
-  {
-    if( e.getClickCount() == 1 )
-      this.comando = "CARREGAR_LANCAMENTO_SELECIONADO";
-  }
-  public void AOCLICARbtnCancelarConta()
-  {
-    this.comando = "CANCELAR_CONTA";
-  }
-  public void AOCLICARbtnConfirmarConta()
-  {
-    this.comando = "CONFIRMAR_CONTA";
-  }
-  public void AOCLICARbtnConfirmarCaixa()
-  {
-    this.comando = "CONFIRMAR_CAIXA";
-  }
-  public void AOCLICARbtnCancelarCaixa()
-  {
-    this.comando = "CANCELAR_CAIXA_SELECIONADO";
-  }
-  public void AOCLICARbtnMovCancelar()
-  {
-    this.comando = "CANCELAR_LANCAMENTO_SELECIONADO";
-  }
-  public void AOCLICARbtnMovExcluir()
-  {
-    this.comando = "EXCLUIR_LANCAMENTO";
-  }
-  public void AOCLICARbtnMovConfirmar()
-  {
-    this.comando = "CONFIRMAR_LANCAMENTO";
-  }
-  public void AOCLICARbtnMovEditar()
-  {
-    this.comando = "EDITAR_LANCAMENTO";
-  }
-  public void AOCLICARbtnMovAdd()
-  {
-    this.comando = "INCLUIR_LANCAMENTO";
-  }
-  public void AOCLICARbtnPesquisarDir()
-  {
-    this.comando = "PESQUISAR_DIR";
-  }
-  public void AOCLICARbtnExtrato()
-  {
-    this.comando = "CONFIRMAR_EXTRATO";
-  }
-  public void AOCLICARdtcPeriodoIni()
-  {
-    this.comando = "ATUALIZAR_PERIODO";
-  }
-  public void AOCLICARdtcPeriodoFim()
-  {
-    this.comando = "ATUALIZAR_PERIODO";
-  }
-  public void AOCLICARbtnCriarBD()
-  {
-    this.comando = "CRIAR_BD";
-  }
-  public void AOCLICARbtnLimparBD()
-  {
-    this.comando = "LIMPAR_BD";
-  }
-  public void AOCLICARbtnExcluirBD()
-  {
-    this.comando = "EXCLUIR_BD";
-  }
-  public void AOCLICARbtnMaisPeriodo()
-  {
-    this.comando = "INCREMENTAR_PERIODO";
-  }
-  public void AOCLICARbtnMenosPeriodo()
-  {
-    this.comando = "DECREMENTAR_PERIODO";
   }
   public String getTxfNomeConta()
   {
     return( txfNomeConta.getText() );
   }
-  public void setTxfNomeConta( String nomeParam )
-  {
-    txfNomeConta.setText( nomeParam );
-  }
-  public String getTxfDiretorioBD()
-  {
-    return( txfDiretorioBD.getText() );
-  }
-  public void setTxfDiretorioBD( String dirParam )
-  {
-    txfDiretorioBD.setText( dirParam );
-  }
   public EnumTipoConta getCbxTipoConta()
   {
     if( cbxTipoConta.getSelectedIndex() >= 0 )
+    {
       return( (EnumTipoConta) cbxTipoConta.getSelectedItem() );
+    }
     return( null );
-  }
-  public void setCbxTipoConta( EnumTipoConta tipo )
-  {
-    cbxTipoConta.setSelectedItem( tipo );
   }
   public String getTxfMovDescricao()
   {
     return( txfMovDescricao.getText() );
   }
-  public void setTxfMovDescricao( String descrParam )
-  {
-    txfMovDescricao.setText( descrParam );
-  }
-  public String getTxfNomeBD()
-  {
-    return( txfNomeBD.getText() );
-  }
-  public void setTxfNomeBD( String nomeParam )
-  {
-    txfNomeBD.setText( nomeParam );
-  }
   public Date getDtcMovData()
   {
     return( dtcMovData.getDate() );
-  }
-  public void setDtcMovData( Date dataParam )
-  {
-    dtcMovData.setDate( dataParam );
   }
   public void setDtcPeriodoIni( Date dataParam )
   {
@@ -1811,356 +1925,50 @@ public class Tela extends JFrame
   {
     dtcPeriodoFim.setDate( dataParam );
   }
-  public Double getDbfMovValor()
+  public double getDbfMovValor()
   {
     return( dbfMovValor.getValue() );
   }
-  public void setDbfMovValor( Double valorParam )
+  public Conta getCbxMovConta()
   {
-    dbfMovValor.setValue( valorParam );
-  }
-  public String getCbxMovConta()
-  {
-    if( cbxMovConta.getSelectedIndex() >= 0 )
-      return( (String) cbxMovConta.getSelectedItem() );
+    if( cbxMovConta.getSelectedIndex() >= 0 ){
+      return( (Conta) cbxMovConta.getSelectedItem() );
+    }
     return( null );
   }
-  public void setCbxMovConta( String contaParam )
-  {
-    cbxMovConta.setSelectedItem( contaParam );
-  }
-  public String getCbxMovCaixa()
+  public Caixa getCbxMovCaixa()
   {
     if( cbxMovCaixa.getSelectedIndex() >= 0 )
-      return( (String) cbxMovCaixa.getSelectedItem() );
+    {
+      return( (Caixa) cbxMovCaixa.getSelectedItem() );
+    }
     return( null );
-  }
-  public void setCbxMovCaixa( String caixaParam )
-  {
-    cbxMovCaixa.setSelectedItem( caixaParam );
   }
   public boolean getCkbMovPago()
   {
     return( ckbMovPago.isSelected() );
   }
-  public void setCkbMovPago( boolean selParam )
-  {
-    ckbMovPago.setSelected( selParam );
-  }
   public char getMovRecorrencia()
   {
     return( (rbtMovRecorrenciaSim.isSelected())? 'S' : 'N' );
   }
-  public void addConta( Conta contaParam )
-  {
-    Object[] dados = { contaParam.getSNome(), EnumTipoConta.getPorCodigo( contaParam.getCTipo() ).toString() };
-    contasModel.addRow(dados);
-    
-    // adiciona ao comboBox de movimento
-    atualizarContaAdicionada( contaParam.getSNome() );
-  }
-  public void addCaixa( Caixa caixaParam )
-  {
-    Object[] dados = { caixaParam.getSNome(), ValueTools.format( caixaParam.getDSaldo() ) };
-    caixasModel.addRow( dados );
-    // adiciona ao comboBox de movimento
-    atualizarCaixaAdicionado( caixaParam.getSNome() );
-  }
-  public void addLancamento( Lancamento lancamentoParam )
-  {
-    Object[] dados = { "", ' ', "", "", ' ' };
-    
-    if( lancamentoParam.getIDataQuitacao() == 0 )
-    {
-      dados[0] = DateTools.formatDataIntToStringBR( lancamentoParam.getIDataVencimento() );
-      dados[4] = 'N';
-    }
-    else
-    {
-      dados[0] = DateTools.formatDataIntToStringBR( lancamentoParam.getIDataQuitacao() );
-      dados[4] = 'S';
-    }
-    
-    dados[1] = lancamentoParam.getCTipo();
-    dados[2] = lancamentoParam.getSDescricao();
-    dados[3] = ValueTools.format( lancamentoParam.getDValor() );
-  
-    movimentoModel.addRow( dados );
-  }
   public Conta getContaSelecionada()
   {
-    Conta conta = new Conta();
-    
-    conta.setSNome( (String) contasModel.getValueAt(contasTable.getSelectedRow(), 0 ) );
-    conta.setCTipo( EnumTipoConta.getPorDescricao( (String) contasModel.getValueAt(contasTable.getSelectedRow(), 1 ) ).getCCodigo() );
-    
+    int linhaConta = this.contasTable.getSelectedRow();
+    Conta conta = this.contasModel.getLinha( linhaConta );
     return( conta );
-  }
-  public Caixa getCaixa( String nomeParam )
-  { 
-    for( int i=0; i<caixasModel.getRowCount(); i++ )
-    {
-      String nomeTela = (String) caixasModel.getValueAt( i, 0 );
-      
-      if( nomeTela.equals( nomeParam ) )
-      {
-        Caixa caixa = new Caixa();
-        caixa.setSNome( (String) caixasModel.getValueAt( i, 0 ) );
-        caixa.setDSaldo( ValueTools.unformat( (String) caixasModel.getValueAt( i, 1 ) ) );
-        return( caixa );
-      }
-    }
-    return( null );
   }
   public Caixa getCaixaSelecionado()
   {
-    Caixa caixa = new Caixa();
-    
-    caixa.setSNome( (String) caixasModel.getValueAt( caixasTable.getSelectedRow(), 0 ) );
-    caixa.setDSaldo( ValueTools.unformat( (String)caixasModel.getValueAt( caixasTable.getSelectedRow(), 1 ) ) );
-    
+    int linhaCaixa = this.caixasTable.getSelectedRow();
+    Caixa caixa = this.caixasModel.getLinha( linhaCaixa );
     return( caixa );
   }
-  public Lancamento getLancamentoSelecionado( BD banco )
+  public Lancamento getLancamentoSelecionado()
   {
-    Lancamento lancamento;
-    
-    // pega os itens da tela
     int linha = movimentoTable.getSelectedRow();
-    
-    String campo1Data = (String) movimentoModel.getValueAt( linha, 0 );
-    char   campo2Tipo = (char)   movimentoModel.getValueAt( linha, 1 );
-    String campo3Desc = (String) movimentoModel.getValueAt( linha, 2 );
-    String campo4Valo = (String) movimentoModel.getValueAt( linha, 3 );
-    char campo5Pago   = (char)   movimentoModel.getValueAt( linha, 4 );
-    
-    // tratamentos
-    campo4Valo = campo4Valo.replace( "R$", "" );
-    campo4Valo = campo4Valo.replaceAll( "\\.", "" );
-    campo4Valo = campo4Valo.replaceAll( ",", "." );
-    
-    // tratamento a vista/provisao
-    lancamento = banco.selectLancamento( campo1Data, campo3Desc, campo4Valo, campo5Pago );
-    lancamento.setCTipo( campo2Tipo );
-    
+    Lancamento lancamento = this.movimentoModel.getLinha( linha );
     return( lancamento );
-  }
-  public void removeConta( Conta contaParam )
-  {
-    if( contasModel.getRowCount() > 0 )
-    {
-      for( int i=0; i<contasModel.getRowCount(); i++ )
-      {
-        String conta = (String) contasModel.getValueAt( i, 0 );
-        if( conta.equals( contaParam.getSNome() ) )
-        {
-          contasModel.removeRow( i );
-          atualizarContaRemovida( conta );
-        }
-      }
-    }
-  }
-  public void removeCaixa( Caixa caixaParam )
-  {
-    if( caixasModel.getRowCount() > 0 )
-    {
-      for( int i=0; i<caixasModel.getRowCount(); i++ )
-      {
-        String caixa = (String) caixasModel.getValueAt( i, 0 );
-        if( caixa.equals( caixaParam.getSNome() ) )
-        {
-          contasModel.removeRow( i );
-          atualizarCaixaRemovido( caixa );
-        }
-      }
-    }
-  }
-  public void removeLancamento( Lancamento lancamentoParam )
-  {
-    if( movimentoModel.getRowCount() > 0 )
-    {
-      String dataFormatada = DateTools.formatDataIntToStringBR( lancamentoParam.getIDataVencimento() );
-      String valorFormatado = ValueTools.format( lancamentoParam.getDValor() );
-      
-      for( int i=0; i<movimentoModel.getRowCount(); i++ )
-      {
-        String dataTela      = (String) movimentoModel.getValueAt( i, 0 );
-        String descricaoTela = (String) movimentoModel.getValueAt( i, 2 );
-        String valorTela     = (String) movimentoModel.getValueAt( i, 3 );
-        
-        if( dataTela.equals( dataFormatada ) &&
-            descricaoTela.equals( lancamentoParam.getSDescricao() ) &&
-            valorTela.equals( valorFormatado )
-          )
-        {
-          movimentoModel.removeRow( i );
-        }
-      }
-    }
-  }
-  public void substituirConta( Conta contaVelhaParam, Conta contaNovaParam )
-  {
-    for( int i=0; i<contasModel.getRowCount(); i++ )
-    {
-      String contaAtual = (String) contasModel.getValueAt( i, 0 );
-      if( contaAtual.equals( contaVelhaParam.getSNome() ) )
-      {
-        contasModel.setValueAt( contaNovaParam.getSNome(), i, 0 );
-        contasModel.setValueAt( EnumTipoConta.getPorCodigo( contaNovaParam.getCTipo() ).toString(), i, 1 );
-        atualizarPainelContas();
-        return;
-      }
-    }
-  }
-  public void substituirLancamento( Lancamento lancamentoVelhoParam, Lancamento lancamentoNovoParam )
-  {
-    String dataFormatada;
-    
-    if( lancamentoVelhoParam.getIDataQuitacao() == 0 )
-    {
-      dataFormatada = DateTools.formatDataIntToStringBR( lancamentoVelhoParam.getIDataVencimento() );
-    }
-    else
-    {
-      dataFormatada = DateTools.formatDataIntToStringBR( lancamentoVelhoParam.getIDataQuitacao() );
-    }
-    
-    String valorFormatado = ValueTools.format( lancamentoVelhoParam.getDValor() );
-      
-    for( int i=0; i<movimentoModel.getRowCount(); i++ )
-    {
-      String dataTela      = (String) movimentoModel.getValueAt( i, 0 );
-      String descricaoTela = (String) movimentoModel.getValueAt( i, 2 );
-      String valorTela     = (String) movimentoModel.getValueAt( i, 3 );
-        
-      if( dataTela.equals( dataFormatada ) &&
-          descricaoTela.equals( lancamentoVelhoParam.getSDescricao() ) &&
-          valorTela.equals( valorFormatado )
-        )
-      {
-        String dataF;
-        if( lancamentoNovoParam.getIDataQuitacao() == 0 )
-        {
-          dataF = DateTools.formatDataIntToStringBR( lancamentoNovoParam.getIDataVencimento() );
-        }
-        else
-        {
-          dataF = DateTools.formatDataIntToStringBR( lancamentoNovoParam.getIDataQuitacao() );
-        }
-        
-        movimentoModel.setValueAt( dataF, i, 0 );
-        movimentoModel.setValueAt( lancamentoNovoParam.getSDescricao(), i, 2 );
-        movimentoModel.setValueAt( ValueTools.format( lancamentoNovoParam.getDValor() ), i, 3 );
-        
-        if( lancamentoNovoParam.getIDataQuitacao() > 0 ) // pago
-        {
-          movimentoModel.setValueAt( 'S', i, 4 );
-        }
-        else // a pagar
-        {
-          movimentoModel.setValueAt( 'N', i, 4 );
-        }
-        
-        atualizarPainelMovimento();
-        return;
-      }
-    }
-  }
-  public void substituirCaixa( Caixa caixaVelhoParam, Caixa caixaNovoParam )
-  {
-    for( int i=0; i<caixasModel.getRowCount(); i++ )
-    {
-      String caixaAtual = (String) caixasModel.getValueAt( i, 0 );
-      if( caixaAtual.equals( caixaVelhoParam.getSNome() ) )
-      {
-        caixasModel.setValueAt( caixaNovoParam.getSNome(), i, 0 );
-        caixasModel.setValueAt( ValueTools.format( caixaNovoParam.getDSaldo() ), i, 1 );
-        atualizarPainelCaixas();
-        atualizarCaixaRemovido( caixaVelhoParam.getSNome() );
-        atualizarCaixaAdicionado( caixaNovoParam.getSNome() );
-        return;
-      }
-    }
-  }
-  public void atualizarPainelContas()
-  {
-    contasTable.repaint();
-  }
-  public void atualizarPainelCaixas()
-  {
-    caixasTable.repaint();
-  }
-  public void atualizarPainelMovimento()
-  {
-    movimentoTable.repaint();
-  }
-  public void atualizarContaRemovida( String conta )
-  {
-    JComboBox[] combos = {cbxMovConta, cbxExtratoConta, cbxResConta};
-    
-    for( JComboBox combo : combos )
-    {
-      int indexRemover = -1;
-
-      for( int i=0; i<combo.getItemCount(); i++ )
-      {
-        String itemCombo = (String)combo.getItemAt( i );
-
-        if( itemCombo.equals( conta ) ){
-          indexRemover = i;
-          break;
-        }
-      }
-
-      if( indexRemover != -1 )
-      {
-        combo.removeItemAt( indexRemover );
-      }
-    }
-  }
-  public void atualizarCaixaRemovido( String caixa )
-  {
-    
-    JComboBox[] combos = {cbxMovCaixa, cbxResCaixa};
-    
-    for( JComboBox combo : combos )
-    {
-      int indexRemover = -1;
-
-      for( int i=0; i<combo.getItemCount(); i++ )
-      {
-        String itemCombo = (String)combo.getItemAt( i );
-
-        if( itemCombo.equals( caixa ) )
-        {
-          indexRemover = i;
-          break;
-        }
-      }
-
-      if( indexRemover != -1 )
-      {
-        combo.removeItemAt( indexRemover );
-      }
-    }
-  }
-  public void atualizarContaAdicionada( String conta )
-  {
-    cbxMovConta.addItem( conta );
-    cbxResConta.addItem( conta );
-    cbxExtratoConta.addItem( conta );
-    
-    cbxMovConta.setSelectedIndex( -1 );
-    cbxResConta.setSelectedIndex( -1 );
-    cbxExtratoConta.setSelectedIndex( -1 );
-  }
-  public void atualizarCaixaAdicionado( String caixa )
-  {
-    cbxMovCaixa.addItem( caixa );
-    cbxResCaixa.addItem( caixa );
-    
-    cbxMovCaixa.setSelectedIndex( -1 );
-    cbxResCaixa.setSelectedIndex( -1 );
   }
   private void habilitarRecorrencia( boolean habilitarParam )
   {
@@ -2175,131 +1983,50 @@ public class Tela extends JFrame
   {
     return( txfNomeCaixa.getText() );
   }
-  public void setTxfNomeCaixa( String nomeParam )
+  public void setTxfResValorSaldoCaixa( double pSaldo )
   {
-    txfNomeCaixa.setText( nomeParam );
+    this.txfResValorSaldoCaixa.setText( ValueTools.formatToField( pSaldo ) );
   }
-  public Double getDbfSaldoInicialCaixa()
+  public Caixa getCbxResCaixa()
   {
-    return( dbfSaldoInicialCaixa.getValue() );
-  }
-  public void setDbfSaldoInicialCaixa( Double valorParam )
-  {
-    dbfSaldoInicialCaixa.setValue( valorParam );
-  }
-  public void limparSelecaoMovimento()
-  {
-    movimentoTable.getSelectionModel().clearSelection();
-  }
-  public void limparSelecaoConta()
-  {
-    contasTable.getSelectionModel().clearSelection();
-  }
-  public void limparSelecaoCaixa()
-  {
-    caixasTable.getSelectionModel().clearSelection();
-  }
-  public void limparMovimentosModel()
-  { 
-    movimentoModel.setRowCount(0);
-  }
-  public void limparCaixasModel()
-  {
-    caixasModel.setRowCount( 0 );
-  }
-  public void limparContasModel()
-  {
-    contasModel.setRowCount( 0 );
-  }
-  public void limparResumoConta()
-  {
-    setLblResValorMovContaPc( "0,00 %" );
-    setLblResValorMovContaRs( "R$ 0,00" );
-    setLblResValorMovContaAno( "R$ 0,00" );
-  }
-  public DefaultTableModel getMovimentoModel()
-  {
-    return( movimentoModel );
-  }
-  public DefaultTableModel getContasModel()
-  {
-    return( contasModel );
-  }
-  public DefaultTableModel getCaixasModel()
-  {
-    return( caixasModel );
-  }
-  public void limparCombos()
-  {
-    JComboBox[] j = new JComboBox[5];
-    j[0] = cbxMovCaixa;
-    j[1] = cbxMovConta;
-    j[2] = cbxExtratoConta;
-    j[3] = cbxResCaixa;
-    j[4] = cbxResConta;
-    
-    for( JComboBox combo : j )
+    if( this.cbxResCaixa.getSelectedIndex() >= 0 )
     {
-      limparCombo( combo );
-    }
-  }
-  public void limparCombo( JComboBox combo )
-  {
-    if( combo.getItemCount() > 0 )
-      combo.removeAllItems();
-  }
-  public void limparTudo()
-  {
-    // Home
-    cbxResCaixa.setSelectedIndex( -1 );
-    setLblResValorSaldoCaixa( "R$ 0,00" );
-    setLblResValTotEntrCaixa( "R$ 0,00" );
-    setLblResValTotSaidaCaixa( "R$ 0,00" );
-    cbxResConta.setSelectedIndex( -1 );
-    setLblResValorMovContaPc( "0.00 %" );
-    setLblResValorMovContaRs( "R$ 0,00" );
-    setLblResValorMovContaAno( "R$ 0,00" );
-    // Movimento
-    txfMovDescricao.setText( "" );
-    dtcMovData.setDate( new Date() );
-    dbfMovValor.setValue( 0.0 );
-    cbxMovConta.setSelectedIndex( -1 );
-    cbxMovCaixa.setSelectedIndex( -1 );
-    ckbMovPago.setSelected( false );
-    rbtMovRecorrenciaNao.setSelected( true );
-    rbtMovRecorrenciaSim.setSelected( false );
-    habilitarRecorrencia( false );
-    // Cadastros
-    txfNomeConta.setText( "" );
-    cbxTipoConta.setSelectedIndex( -1 );
-    txfNomeCaixa.setText( "" );
-  }
-  public void limparCamposHome()
-  {
-    cbxResCaixa.setSelectedIndex( -1 );
-    cbxResConta.setSelectedIndex( -1 );
-  }
-  public void selecionarCaixaHome( String caixaParam )
-  {
-    cbxResCaixa.setSelectedItem( caixaParam );
-  }
-  public void setLblResValorSaldoCaixa( String saldoParam )
-  {
-    lblResValorSaldoCaixa.setText( saldoParam );
-  }
-  public String getCbxResCaixa()
-  {
-    if( cbxResCaixa.getSelectedIndex() >= 0 )
-    {
-      return( (String) cbxResCaixa.getSelectedItem() );
+      Caixa c;
+      
+      try
+      {
+        c = (Caixa) this.cbxResCaixa.getSelectedItem();
+      }
+      catch( ClassCastException ex )
+      {
+        String opcao = (String) this.cbxResCaixa.getSelectedItem();
+        c = new Caixa();
+        c.setCodCaixa( null );
+        c.setNome(opcao);
+      }
+      return( c );
     }
     return( null );
   }
-  public String getCbxResConta()
+  public Conta getCbxResConta()
   {
-    if( cbxResConta.getSelectedIndex() >= 0 )
+    if( this.cbxResConta.getSelectedIndex() >= 0 )
     {
-      return( (String) cbxResConta.getSelectedItem() );
+      Conta c;
+      
+      try
+      {
+        c = (Conta) this.cbxResConta.getSelectedItem();
+      }
+      catch( ClassCastException ex )
+      {
+        String opcao = (String) this.cbxResConta.getSelectedItem();
+        c = new Conta();
+        c.setCodConta( null );
+        c.setNome(opcao);
+        c.setTipo( (opcao.equals("TODOS DÉBITO"))? 'D' : 'C' );
+      }
+      return( c );
     }
     return( null );
   }
@@ -2311,93 +2038,83 @@ public class Tela extends JFrame
   {
     return( dtcPeriodoFim.getDate() );
   }
-  public void setLblResValTotEntrCaixa( String valorParam )
+  public void setTxfResValTotEntrCaixa( double pValor )
   {
-    lblResValTotEntrCaixa.setText( valorParam );
+    this.txfResValTotEntrCaixa.setText( ValueTools.formatToField( pValor ) );
   }
-  public void setLblResValTotSaidaCaixa( String valorParam )
+  public void setTxfResValTotSaidaCaixa( double pValor )
   {
-    lblResValTotSaidaCaixa.setText( valorParam );
+    this.txfResValTotSaidaCaixa.setText( ValueTools.formatToField( pValor ) );
   }
-  public void setLblResValorMovContaPc( String valorParam )
+  public void setTxfResValorMovContaPc( double pValor )
   {
-    lblResValorMovContaPc.setText( valorParam );
+    this.txfResValorMovContaPc.setText( ValueTools.formatToFieldPerc( pValor ) );
   }
-  public void setLblResValorMovContaRs( String valorParam )
+  public void setTxfResValorMovContaRs( double pValor )
   {
-    lblResValorMovContaRs.setText( valorParam );
+    this.txfResValorMovContaRs.setText( ValueTools.formatToField( pValor ) );
   }
-  public void setLblResValorMovContaAno( String valorParam )
+  public void setTxfResValorMovContaAno( double pValor )
   {
-    lblResValorMovContaAno.setText( valorParam );
+    this.txfResValorMovContaAno.setText( ValueTools.formatToField( pValor ) );
   }
   public Caixa getCaixaTela()
   {
     Caixa caixa = new Caixa();
-    
-    caixa.setSNome( getTxfNomeCaixa() );
-    caixa.setDSaldo( getDbfSaldoInicialCaixa() );
+    caixa.setNome( this.txfNomeCaixa.getText() );
+    caixa.setSaldo( this.dbfSaldoInicialCaixa.getValue() );
+    caixa.setLimite( (this.rbtTipoCaixaCartao.isSelected())? 'S' : 'N' );
+    caixa.setValorLimite( this.dbfValorLimite.getValue() );
     return( caixa );
   }
   public Conta getContaTela()
   {
     Conta conta = new Conta();
-    conta.setSNome( getTxfNomeConta() );
-    conta.setCTipo( getCbxTipoConta().getCCodigo() );
+    conta.setNome( this.txfNomeConta.getText() );
+    conta.setTipo( getCbxTipoConta().getCodigo() );
     return( conta );
   }
-  public Lancamento getLancamentoTela( BD banco )
+  public Lancamento getLancamentoTela()
   {
     Lancamento lancamento = new Lancamento();
     
     if( getCkbMovPago() )
     {
       // lancamento a vista
-      lancamento.setIDataEmissao( DateTools.parseDateToInteger( getDtcMovData() ) );
-      lancamento.setIDataVencimento( DateTools.parseDateToInteger( getDtcMovData() ) );
-      lancamento.setIDataQuitacao( DateTools.parseDateToInteger( getDtcMovData() ) );
+      lancamento.setDataEmissao( DateTools.parseDateToInteger( getDtcMovData() ) );
+      lancamento.setDataVencimento( DateTools.parseDateToInteger( getDtcMovData() ) );
+      lancamento.setDataQuitacao( DateTools.parseDateToInteger( getDtcMovData() ) );
     }
     else
     {
       // provisao
-      lancamento.setIDataEmissao( DateTools.parseDateToInteger( new Date() ) );
-      lancamento.setIDataVencimento( DateTools.parseDateToInteger( getDtcMovData() ) );
-      lancamento.setIDataQuitacao( 0 );
+      lancamento.setDataEmissao( DateTools.parseDateToInteger( new Date() ) );
+      lancamento.setDataVencimento( DateTools.parseDateToInteger( getDtcMovData() ) );
+      lancamento.setDataQuitacao( 0 );
     }
     
     lancamento.setDescricao( getTxfMovDescricao() );
-    lancamento.setDValor( getDbfMovValor() );
-    lancamento.setCTipo( banco.selectCTipoConta( banco.selectICodConta( getCbxMovConta() ) ) );
-    lancamento.setICodConta( banco.selectICodConta( getCbxMovConta() ) );
-    lancamento.setICodCaixa( banco.selectICodCaixa( getCbxMovCaixa() ) );
+    lancamento.setValor( getDbfMovValor() );
+    Conta conta = (Conta) getCbxMovConta();
+    lancamento.setConta( conta );
+    Caixa caixa = (Caixa) getCbxMovCaixa();
+    lancamento.setCaixa( caixa );
     
     return( lancamento );
   }
-  public JTable getCaixasTable()
-  {
-    return( caixasTable );
-  }
-  public JTable getContasTable()
-  {
-    return( contasTable );
-  }
-  public JTable getMovimentoTable()
-  {
-    return( movimentoTable );
-  }
   public int getItfNumVezes()
   {
-    return( itfNumVezes.getValue() );
+    return( this.itfNumVezes.getValue() );
   }
   public int getItfNumPeriodo()
   {
-    return( itfNumPeriodo.getValue() );
+    return( this.itfNumPeriodo.getValue() );
   }
   public EnumPeriodo getCbxPeriodo()
   {
-    if( cbxPeriodo.getSelectedIndex() >= 0 )
+    if( this.cbxPeriodo.getSelectedIndex() >= 0 )
     {
-      return( (EnumPeriodo) cbxPeriodo.getSelectedItem() );
+      return( (EnumPeriodo) this.cbxPeriodo.getSelectedItem() );
     }
     return( null );
   }
@@ -2409,11 +2126,25 @@ public class Tela extends JFrame
   {
     return( this.txtExtrato.getText() );
   }
-  public String getCbxExtratoConta()
+  public Conta getCbxExtratoConta()
   {
-    if( cbxExtratoConta.getSelectedIndex() >= 0 )
+    if( this.cbxExtratoConta.getSelectedIndex() >= 0 )
     {
-      return( (String) this.cbxExtratoConta.getSelectedItem() );
+      Conta c;
+      
+      try
+      {
+        c = (Conta) this.cbxExtratoConta.getSelectedItem();
+      }
+      catch( ClassCastException ex )
+      {
+        String opcao = (String) this.cbxExtratoConta.getSelectedItem();
+        c = new Conta();
+        c.setCodConta( null );
+        c.setNome(opcao);
+        c.setTipo( (opcao.equals("TODOS DÉBITO"))? 'D' : 'C' );
+      }
+      return( c );
     }
     return( null );
   }
@@ -2427,60 +2158,307 @@ public class Tela extends JFrame
   }
   public boolean getCkbExtratoProvisao()
   {
-    return( ckbExtratoProvisao.isSelected() );
+    return( this.ckbExtratoProvisao.isSelected() );
   }
   public boolean getCkbResumoConta()
   {
-    return( ckbResumoConta.isSelected() );
+    return( this.ckbResumoConta.isSelected() );
   }
   public boolean getCkbResumoCaixa()
   {
-    return( ckbResumoCaixa.isSelected() );
+    return( this.ckbResumoCaixa.isSelected() );
   }
   public void habilitarComponentesRecorrencia( boolean hab )
   {
-    lblMovRecorrencia.setVisible(hab);
-    rbtMovRecorrenciaSim.setVisible(hab);
-    rbtMovRecorrenciaNao.setVisible(hab);
-    lblRepetir.setVisible(hab);
-    itfNumVezes.setVisible(hab);
-    lblVezes.setVisible(hab);
-    lblACada.setVisible(hab);
-    itfNumPeriodo.setVisible(hab);
-    cbxPeriodo.setVisible(hab);
-  }
-  public void atualizarSaldoCaixa( Caixa pCaixa )
-  {
-    int linhas = caixasModel.getRowCount();
-    
-    if( linhas <= 0 )
-      return;
-    
-    for( int linha=0; linha<linhas; linha++ )
-    {
-      String caixaLinha = (String) caixasModel.getValueAt( linha, 0 );
-      
-      if( caixaLinha.equals( pCaixa.getSNome() ) )
-      {
-        caixasModel.setValueAt( ValueTools.format( pCaixa.getDSaldo() ), linha, 1 );
-        break;
-      }
-    }
+    this.lblMovRecorrencia.setVisible(hab);
+    this.rbtMovRecorrenciaSim.setVisible(hab);
+    this.rbtMovRecorrenciaNao.setVisible(hab);
+    this.lblRepetir.setVisible(hab);
+    this.itfNumVezes.setVisible(hab);
+    this.lblVezes.setVisible(hab);
+    this.lblACada.setVisible(hab);
+    this.itfNumPeriodo.setVisible(hab);
+    this.cbxPeriodo.setVisible(hab);
   }
   public void setGrafico( JFreeChart pGrafico )
   {
     if( pGrafico != null )
     {
-      pnlGrafico.setChart( pGrafico );
-      pnlGrafico.setVisible( true );
-      pnlGrafico.setMouseWheelEnabled( true );
-      pnlGrafico.setMouseZoomable( true );
+      this.pnlGrafico.setChart( pGrafico );
+      this.pnlGrafico.setVisible( true );
+      this.pnlGrafico.setMouseWheelEnabled( true );
+      this.pnlGrafico.setMouseZoomable( true );
     }
     else
     {
-      pnlGrafico.setMouseWheelEnabled( false );
-      pnlGrafico.setMouseZoomable( false );
-      pnlGrafico.setVisible( false );
+      this.pnlGrafico.setVisible( false );
     }
+  }
+  public void focoConta()
+  {
+    this.txfNomeConta.requestFocus();
+  }
+  public void focoCaixa()
+  {
+    this.txfNomeCaixa.requestFocus();
+  }
+  public void focoLancamento()
+  {
+    this.txfMovDescricao.requestFocus();
+  }
+  public void addCaixaHomeTODOS()
+  {
+    this.cbxResCaixa.addItem( "TODOS" );
+    this.cbxResCaixa.setSelectedIndex( -1 );
+  }
+  public void addContaHomeTODOS()
+  {
+    this.cbxResConta.addItem( "TODOS CRÉDITO" );
+    this.cbxResConta.addItem( "TODOS DÉBITO" );
+    //--
+    this.cbxExtratoConta.addItem( "TODOS CRÉDITO" );
+    this.cbxExtratoConta.addItem( "TODOS DÉBITO" );
+  }
+  public void setLancamentos( ArrayList<Lancamento> pLancList )
+  {
+    this.movimentoModel.setLinhas( pLancList );
+  }
+  public void setContas( ArrayList<Conta> pContasList )
+  {
+    this.contasModel.setLinhas( pContasList );
+  }
+  public void setCaixas( ArrayList<Caixa> pCaixasList )
+  {
+    this.caixasModel.setLinhas( pCaixasList );
+  }
+  public void limparContasGeral( ArrayList<Conta> contas )
+  {
+    this.cbxResConta.removeAllItems();
+    this.cbxExtratoConta.removeAllItems();
+    this.cbxMovConta.removeAllItems();
+    this.contasModel.limpar();
+    
+    for( Conta c : contas )
+    {
+      this.cbxResConta.addItem( c );
+      this.cbxExtratoConta.addItem( c );
+      this.cbxMovConta.addItem( c );
+    }
+    
+    this.contasModel.setLinhas( contas );
+  }
+  public void limparCaixasGeral( ArrayList<Caixa> caixas )
+  {
+    this.cbxResCaixa.removeAllItems();
+    this.cbxMovCaixa.removeAllItems();
+    this.cbxTransfCaixaOrigem.removeAllItems();
+    this.cbxTransfCaixaDestino.removeAllItems();
+    
+    this.caixasModel.limpar();
+    
+    for( Caixa c : caixas )
+    {
+      this.cbxResCaixa.addItem( c );
+      this.cbxMovCaixa.addItem( c );
+      this.cbxTransfCaixaOrigem.addItem( c );
+      this.cbxTransfCaixaDestino.addItem( c );
+    }
+    
+    this.caixasModel.setLinhas( caixas );
+  }
+  public void atualizarCampos( final Object pDestino )
+  {
+    if( pDestino instanceof Caixa ) {
+      Caixa c = (Caixa)pDestino;
+      
+      this.txfNomeCaixa.setText( c.getNome() );
+      this.dbfSaldoInicialCaixa.setValue( c.getSaldo() );
+      
+      if( c.getLimite() == 'S' ) {
+        this.rbtTipoCaixaCartao.setSelected( true );
+        this.rbtTipoCaixaNormal.setSelected( false );
+        this.dbfValorLimite.setValue( c.getValorLimite() );
+      }
+      else {
+        this.rbtTipoCaixaCartao.setSelected( false );
+        this.rbtTipoCaixaNormal.setSelected( true );
+        this.dbfValorLimite.setValue( 0.0 );
+      }
+    }
+    else if( pDestino instanceof Conta ) {
+      Conta c = (Conta)pDestino;
+      
+      this.txfNomeConta.setText( c.getNome() );
+      this.cbxTipoConta.setSelectedItem( EnumTipoConta.getPorCodigo( c.getTipo() ) );
+    }
+    else {
+      try {
+      SwingUtilities.invokeAndWait( new Runnable() {
+        @Override
+        public void run() {
+          Lancamento l = (Lancamento)pDestino;
+          int data = (l.getPago() == 'S')? l.getDataQuitacao() : l.getDataVencimento();
+          boolean pago = l.getPago() == 'S';
+
+          txfMovDescricao.setText( l.getDescricao() );
+          dtcMovData.setDate( DateTools.parseDataIntToDate( data ) );
+          dbfMovValor.setValue( l.getValor() );
+          cbxMovConta.setSelectedItem( l.getConta() );
+          cbxMovCaixa.setSelectedItem( l.getCaixa() );
+          ckbMovPago.setSelected( pago );
+        }
+      });
+      }
+      catch( InvocationTargetException | InterruptedException ex ) {}
+    }
+  }
+  public void habilitarCampoAlteracao( String pObjeto, boolean hab )
+  {
+    if( pObjeto.equals( "Caixa" ) ) {
+      this.dbfSaldoInicialCaixa.setEnabled( hab );
+      this.rbtTipoCaixaCartao.setEnabled( hab );
+      this.rbtTipoCaixaNormal.setEnabled( hab );
+    }
+    else if( pObjeto.equals( "Conta" ) ) {
+      this.cbxTipoConta.setEnabled( hab );
+    }
+    else if( pObjeto.equals( "Lancamento" ) ) {
+      this.dtcMovData.setEnabled( hab );
+      this.dtcMovData.setEditable( hab );
+      this.cbxMovConta.setEnabled( hab );
+      this.cbxMovCaixa.setEnabled( hab );
+    }
+    else if( pObjeto.equals( "Transferencia" ) ) {
+      this.cbxTransfCaixaOrigem.setEnabled( hab );
+      this.cbxTransfCaixaDestino.setEnabled( hab );
+      this.txfTransfDescricao.setEnabled( hab );
+      this.dtcTransfData.setEnabled( hab );
+      this.dbfTransfValor.setEnabled( hab );
+      this.ckbTransf.setEnabled( hab );
+    }
+  }
+  public void habilitarTipoCaixa( boolean hab ) {
+    this.dbfValorLimite.setEnabled( hab );
+  }
+  public boolean getRbtTipoCaixaCartao() {
+    return( this.rbtTipoCaixaCartao.isSelected() );
+  }
+  public boolean getRbtTipoCaixaNormal() {
+    return( this.rbtTipoCaixaNormal.isSelected() );
+  }
+  public double getDbfValorLimite() {
+    return( this.dbfValorLimite.getValue() );
+  }
+  public void setTxfResSaldoCaixaLimite( double pValor ) {
+    this.txfResSaldoCaixaLimite.setText( ValueTools.formatToField( pValor ) );
+  }
+  public void limparCamposTransferencia() {
+    this.cbxTransfCaixaOrigem.setSelectedIndex( -1 );
+    this.cbxTransfCaixaDestino.setSelectedIndex( -1 );
+    this.txfTransfDescricao.setText( "" );
+    this.dtcTransfData.setDate( null );
+    this.dbfTransfValor.setValue( 0.0 );
+    this.ckbTransf.setSelected( false );
+  }
+  public void focoTransferencia() {
+    this.cbxTransfCaixaOrigem.requestFocus();
+  }
+  public Caixa getCbxTransfCaixaOrigem() {
+    if( this.cbxTransfCaixaOrigem.getSelectedIndex() >= 0 ) {
+      return( (Caixa) this.cbxTransfCaixaOrigem.getSelectedItem() );
+    }
+    return( null );
+  }
+  public Caixa getCbxTransfCaixaDestino() {
+    if( this.cbxTransfCaixaDestino.getSelectedIndex() >= 0 ) {
+      return( (Caixa) this.cbxTransfCaixaDestino.getSelectedItem() );
+    }
+    return( null );
+  }
+  public String getTxfTransfDescricao() {
+    return( this.txfTransfDescricao.getText() );
+  }
+  public Date getDtcTransfData() {
+    return( this.dtcTransfData.getDate() );
+  }
+  public double getDbfTransfValor() {
+    return( this.dbfTransfValor.getValue() );
+  }
+  public boolean getCkbTransf() {
+    return( this.ckbTransf.isSelected() );
+  }
+  public Lancamento getTransferenciaTela() {
+    Lancamento transf = new Lancamento();
+    
+    transf.setCaixa( getCbxTransfCaixaOrigem() );
+    transf.setConta( null ); // conta == null siginifica transferencia
+    transf.setDescricao( getTxfTransfDescricao() );
+    
+    if( getCkbTransf() ) {
+      // pago
+      transf.setDataEmissao( DateTools.parseDateToInteger( getDtcTransfData() ) );
+      transf.setDataQuitacao( DateTools.parseDateToInteger( getDtcTransfData() ) );
+      transf.setDataVencimento( DateTools.parseDateToInteger( getDtcTransfData() ) );
+      transf.setPago( 'S' );
+    }
+    else {
+      // provisionado
+      transf.setDataEmissao( DateTools.getDataAtual() );
+      transf.setDataQuitacao( 0 );
+      transf.setDataVencimento( DateTools.parseDateToInteger( getDtcTransfData() ) );
+      transf.setPago( 'N' );
+    }
+    
+    transf.setValor( getDbfTransfValor() );
+    
+    return( transf );
+  }
+  public void perderFocoLancamento() {
+    this.pnlLancamentoMov.requestFocus();
+  }
+  public void perderFocoTransferencia() {
+    this.pnlTransferencia.requestFocus();
+  }
+  public void perderFocoConta() {
+    this.pnlCadConta.requestFocus();
+  }
+  public void perderFocoCaixa() {
+    this.pnlCadCaixa.requestFocus();
+  }
+  private void criarListener() {
+    KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+      @Override
+      public boolean dispatchKeyEvent(KeyEvent e) {
+        try {
+          AOPRESSIONARTecla(e);
+        }
+        catch( Exception exc ) {
+          System.out.println( "Erro ao disparar evento de tecla." );
+        }
+        return false;
+      }
+    });
+  }
+  public void AOPRESSIONARTecla( KeyEvent e ) {
+    if( e.isControlDown() && e.getKeyCode() == KeyEvent.VK_I && e.getID() == KeyEvent.KEY_PRESSED ) {
+      if( this.console.isVisible() ) {
+        this.console.setVisible( false );
+      }
+      else {
+        this.console.setVisible( true );
+      }
+    }
+  }
+  private void iniciarConsole() {
+    this.console = new FrConsole();
+  }
+  public void setCaixaResumoSemLimite() {
+    this.txfResSaldoCaixaLimite.setText( "R$           -- " );
+  }
+  public void lostFocus() {
+    this.dtcPeriodoIni.requestFocus();
+  }
+  public void mudarFoco( Component c ) {
+    c.requestFocus();
   }
 }

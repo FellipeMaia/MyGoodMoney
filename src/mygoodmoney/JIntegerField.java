@@ -32,106 +32,81 @@ import javax.swing.JLabel;
 /**
  * @class JIntegerField
  */
-public class JIntegerField extends JTextField
-{
+public class JIntegerField extends JTextField {
   private int valor;  /**< O valor armazenado no JTextField em formato inteiro. */
 
   /**
   * @brief Construtor da classe.
   */
-  public JIntegerField()
-  {
+  public JIntegerField() {
     super( "0" );
     setHorizontalAlignment( JLabel.RIGHT );
     this.valor = 0;
-    this.addFocusListener(
-      new FocusListener()
-      {
+    this.addFocusListener( new FocusListener() {
       @Override
-      public void focusGained(FocusEvent e)
-      {
-        if( getText().equals( "0" ) )
-        {
+      public void focusGained( FocusEvent e ) {
+        if( getText().equals( "0" ) ) {
           setText( "" );
         }
-        else
-        {
+        else {
           selectAll();
         }
       }
       @Override
-      public void focusLost(FocusEvent e)
-      {
-        if( getText().isEmpty() || !valorValido( getText() ) )
-        {
+      public void focusLost( FocusEvent e ) {
+        if( getText().isEmpty() || !valorValido( getText() ) ) {
           setText( "0");
         }
-        if( getText().indexOf( "." ) != -1 )
-        {
+        if( getText().indexOf( "." ) != -1 ) {
           setText( getText().replaceAll( "\\.", "" ) );
         }
-        if( getText().indexOf( "," ) != -1 )
-        {
+        if( getText().indexOf( "," ) != -1 ) {
           setText( getText().replaceAll( "\\.", "" ) );
         }
         valor = Integer.parseInt( getText() );
       }
-    }
-    );
+    });
   }
-
   /**
-  * @brief Verifica se o valor recebido no campo é valido.
-  * @param psValor O valor recebido.
-  * @return true se sim, ou false se não.
-  */
-  private boolean valorValido( String psValor )
-  {
-    try
-    {
-      if( psValor.indexOf( "," ) != -1 )
-      {
-        psValor = psValor.replaceAll( ",", "" );
+   * @brief Verifica se o valor recebido no campo é valido.
+   * @param pValor O valor recebido.
+   * @return true se sim, ou false se não.
+   */
+  private boolean valorValido( String pValor ) {
+    try {
+      if( pValor.indexOf( "," ) != -1 ) {
+        pValor = pValor.replaceAll( ",", "" );
       }
-      if( psValor.indexOf( "." ) != -1 )
-      {
-        psValor = psValor.replaceAll( "\\.", "" );
+      if( pValor.indexOf( "." ) != -1 ) {
+        pValor = pValor.replaceAll( "\\.", "" );
       }
       
-      int valorValido = Integer.parseInt( psValor );
-      
+      int valorValido = Integer.parseInt( pValor );
       return( true );
     }
-    catch( NumberFormatException e )
-    {
-      System.out.println( "O valor " + valor + " nao eh um int valido." );
+    catch( NumberFormatException e ) {
+      System.out.println( "ERRO: O valor " + valor + " não é um int válido." );
       return( false );
     }
   }
-
   /**
-  * @brief Obtém o valor do campo.
-  * @return O valor do campo.
-  */
-  public int getValue()
-  {
+   * @brief Obtém o valor do campo.
+   * @return O valor do campo.
+   */
+  public int getValue() {
     return( this.valor );
   }
-
   /**
-  * @brief Seta o valor no campo texto.
-  * @param piValor O valor a ser setado.
-  */
-  public void setValue( int piValor )
-  {
-    this.valor = piValor;
-    if( piValor == 0 )
-    {
+   * @brief Seta o valor no campo texto.
+   * @param pValor O valor a ser setado.
+   */
+  public void setValue( int pValor ) {
+    this.valor = pValor;
+    if( pValor == 0 ) {
       setText( "" );
     }
-    else
-    {
-      setText( new Integer( piValor ).toString() );
+    else {
+      setText( new Integer( pValor ).toString() );
     }
   }
 }

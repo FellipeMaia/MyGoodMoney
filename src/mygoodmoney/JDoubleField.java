@@ -24,55 +24,53 @@
 
 package mygoodmoney;
 
+import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import javax.swing.BorderFactory;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.DocumentFilter;
 
 /**
  * @class JDoubleField
  */
-public class JDoubleField extends JTextField
-{
+public class JDoubleField extends JTextField {
   private Double valor;  /**< O valor armazenado no JTextField em formato Double. */
 
   /**
   * @brief Construtor da classe JDoubleField.
   */
-  public JDoubleField()
-  {
+  public JDoubleField() {
     super( "0,00" );
     setHorizontalAlignment( JLabel.RIGHT );
     this.valor = new Double( 0.0 );
-    this.addFocusListener( new FocusListener()
-    {
+    this.addFocusListener( new FocusListener() {
       @Override
-      public void focusGained(FocusEvent e)
-      {
-        if( getText().equals( "0,00" ) )
-        {
-          setText( "" );
-        }
-        else
-        {
+      public void focusGained(FocusEvent e) {
+        //if( getText().equals( "0,00" ) ) {
+        //  setText( "" );
+        //}
+        //else {
           selectAll();
-        }
+          setBorder( BorderFactory.createLineBorder( Color.gray ));
+        //}
       }
       @Override
-      public void focusLost(FocusEvent e)
-      {
-        if( getText().isEmpty() || !valorValido( getText() ) )
-        {
+      public void focusLost(FocusEvent e) {
+        if( getText().isEmpty() || !valorValido( getText() ) ) {
           setText( "0,00");
         }
-        if( getText().indexOf( "." ) != -1 )
-        {
+        if( getText().indexOf( "." ) != -1 ) {
           setText( getText().replaceAll( "\\.", "," ) );
         }
         valor = Double.parseDouble( getText().replaceAll( ",", "\\." ) );
       }
-    }
-    );
+    });
+    DocumentFilter filtro = new NumberDocumentFilter();
+    ((AbstractDocument) this.getDocument()).setDocumentFilter( filtro );
+    // criar document listener
   }
 
   /**
@@ -80,12 +78,9 @@ public class JDoubleField extends JTextField
   * @param psValor O valor recebido.
   * @return true se sim, ou false se não.
   */
-  private boolean valorValido( String psValor )
-  {
-    try
-    {
-      if( psValor.indexOf( "," ) != -1 )
-      {
+  private boolean valorValido( String psValor ) {
+    try {
+      if( psValor.indexOf( "," ) != -1 ) {
         psValor = psValor.replaceAll( ",", "." );
       }
       
@@ -93,8 +88,7 @@ public class JDoubleField extends JTextField
       
       return( true );
     }
-    catch( NumberFormatException e )
-    {
+    catch( NumberFormatException e ) {
       return( false );
     }
   }
@@ -103,8 +97,7 @@ public class JDoubleField extends JTextField
   * @brief Obtém o valor do campo.
   * @return O valor do campo.
   */
-  public Double getValue()
-  {
+  public Double getValue() {
     return( this.valor );
   }
 
@@ -112,18 +105,20 @@ public class JDoubleField extends JTextField
   * @brief Seta o valor no campo texto.
   * @param pdValor O valor a ser setado.
   */
-  public void setValue( Double pdValor )
-  { 
+  public void setValue( Double pdValor ) { 
     this.valor = pdValor;
     
-    if( pdValor.equals( Double.NaN ) )
-    {
+    if( pdValor.equals( Double.NaN ) ) {
       setText( "0,00" );
     }
-    else
-    {
+    else {
       setText( ValueTools.format( pdValor ).replace( "R$","" ) );
       //setText( valorParam.toString() );
     }
+  }
+  
+  @Override
+  public void requestFocus() {
+    super.requestFocus();
   }
 }

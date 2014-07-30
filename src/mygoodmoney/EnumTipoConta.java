@@ -27,84 +27,69 @@ package mygoodmoney;
 /**
  * @enum EnumTipoConta
  */
-public enum EnumTipoConta
-{
+public enum EnumTipoConta {
   CREDITO('C',"Crédito"),  /**< Define 'C' para CREDITO */
   DEBITO('D',"Débito");    /**< Define 'D' para DEBITO */
   
-  private final char   cCodigo;
-  private final String sDescricao;
+  private final char   codigo;
+  private final String descricao;
 
   /**
-  * @brief Construtor do enum EnumTipoConta.
-  * @param pcCodigo O código do enum.
-  * @param psDescricao A descrição do enum.
-  */
-  private EnumTipoConta( char pcCodigo, String psDescricao )
-  {
-    this.cCodigo    = pcCodigo;
-    this.sDescricao = psDescricao;
+   * @brief Construtor do enum EnumTipoConta.
+   * @param pCodigo O código do enum.
+   * @param pDescricao A descrição do enum.
+   */
+  private EnumTipoConta( char pCodigo, String pDescricao ) {
+    this.codigo    = pCodigo;
+    this.descricao = pDescricao;
   }
 
   /**
-  * @brief Obtém o código do enum.
-  * @return O código do enum.
-  */
-  public char getCCodigo()
-  {
-    return( this.cCodigo );
+   * @brief Obtém o código do enum.
+   * @return O código do enum.
+   */
+  public char getCodigo() {
+    return( this.codigo );
   }
-
   /**
-  * @brief Obtém a descrição do enum.
-  * @return A descrição do enum.
-  */
-  public String getSDescricao()
-  {
-      return( this.sDescricao );
+   * @brief Obtém a descrição do enum.
+   * @return A descrição do enum.
+   */
+  public String getDescricao() {
+      return( this.descricao );
   }
-
   /**
-  * @brief Busca um enum por código.
-  * @param pcCodEnum O código do ennum.
-  * @return O enum se encontrado, ou null se não.
-  */
-  public static EnumTipoConta getPorCodigo( char pcCodEnum )
-  {
-    for( EnumTipoConta valor : EnumTipoConta.values() )
-    {
-      if( valor.cCodigo == pcCodEnum )
-      {
+   * @brief Busca um enum por código.
+   * @param pCodEnum O código do ennum.
+   * @return O enum se encontrado, ou null se não.
+   */
+  public static EnumTipoConta getPorCodigo( char pCodEnum ) {
+    for( EnumTipoConta valor : EnumTipoConta.values() ) {
+      if( valor.codigo == pCodEnum ) {
         return( valor );
       }
     }
     return( null );
   }
-
   /**
-  * @brief Busca um enum por descrição.
-  * @param psDescricaoEnum A descrição do ennum.
-  * @return O enum se encontrado, ou null se não.
-  */
-  public static EnumTipoConta getPorDescricao( String psDescricaoEnum )
-  {
-    for( EnumTipoConta valor : EnumTipoConta.values() )
-    {
-      if( valor.sDescricao.equals( psDescricaoEnum ) )
-      {
+   * @brief Busca um enum por descrição.
+   * @param pDescricaoEnum A descrição do ennum.
+   * @return O enum se encontrado, ou null se não.
+   */
+  public static EnumTipoConta getPorDescricao( String pDescricaoEnum ) {
+    for( EnumTipoConta valor : EnumTipoConta.values() ) {
+      if( valor.descricao.equals( pDescricaoEnum ) ) {
         return( valor );
       }
     }
     return( null );
   }
-
   /**
-  * @brief Converte o enum para String.
-  * @return A descrição do enum.
-  */
+   * @brief Converte o enum para String.
+   * @return A descrição do enum.
+   */
   @Override
-  public String toString()
-  {
-    return( this.sDescricao );
+  public String toString() {
+    return( this.descricao );
   }
 }

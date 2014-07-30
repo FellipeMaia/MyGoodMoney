@@ -17,1234 +17,659 @@
 
 package mygoodmoney;
 
-import java.awt.HeadlessException;
-import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
-import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.general.DefaultPieDataset;
-/**
- *
- * @author Ricardo
- */
-public class Main
-{
-  private final Tela frame;
-  private final BD banco;
-  private boolean bancoCriado;
+
+public class Main {
+  private Tela frame;
   private Date perDataIni;
   private Date perDataFim;
   private char transacaoConta;
   private char transacaoCaixa;
   private char transacaoLancamento;
+  private CaixaDAO caixaDAO;
+  private ContaDAO contaDAO;
+  private LancamentoDAO lancamentoDAO;
+  private Caixa caixaAtual;
+  private Conta contaAtual;
+  private Lancamento lancamentoAtual;
   
-  public Main()
-  {
-    // 1.1 - Periodo foi para painel superior
-    // 1.2 - Banco de dados totalmente modificado
-    // 1.3 - Muitos bugs corrigidos e provisao funcionando
-    // 1.4 - Grafico funcionando
-    // 1.5 - Pode digitar a data sem o usar o mouse
-    // 1.6 - Fazer transferencia
-    // 2.0 - Novo layout modelo novo/editar/excluir (22/04/2014)
-    this.frame = new Tela( "My Good Money - Controle Financeiro - Versão 2.0" );
-    this.frame.limparCamposConta();
-    this.frame.setModoBotoesConta( "NAVEGACAO" );
-    this.frame.setModoBotoesCaixa( "NAVEGACAO" );
-    this.frame.setModoBotoesMovimento( "NAVEGACAO" );
-    this.bancoCriado = false;
-    this.banco = new BD();
-    this.perDataIni = new Date();
-    this.perDataFim = new Date();
-    this.transacaoConta = 'I';
-    this.transacaoCaixa = 'I';
-    this.transacaoLancamento = 'I';
+  public Main() {
+    try {
+      SwingUtilities.invokeAndWait( new Runnable() {
+        @Override
+        public void run(){
+          frame = new Tela( "My Good Money - Controle Financeiro - Versão 3.1 (23/07/2014) - beta_release" );
+        }
+      });
+    }
+    catch( InterruptedException ex ) {}
+    catch( InvocationTargetException ex ) {}
   }
-  public void exec()
-  {
-    try
-    {
-      setarCaminhoDirBD();
-      verificarSeExisteBD();
-      processar();
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
+  public void exec() {
+    iniciar();
+    processar();
   }
-  private void setarCaminhoDirBD()
-  {
-    try
-    {
-      File qualquer = new File( "." );
-      String caminho = qualquer.getAbsolutePath();
-      this.frame.setTxfDiretorioBD( caminho.substring( 0, caminho.length()-1) );
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void verificarSeExisteBD()
-  {
-    String caminho = this.frame.getTxfDiretorioBD();
-    String arquivo = this.frame.getTxfNomeBD();
-    
-    this.bancoCriado = this.banco.existeBD( caminho + arquivo );
-    
-    if( this.bancoCriado )
-    {
-      setarPeriodoHome();
-      carregarContasAoIniciarPrograma();
-      carregarCaixasAoIniciarPrograma();
-      carregarLancamentosAoIniciarPrograma();
-      this.frame.selecionarAba( 0 );
-      this.frame.atualizarPainelCaixas();
-      this.frame.atualizarPainelContas();
-      this.frame.atualizarPainelMovimento();
-      carregarGrafico();
-    }
-    else
-    {
-      this.frame.selecionarAba( 4 );
-    }
-  }
-  private void carregarContasAoIniciarPrograma()
-  {
-    try
-    {
-      ArrayList<Conta> contasList = this.banco.selectAlTodasAsContas();
-      
-      if( contasList.isEmpty() )
-      {
-        return;
-      }
+  private void iniciar() {
+    this.transacaoConta = 'C';
+    this.transacaoCaixa = 'C';
+    this.transacaoLancamento = 'C';
+    this.caixaDAO = new CaixaDAO();
+    this.contaDAO = new ContaDAO();
+    this.lancamentoDAO = new LancamentoDAO();
+    this.caixaAtual = null;
+    this.contaAtual = null;
+    this.lancamentoAtual = null;
+    this.frame.mudarEstado( "", "NAVEGACAO" );
 
-      for( Conta conta : contasList )
-      {
-        this.frame.addConta( conta );
-      }
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
+    setarPeriodoHome();
+    recarregarDoBancoDeDados( "Contas" );
+    recarregarDoBancoDeDados( "Caixas" );
+    recarregarDoBancoDeDados( "Lancamentos" );
   }
-  private void carregarCaixasAoIniciarPrograma()
-  {
-    try
-    {
-      ArrayList<Caixa> caixasList = this.banco.selectAlTodosOsCaixas();
-      
-      if( caixasList.isEmpty() )
-      {
-        return;
-      }
-
-      for( Caixa caixa : caixasList )
-      {
-        this.frame.addCaixa( caixa );
-      }
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void carregarLancamentosAoIniciarPrograma()
-  {
-    ArrayList<Lancamento> lancamentosList = this.banco.selectAlTodosOsLancamentosPeriodo
-    (
-      DateTools.parseDateToInteger( this.perDataIni ),
-      DateTools.parseDateToInteger( this.perDataFim )
-    );
+  private void setarPeriodoHome() {
+    Date dataIni, dataFim;
     
-    if( lancamentosList.isEmpty() )
-    {
+    try {
+      dataIni = DateTools.getPrimeiraDataMesAtual();
+      dataFim = DateTools.getUltimaDataMesAtual();
+    }
+    catch( ParseException pe ) {
+      System.out.println( "ParseException: " + pe.getLocalizedMessage() );
+      dataIni = new Date();
+      dataFim = new Date();
+    }
+
+    this.frame.setDtcPeriodoIni( dataIni );
+    this.frame.setDtcPeriodoFim( dataFim );
+    this.perDataIni = dataIni;
+    this.perDataFim = dataFim;
+
+  }
+  private void processar() {
+    do {
+      this.frame.acessar();
+
+      if( this.frame.getComandoTela().equals( "ALTERAR_CAIXA" ) ) {
+        alterar( "Caixa" );
+      }
+      if( this.frame.getComandoTela().equals( "ALTERAR_CONTA" ) ) {
+        alterar( "Conta" );
+      }
+      if( this.frame.getComandoTela().equals( "ALTERAR_LANCAMENTO" ) ) {
+        alterar( "Lancamento" );
+      }
+      if( this.frame.getComandoTela().equals( "ALTERAR_TRANSFERENCIA" ) ) {
+        alterar( "Transferencia" );
+      }
+      if( this.frame.getComandoTela().equals( "ATUALIZAR_PERIODO" ) ) {
+        atualizarPeriodo();
+      }
+      if( this.frame.getComandoTela().equals( "CANCELAR_CAIXA" ) ) {
+        cancelar( "Caixa" );
+      }
+      if( this.frame.getComandoTela().equals( "CANCELAR_CONTA" ) ) {
+        cancelar( "Conta" );
+      }
+      if( this.frame.getComandoTela().equals( "CANCELAR_LANCAMENTO_SELECIONADO" ) ) {
+        cancelar( "Lancamento" );
+      }
+      if( this.frame.getComandoTela().equals( "CANCELAR_TRANSFERENCIA" ) ) {
+        cancelar( "Transferencia" );
+      }
+      if( this.frame.getComandoTela().equals( "CARREGAR_CAIXA_SELECIONADO" ) ) {
+        carregarSelecao( "Caixa" );
+      }
+      if( this.frame.getComandoTela().equals( "CARREGAR_CONTA_SELECIONADA" ) ) {
+        carregarSelecao( "Conta" );
+      }
+      if( this.frame.getComandoTela().equals( "CARREGAR_LANCAMENTO_SELECIONADO" ) ) {
+        carregarSelecao( "Lancamento" );
+      }
+      if( this.frame.getComandoTela().equals( "CONFIRMAR_LANCAMENTO" ) ) {
+        confirmar( "Lancamento" );
+      }
+      if( this.frame.getComandoTela().equals( "CONFIRMAR_CAIXA" ) ) {
+        confirmar( "Caixa" );
+      }
+      if( this.frame.getComandoTela().equals( "CONFIRMAR_CONTA" ) ) {
+        confirmar( "Conta" );
+      }
+      if( this.frame.getComandoTela().equals( "CONFIRMAR_TRANSFERENCIA" ) ) {
+        confirmar( "Transferencia" );
+      }
+      if( this.frame.getComandoTela().equals( "EXCLUIR_CAIXA" ) ) {
+        excluir( "Caixa" );
+      }
+      if( this.frame.getComandoTela().equals( "EXCLUIR_CONTA" ) ) {
+        excluir( "Conta" );
+      }
+      if( this.frame.getComandoTela().equals( "EXCLUIR_LANCAMENTO" ) ) {
+        excluir( "Lancamento" );
+      }
+      if( this.frame.getComandoTela().equals( "INCLUIR_CAIXA" ) ) {
+        incluir( "Caixa" );
+      }
+      if( this.frame.getComandoTela().equals( "INCLUIR_CONTA" ) ) {
+        incluir( "Conta" );
+      }
+      if( this.frame.getComandoTela().equals( "INCLUIR_TRANSFERENCIA" ) ) {
+        incluir( "Transferencia" );
+      }
+      if( this.frame.getComandoTela().equals( "INCLUIR_LANCAMENTO" ) ) {
+        incluir( "Lancamento" );
+      }
+      if( this.frame.getComandoTela().equals( "PERIODO_MENOS" ) ) {
+        mudarPeriodo( '-' );
+      }
+      if( this.frame.getComandoTela().equals( "PERIODO_MAIS" ) ) {
+        mudarPeriodo( '+' );
+      }
+      if( this.frame.getComandoTela().equals( "RESUMO_CAIXA" ) ) {
+        solicitarResumoCaixa();
+      }
+      if( this.frame.getComandoTela().equals( "RESUMO_CONTA" ) ) {
+        solicitarResumoConta();
+      }
+      if( this.frame.getComandoTela().equals( "SOLICITAR_EXTRATO" ) ) {
+        solicitarExtrato();
+      }
+    }
+    while( !this.frame.getComandoTela().equals( "SAIR" ) );
+  }
+  private void atualizarPeriodo() {
+    if( this.frame.getDtcPeriodoIni() == null || this.frame.getDtcPeriodoFim() == null ) {
       return;
     }
-    
-    for( Lancamento lancamento : lancamentosList )
-    {
-      this.frame.addLancamento( lancamento );
-    }
-  }
-  private void setarPeriodoHome()
-  {
-    try
-    {
-      DateFormat mesAno   = new SimpleDateFormat( "MM/yyyy" );
-      DateFormat diaMesAno = new SimpleDateFormat( "dd/MM/yyyy" );
-      String primeiroDia  = "01/";
-      String ultimoDia    = "";
-      String mesAnoStr    = mesAno.format( new Date() );
-      
-      int mes = Integer.parseInt( mesAnoStr.substring( 0, 2) );
-      switch( mes )
-      {
-        case 1:  ultimoDia = "31/"; break;
-        case 2:  ultimoDia = "28/"; break;
-        case 3:  ultimoDia = "31/"; break;
-        case 4:  ultimoDia = "30/"; break;
-        case 5:  ultimoDia = "31/"; break;
-        case 6:  ultimoDia = "30/"; break;
-        case 7:  ultimoDia = "31/"; break;
-        case 8:  ultimoDia = "31/"; break;
-        case 9:  ultimoDia = "30/"; break;
-        case 10: ultimoDia = "31/"; break;
-        case 11: ultimoDia = "30/"; break;
-        case 12: ultimoDia = "31/"; break;
-      }
-      
-      Date dataIni = diaMesAno.parse( primeiroDia + mesAnoStr );
-      Date dataFim = diaMesAno.parse( ultimoDia + mesAnoStr );
-      
-      this.frame.setDtcPeriodoIni( dataIni );
-      this.frame.setDtcPeriodoFim( dataFim );
-      this.perDataIni = dataIni;
-      this.perDataFim = dataFim;
-    }
-    catch( NumberFormatException | ParseException e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void processar()
-  {
-    try
-    {
-      do
-      {
-        if( this.frame.getComandoTela().equals( "ADICIONAR_CAIXA" ) )
-        {
-          adicionarCaixa();
-        }
-        if( this.frame.getComandoTela().equals( "ALTERAR_CONTA" ) )
-        {
-          alterarConta();
-        }
-        if( this.frame.getComandoTela().equals( "ATUALIZAR_PERIODO" ) )
-        {
-          atualizarPeriodo();
-        }
-        if( this.frame.getComandoTela().equals( "CANCELAR_CAIXA_SELECIONADO" ) )
-        {
-          cancelarCaixaSelecionado();
-        }
-        if( this.frame.getComandoTela().equals( "CANCELAR_CONTA" ) )
-        {
-          cancelarConta();
-        }
-        if( this.frame.getComandoTela().equals( "CANCELAR_LANCAMENTO_SELECIONADO" ) )
-        {
-          cancelarLancamentoSelecionado();
-        }
-        if( this.frame.getComandoTela().equals( "CARREGAR_CAIXA_SELECIONADO" ) )
-        {
-          carregarCaixaSelecionado();
-        }
-        if( this.frame.getComandoTela().equals( "CARREGAR_CAIXA_HOME" ) )
-        {
-          carregarCaixaHome();
-        }
-        if( this.frame.getComandoTela().equals( "CARREGAR_CONTA_SELECIONADA" ) )
-        {
-          carregarContaSelecionada();
-        }
-        if( this.frame.getComandoTela().equals( "CARREGAR_CONTA_HOME" ) )
-        {
-          carregarContaHome();
-        }
-        if( this.frame.getComandoTela().equals( "CARREGAR_LANCAMENTO_SELECIONADO" ) )
-        {
-          carregarLancamentoSelecionado();
-        }
-        if( this.frame.getComandoTela().equals( "CONFIRMAR_EXTRATO" ) )
-        {
-          obterExtratoConta();
-        }
-        if( this.frame.getComandoTela().equals( "CONFIRMAR_LANCAMENTO" ) )
-        {
-          confirmarLancamento();
-        }
-        if( this.frame.getComandoTela().equals( "CONFIRMAR_CONTA" ) )
-        {
-          confirmarConta();
-        }
-        if( this.frame.getComandoTela().equals( "CRIAR_BD" ) )
-        {
-          criarBD();
-        }
-        if( this.frame.getComandoTela().equals( "DECREMENTAR_PERIODO" ) )
-        {
-          decrementarPeriodo();
-        }
-        if( this.frame.getComandoTela().equals( "EDITAR_CAIXA" ) )
-        {
-          editarCaixa();
-        }
-        if( this.frame.getComandoTela().equals( "EDITAR_LANCAMENTO" ) )
-        {
-          alterarLancamento();
-        }
-        if( this.frame.getComandoTela().equals( "EXCLUIR_BD" ) )
-        {
-          excluirBD();
-        }
-        if( this.frame.getComandoTela().equals( "EXCLUIR_CAIXA" ) )
-        {
-          excluirCaixa();
-        }
-        if( this.frame.getComandoTela().equals( "EXCLUIR_CONTA" ) )
-        {
-          excluirConta();
-        }
-        if( this.frame.getComandoTela().equals( "EXCLUIR_LANCAMENTO" ) )
-        {
-          excluirLancamento();
-        }
-        if( this.frame.getComandoTela().equals( "INCLUIR_CONTA" ) )
-        {
-          incluirConta();
-        }
-        if( this.frame.getComandoTela().equals( "INCLUIR_LANCAMENTO" ) )
-        {
-          incluirLancamento();
-        }
-        if( this.frame.getComandoTela().equals( "INCREMENTAR_PERIODO" ) )
-        {
-          incrementarPeriodo();
-        }
-        if( this.frame.getComandoTela().equals( "LIMPAR_BD" ) )
-        {
-          limparBD();
-        }
-        if( this.frame.getComandoTela().equals( "PESQUISAR_DIR" ) )
-        {
-          pesquisarDir();
-        }
-        this.frame.acessar();
-      }
-      while( !this.frame.getComandoTela().equals( "SAIR" ) );
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void atualizarPeriodo()
-  {
     this.perDataIni = this.frame.getDtcPeriodoIni();
     this.perDataFim = this.frame.getDtcPeriodoFim();
-    recarregarLancamentos();
+    recarregarDoBancoDeDados("Lancamentos" );
   }
-  private void criarBD()
-  {
-    try
-    {
-      if( this.bancoCriado )
-      {
-        Mensagem.aviso( "Banco de dados já criado.\nExclua o atual para criar um novo!", this.frame );
-        return;
-      }
-      
-      String caminhoBanco = this.frame.getTxfDiretorioBD();
-      String nomeBanco = this.frame.getTxfNomeBD();
-
-      this.banco.criarBancoDeDados( caminhoBanco + nomeBanco );
-      this.bancoCriado = true;
-      setarPeriodoHome();
-    }
-    catch( ClassNotFoundException e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void limparBD()
-  {
-    try
-    {
-      if( this.bancoCriado )
-      {
-        if( Mensagem.confirmacao( "Confirma DELETAR todos os dados existentes?" , this.frame ) )
-        {
-          this.banco.excluirTodosRegistros();
-          this.frame.limparMovimentosModel();
-          this.frame.limparContasModel();
-          this.frame.limparCaixasModel();
-          this.frame.limparCombos();
-        }
-      }
-      else
-      {
-        Mensagem.aviso( "Não existe nenhum banco de dados criado!", this.frame );
-      }
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void excluirBD()
-  {
-    try
-    {
-      if( this.bancoCriado )
-      {
-        if( !Mensagem.confirmacao( "Confirma exclusão do Banco de Dados?", this.frame ) )
-        {
-          return;
-        }
-        
-        this.banco.fechar();
-        File bancoAtual = new File( this.banco.getSCaminhoAbsoluto() );
-        
-        if( bancoAtual.delete() )
-        {
-          this.frame.limparMovimentosModel();
-          this.frame.limparContasModel();
-          this.frame.limparCaixasModel();
-          
-          System.out.println
-          (
-            "Deletando o arquivo: " + this.banco.getSCaminhoAbsoluto() + "... \n" +
-            "Banco de dados deletado com sucesso!"
-          );
-          
-          // limpa as contas e caixas do home
-          this.frame.limparCombos();
-          this.bancoCriado = false;
-        }
-        else
-        {
-          System.out.println( "Erro ao apagar o arquivo: " + this.banco.getSCaminhoAbsoluto() );
-        }
-      }
-      else
-      {
-        Mensagem.aviso( "Não existe nenhum banco de dadaos criado!", this.frame );
-      }
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void pesquisarDir()
-  {
-    try
-    {
-      JFileChooser folder = new JFileChooser();
-      folder.setCurrentDirectory( new File( "." ) );
-      folder.setDialogTitle( "Selecione uma pasta" );
-      folder.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
-      folder.setAcceptAllFileFilterUsed( false );
-
-      if( folder.showOpenDialog( this.frame ) == JFileChooser.APPROVE_OPTION )
-      {
-        System.out.println( "Selecionado: " + folder.getSelectedFile());
-        this.frame.setTxfDiretorioBD( folder.getSelectedFile().toString() );
-      }
-    }
-    catch( HeadlessException e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void confirmarIncluirConta()
-  {
-    try
-    {
-      if( !this.bancoCriado )
-      {
-        Mensagem.aviso( "Não existe nenhum banco de dados criado!", this.frame );
-        return;
-      }
-
-      if( validarCamposConta() )
-      {
-        Conta conta = this.frame.getContaTela();
-
-        this.frame.addConta( conta );
-        this.banco.inserirConta( conta );
-        this.frame.setModoBotoesConta( "NAVEGACAO" );
-        this.frame.limparCamposConta();
-      }
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void excluirConta()
-  {
-    if( this.frame.getTxfNomeConta().isEmpty() )
-    {
-      Mensagem.info( "Selecione uma conta para excluir.", this.frame );
+  private void confirmarIncluirConta() {
+    if( !validarCamposConta() ) {
       return;
     }
 
-    try
-    {
-      if( Mensagem.confirmacao( "Confirma exclusão da Conta?", this.frame ) )
-      {
-        Conta conta = this.frame.getContaSelecionada();
-        conta.setICodConta( this.banco.selectICodConta( conta.getSNome() ) );
-        
-        this.frame.removeConta( conta );
-        this.banco.excluirConta( conta );
-        this.frame.limparCamposConta();
-        this.frame.setModoBotoesConta( "NOVO" );
-        this.transacaoConta = 'I';
-      }
+    Conta conta = this.frame.getContaTela();
+
+    this.contaDAO.inserir( conta );
+    this.frame.limparCamposConta();
+    this.frame.mudarEstado( "Conta", "NAVEGACAO" );
+    recarregarDoBancoDeDados("Contas" );
+
+    Mensagem.info( "Conta incluída com sucesso.", this.frame );
+  }
+  private void recarregarDoBancoDeDados( String pObjeto) {
+    if( pObjeto.equals( "Contas" ) ) {
+      ArrayList<Conta> contasList = this.contaDAO.selectListaTodosRegistros();
+      this.frame.limparContasGeral( contasList );
+      this.frame.addContaHomeTODOS();
     }
-    catch( Exception e )
-    {
-      e.printStackTrace();
+    else if( pObjeto.equals( "Caixas" ) ) {
+      ArrayList<Caixa> caixasList = this.caixaDAO.selectListaTodosRegistros();
+      this.frame.limparCaixasGeral( caixasList );
+      this.frame.addCaixaHomeTODOS();
+    }
+    else if( pObjeto.equals( "Lancamentos" ) ) {
+      ArrayList<Lancamento> lancamentosList = this.lancamentoDAO.selectListaRegistrosPeriodo(
+        DateTools.parseDateToInteger( this.perDataIni ),
+        DateTools.parseDateToInteger( this.perDataFim )
+      );
+
+      this.frame.setLancamentos( lancamentosList );
     }
   }
-  private void carregarContaSelecionada()
-  {
-    try
-    {
-      Conta conta = this.frame.getContaSelecionada();
-      
-      this.frame.setModoBotoesConta( "SELECIONADO" );
-      this.frame.setTxfNomeConta( conta.getSNome() );
-      this.frame.setCbxTipoConta( EnumTipoConta.getPorCodigo( conta.getCTipo() ) );
-      this.transacaoConta = 'A';
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void alterarConta()
-  {
-    if( this.frame.getTxfNomeConta().isEmpty() )
-    {
-      Mensagem.info( "Selecione uma conta para alterar.", this.frame );
+  private void confirmarAlterarConta() {
+    if( !validarCamposConta() ) {
       return;
     }
     
-    this.transacaoConta = 'A';
-    this.frame.setModoBotoesConta( "EDICAO" );
+    if( !Mensagem.confirmacao( "Confirma alterar a conta?", this.frame ) ) {
+      return;
+    }
+
+    this.contaAtual.setNome( this.frame.getTxfNomeConta() );
+    this.contaDAO.alterar( this.contaAtual );
+    recarregarDoBancoDeDados("Contas" );
+    this.frame.mudarEstado( "Conta", "NAVEGACAO" );
+    this.transacaoConta = 'C';
   }
-  private void confirmarAlterarConta()
-  {
-    try
-    {
-      if( validarCamposConta() )
-      {
-        Conta contaVelha = this.frame.getContaSelecionada();
-        Conta contaNova = new Conta();
-        
-        contaVelha.setICodConta( this.banco.selectICodConta( contaVelha.getSNome() ) );
-        contaNova.setICodConta( contaVelha.getICodConta() );
-        contaNova.setSNome( this.frame.getTxfNomeConta() );
-        contaNova.setCTipo( this.frame.getCbxTipoConta().getCCodigo() );
-        
-        this.frame.substituirConta( contaVelha, contaNova );
-        this.banco.alterarConta( contaNova );
-        this.frame.limparCamposConta();
-        this.frame.setModoBotoesConta( "NOVO" );
-        this.transacaoConta = 'I';
+  private boolean validarCamposConta() {
+    boolean contaValida = true;
+    String mensagemErro = "";
+
+    if( frame.getTxfNomeConta().isEmpty() ) {
+      contaValida = false;
+      mensagemErro += ">> Nome inválido.\n";
+    }
+
+    if( frame.getCbxTipoConta() == null ) {
+      contaValida = false;
+      mensagemErro += ">> Tipo inválido.\n";
+    }
+
+    if( !contaValida ) {
+      Mensagem.info( "Erro ao inserir conta:\n" + mensagemErro, this.frame );
+    }
+
+    return( contaValida );
+  }
+  private void confirmarIncluirLancamento() {
+    if( !validarCamposLancamento() ) {
+      return;
+    }
+    
+    Lancamento lancamento = this.frame.getLancamentoTela();
+
+    // tratar recorrencia
+    if( this.frame.getMovRecorrencia() == 'S' ) {
+      ArrayList<Integer> datasVencimento = DateTools.calcularVencimentos(
+        lancamento.getDataVencimento(),
+        this.frame.getItfNumVezes(),
+        (this.frame.getItfNumPeriodo()*this.frame.getCbxPeriodo().getIDias())
+      );
+      
+      for( Integer data : datasVencimento ) {
+        Lancamento provisao = new Lancamento();
+
+        provisao.setDataEmissao( lancamento.getDataEmissao() );
+        provisao.setDataVencimento( data );
+
+        if( lancamento.getDataQuitacao() > 0 ) {
+          provisao.setDataQuitacao( data );
+        }
+        else {
+          provisao.setDataQuitacao( 0 );
+        }
+
+        provisao.setDescricao( lancamento.getDescricao() );
+        provisao.setValor( lancamento.getValor() );
+        provisao.setConta( lancamento.getConta() );
+        provisao.setCaixa( lancamento.getCaixa() );
+
+        this.lancamentoDAO.inserir( provisao );
+
+        if( provisao.getDataQuitacao() > 0 ) {
+          if( lancamento.getConta().getTipo() == 'D' ) {
+            this.caixaDAO.subtrairDoSaldo( lancamento.getCaixa().getCodCaixa(), lancamento.getValor() );
+          }
+          else {
+            this.caixaDAO.adicionarAoSaldo( lancamento.getCaixa().getCodCaixa(), lancamento.getValor() );
+          }
+        }
       }
     }
-    catch( Exception e )
-    {
-      e.printStackTrace();
+    else {
+      this.lancamentoDAO.inserir( lancamento );
+
+      if( lancamento.getDataQuitacao() > 0 ) {
+        if( lancamento.getConta().getTipo() == 'D' ) {
+          this.caixaDAO.subtrairDoSaldo( lancamento.getCaixa().getCodCaixa(), lancamento.getValor() );
+        }
+        else {
+          this.caixaDAO.adicionarAoSaldo( lancamento.getCaixa().getCodCaixa(), lancamento.getValor() );
+        }
+      }
     }
+
+    this.frame.mudarEstado( "Lancamento", "NAVEGACAO" );
+    recarregarDoBancoDeDados( "Lancamentos" );
+    recarregarDoBancoDeDados( "Caixas" );
+
+    Mensagem.info( "Lançamento incluído com sucesso!" , this.frame);
   }
-  private void cancelarConta()
-  {
-    try
-    {
-      //this.frame.limparCamposConta();
-      this.frame.limparSelecaoConta();
-      this.frame.setModoBotoesConta( "NAVEGACAO" );
+  private boolean validarCamposLancamento() {
+    boolean lancamentoValido = true;
+    String msg = "";
+
+    if( this.frame.getTxfMovDescricao().isEmpty() ) {
+      lancamentoValido = false;
+      msg += ">> Descrição inválida.\n";
+    }
+
+    if( this.frame.getDtcMovData() == null ) {
+      lancamentoValido = false;
+      msg += ">> Data inválida.\n";
+    }
+
+    if( this.frame.getDbfMovValor() == 0.0 ) {
+      lancamentoValido = false;
+      msg += ">> Valor inválido.\n";
+    }
+
+    if( this.frame.getCbxMovConta() == null ) {
+      lancamentoValido = false;
+      msg += ">> Conta inválida.\n";
+    }
+
+    if( this.frame.getCbxMovCaixa() == null ) {
+      lancamentoValido = false;
+      msg += ">> Caixa inválida.\n";
+    }
+
+    if( this.frame.getDtcMovData() != null  && this.frame.getCbxMovConta() != null && this.frame.getCbxMovCaixa() != null && this.transacaoLancamento == 'I' ) {
+      Lancamento lanc = this.frame.getLancamentoTela();
+      if( lanc.getCodLancamento() != 0 ) {
+        Mensagem.info( "Já existe um lançamento para este vencimento, valor, conta e caixa.", this.frame );
+        return( false );
+      }
+    }
+
+    if( !lancamentoValido ) {
+      Mensagem.info( "Erro ao inserir lançamento:\n" + msg, this.frame );
+    }
+
+    return( lancamentoValido );
+  }
+  private void confirmarIncluirCaixa() {
+    if( !validarCamposCaixa() ) {
+      return;
+    }
+    
+    Caixa caixa = this.frame.getCaixaTela();
+
+    this.caixaDAO.inserir( caixa );
+    this.frame.limparCamposCaixa();
+    this.frame.mudarEstado( "Caixa", "NAVEGACAO" );
+    recarregarDoBancoDeDados("Caixas" );
+    
+    Mensagem.info( "Caixa incluído com sucesso.", this.frame );
+  }
+  private boolean validarCamposCaixa() {
+    boolean caixaValido = true;
+    String mensagemErro = "";
+
+    if( this.frame.getTxfNomeCaixa().isEmpty() ) {
+      caixaValido = false;
+      mensagemErro += ">> Nome inválido.\n";
+    }
+
+    if( !caixaValido ) {
+      Mensagem.info( "Erro ao inserir caixa:\n" + mensagemErro, this.frame );
+    }
+
+    return( caixaValido );
+  }
+  private void confirmarAlterarCaixa() {
+    if( !validarCamposCaixa() ) {
+      return;
+    }
+    
+    if( !Mensagem.confirmacao( "Confirma alterar o caixa?", this.frame ) ) {
+      return;
+    }
+
+    this.caixaAtual.setNome( this.frame.getTxfNomeCaixa() );
+    this.caixaAtual.setValorLimite( this.frame.getDbfValorLimite() );
+    //this.caixaAtual.setSaldo( this.frame.getDbfSaldoInicialCaixa() );
+    
+    this.caixaDAO.alterar( this.caixaAtual );
+    recarregarDoBancoDeDados("Caixas" );
+    this.frame.mudarEstado( "Caixa", "NAVEGACAO" );
+    this.transacaoCaixa = 'C';
+  }
+  private void excluir( String pObjeto ) {
+    if( pObjeto.equals( "Caixa" ) ) {
+      if( this.caixaAtual == null ) {
+        Mensagem.info( "Selecione um caixa para excluir.", this.frame );
+        return;
+      }
+      
+      if( this.caixaDAO.existeRegistro( this.caixaAtual ) ) {
+        Mensagem.info( "Não é possível excluir.\nCaixa com movimentação.", this.frame );
+        return;
+      }
+
+      if( !Mensagem.confirmacao( "Confirma exclusão do Caixa?", this.frame ) ) {
+        return;
+      }
+      
+      this.caixaDAO.excluir( this.caixaAtual );
+      recarregarDoBancoDeDados("Caixas" );
+      this.frame.limparCamposCaixa();
+      this.transacaoCaixa = 'C';
+      this.caixaAtual = null;
+    }
+    else if( pObjeto.equals( "Conta" ) ) {
+      if( this.contaAtual == null ) {
+        Mensagem.info( "Selecione uma conta para excluir.", this.frame );
+        return;
+      }
+      
+      if( this.contaDAO.existeRegistro( this.contaAtual ) ) {
+        Mensagem.info( "Não é possível excluir.\nConta com movimentação.", this.frame );
+        return;
+      }
+
+      if( !Mensagem.confirmacao( "Confirma exclusão da conta?", this.frame ) ) {
+        return;
+      }
+      
+      this.contaDAO.excluir( this.contaAtual );
+      recarregarDoBancoDeDados("Contas" );
+      this.frame.limparCamposConta();
+      this.transacaoConta = 'C';
+      this.contaAtual = null;
+    }
+    else if( pObjeto.equals( "Lancamento" ) ) {
+      if( this.lancamentoAtual == null ) {
+        Mensagem.info( "Selecione um lançamento para excluir.", this.frame );
+        return;
+      }
+
+      if( !Mensagem.confirmacao( "Confirma exclusão do lançamento?", this.frame ) ) {
+        return;
+      }
+      
+      this.lancamentoDAO.excluir( this.lancamentoAtual );
+      
+      if( this.lancamentoAtual.getPago() == 'S' ) {
+        if( this.lancamentoAtual.getConta().getTipo() == 'D' ) {
+           this.caixaDAO.adicionarAoSaldo( this.lancamentoAtual.getCaixa().getCodCaixa(), this.lancamentoAtual.getValor() );
+        }
+        else {
+          this.caixaDAO.subtrairDoSaldo( this.lancamentoAtual.getCaixa().getCodCaixa(), this.lancamentoAtual.getValor() );
+        }
+      }
+      recarregarDoBancoDeDados( "Lancamentos" );
+      recarregarDoBancoDeDados( "Caixas" );
+      this.frame.limparCamposLancamento();
+      this.transacaoLancamento = 'C';
+      this.lancamentoAtual = null;
+    }
+    
+    this.frame.mudarEstado( pObjeto, "NAVEGACAO" );
+  }
+  private void cancelar( String pObjeto ) {
+    if( pObjeto.equals( "Caixa" ) ) {
+      if( this.transacaoCaixa == 'I' ) {
+        this.frame.limparCamposCaixa();
+        this.caixaAtual = null;
+      }
+      else {
+        this.frame.atualizarCampos( this.caixaAtual );
+      }
+      this.transacaoCaixa = 'C';
+    }
+    else if( pObjeto.equals( "Conta" ) ) {
+      if( this.transacaoConta == 'I' ) {
+        this.frame.limparCamposConta();
+        this.contaAtual = null;
+      }
+      else {
+        this.frame.atualizarCampos( this.contaAtual );
+      }
       this.transacaoConta = 'C';
     }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private boolean validarCamposConta()
-  {
-    try
-    {
-      boolean contaValida = true;
-      String mensagemErro = "";
-
-      if( frame.getTxfNomeConta().isEmpty() )
-      {
-        contaValida = false;
-        mensagemErro += "-> Nome da conta inválido.\n";
-      }
-      
-      if( frame.getCbxTipoConta() == null )
-      {
-        contaValida = false;
-        mensagemErro += "-> Tipo da conta não selecionado.\n";
-      }
-
-      if( this.frame.getCbxTipoConta() != null && this.transacaoConta == 'I' )
-      {
-        Conta conta = this.frame.getContaTela();
-        int codContaNova = 0;
-        codContaNova = this.banco.selectICodConta( conta.getSNome() );
-
-        if( codContaNova != 0 )  
-        {
-          contaValida = false;
-          mensagemErro += "-> Não é permitido duas contas com o mesmo nome!\n";
-        }
-      }
-      
-      if( !contaValida )
-      {
-        Mensagem.erro( "Erro ao adicionar conta:\n" + mensagemErro, this.frame );
-      }
-      
-      return( contaValida );
-    }
-    catch( HeadlessException e )
-    {
-      e.printStackTrace();
-      return( false );
-    }
-  }
-  private void confirmarIncluirLancamento()
-  {
-    try
-    {
-      if( !this.bancoCriado )
-      {
-        Mensagem.aviso( "Não existe nenhum banco de dados criado!", this.frame );
-        return;
-      }
-
-      if( validarCamposLancamento() )
-      {
-        Lancamento lancamento = this.frame.getLancamentoTela( this.banco );
-        
-        // tratar recorrencia
-        if( this.frame.getMovRecorrencia() == 'S' )
-        {
-          ArrayList<Integer> datasVencimento = DateTools.calcularVencimentos
-          (
-            lancamento.getIDataVencimento(),
-            this.frame.getItfNumVezes(),
-            (this.frame.getItfNumPeriodo()*this.frame.getCbxPeriodo().getIDias())
-          );
-          
-          for( Integer data : datasVencimento )
-          {
-            Lancamento provisao = new Lancamento();
-            
-            provisao.setIDataEmissao( lancamento.getIDataEmissao() );
-            provisao.setIDataVencimento( data );
-            
-            if( lancamento.getIDataQuitacao() > 0 )
-              provisao.setIDataQuitacao( data );
-            else
-              provisao.setIDataQuitacao( 0 );
-            
-            provisao.setDescricao( lancamento.getSDescricao() );
-            provisao.setDValor( lancamento.getDValor() );
-            provisao.setICodConta( lancamento.getICodConta() );
-            provisao.setICodCaixa( lancamento.getICodCaixa() );
-            
-            this.banco.inserirLancamento( provisao );
-            
-            if( provisao.getIDataQuitacao() > 0 )
-            {
-              if( lancamento.getCTipo() == 'D' )
-              {
-                this.banco.subtrairDoSaldoCaixa( lancamento.getICodCaixa(), lancamento.getDValor() );
-                atualizarSaldoCadastroCaixa( this.frame.getCbxMovCaixa(), lancamento.getDValor(), "-" );
-              }
-              else
-              {
-                this.banco.adicionarAoSaldoCaixa( lancamento.getICodCaixa(), lancamento.getDValor() );
-                atualizarSaldoCadastroCaixa( this.frame.getCbxMovCaixa(), lancamento.getDValor(), "+" );
-              }
-            }
-          }
-        }
-        else
-        {
-          this.banco.inserirLancamento( lancamento );
-          
-          if( lancamento.getIDataQuitacao() > 0 )
-          {
-            if( lancamento.getCTipo() == 'D' )
-            {
-              this.banco.subtrairDoSaldoCaixa( lancamento.getICodCaixa(), lancamento.getDValor() );
-              atualizarSaldoCadastroCaixa( this.frame.getCbxMovCaixa(), lancamento.getDValor(), "-" );
-            }
-            else
-            {
-              this.banco.adicionarAoSaldoCaixa( lancamento.getICodCaixa(), lancamento.getDValor() );
-              atualizarSaldoCadastroCaixa( this.frame.getCbxMovCaixa(), lancamento.getDValor(), "+" );
-            }
-          }
-        }
-
-        //this.frame.limparCamposLancamento();
-        this.frame.setModoBotoesMovimento( "NAVEGACAO" );
-        recarregarLancamentos();
-        
-        Mensagem.info( "Lançamento incluído com sucesso!" , this.frame);
-      }
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void recarregarLancamentos()
-  {
-    this.frame.limparMovimentosModel();
-    ArrayList<Lancamento> lancamentosList = this.banco.selectAlTodosOsLancamentosPeriodo
-    (
-      DateTools.parseDateToInteger( this.perDataIni ),
-      DateTools.parseDateToInteger( this.perDataFim )
-    );
-    
-    if( lancamentosList.isEmpty() )
-    {
-      return;
-    }
-    
-    for( Lancamento lancamento : lancamentosList )
-    {
-      this.frame.addLancamento( lancamento );
-    }
-  }
-  private void atualizarSaldoCadastroCaixa( String caixaParam, Double valorParam, String operacaoParam )
-  {
-    try
-    {
-      Caixa caixa = this.frame.getCaixa( caixaParam );
-      
-      switch( operacaoParam )
-      {
-        case "+":
-        {
-          caixa.setDSaldo( caixa.getDSaldo() + valorParam);
-          break;
-        }
-        case "-":
-        {
-          caixa.setDSaldo( caixa.getDSaldo() - valorParam);
-        }
-      }
-      
-      this.frame.substituirCaixa( caixa, caixa );
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private boolean validarCamposLancamento()
-  {
-    try
-    {
-      boolean lancamentoValido = true;
-      String mensagemErro = "";
-
-      if( this.frame.getTxfMovDescricao().isEmpty() )
-      {
-        lancamentoValido = false;
-        mensagemErro += "-> Descrição do lançamento inválida.\n";
-      }
-      
-      if( this.frame.getDtcMovData() == null )
-      {
-        lancamentoValido = false;
-        mensagemErro += "-> Data do lançamento inválida.\n";
-      }
-      
-      if( this.frame.getDbfMovValor().intValue() == 0 )
-      {
-        lancamentoValido = false;
-        mensagemErro += "-> Valor do lançamento inválido.\n";
-      }
-      
-      if( this.frame.getCbxMovConta() == null )
-      {
-        lancamentoValido = false;
-        mensagemErro += "-> Nenhuma conta selecionada.\n";
-      }
-      
-      if( this.frame.getCbxMovCaixa() == null )
-      {
-        lancamentoValido = false;
-        mensagemErro += "-> Nenhum caixa selecionado.\n";
-      }
-      
-      if( this.frame.getDtcMovData() != null &&
-          this.frame.getCbxMovConta() != null &&
-          this.frame.getCbxMovCaixa() != null &&
-          this.transacaoLancamento == 'I'
-        )
-      {
-        Lancamento lanc = this.frame.getLancamentoTela( this.banco );
-        int codLancNovo = this.banco.selectICodLancamento( lanc.getIDataVencimento(), lanc.getDValor(), lanc.getICodConta(), lanc.getICodCaixa() );
-        if( codLancNovo != 0 )
-        {
-          lancamentoValido = false;
-          mensagemErro += "-> Já existe um lançamento para este vencimento, valor, conta e caixa.\n";
-        }
-      }
-      
-      if( !lancamentoValido )
-      {
-        Mensagem.erro( "Erro ao adicionar lançamento:\n" + mensagemErro, this.frame );
-      }
-      
-      return( lancamentoValido );
-    }
-    catch( HeadlessException e )
-    {
-      e.printStackTrace();
-      return( false );
-    }
-  }
-  private void alterarLancamento()
-  {
-    if( this.frame.getTxfMovDescricao().isEmpty() )
-    {
-      Mensagem.info( "Selecione um lançamento para editar.", this.frame );
-      return;
-    }
-    
-    this.frame.setModoBotoesMovimento( "EDICAO" );
-    this.transacaoLancamento = 'I';
-  }
-  private void excluirLancamento()
-  {
-    if( this.frame.getTxfMovDescricao().isEmpty() )
-    {
-      Mensagem.info( "Selecione um lançamento para excluir.", this.frame );
-      return;
-    }
-    
-    try
-    {
-      if( Mensagem.confirmacao( "Confirma exclusão do Lançamento?", this.frame ) )
-      {
-        Lancamento lancamento = this.frame.getLancamentoSelecionado( this.banco );
-        
-        if( lancamento.getCTipo() == 'D' )
-        {
-          this.banco.adicionarAoSaldoCaixa( lancamento.getICodCaixa(), lancamento.getDValor() );
-          atualizarSaldoCadastroCaixa( this.banco.selectSNomeCaixa( lancamento.getICodCaixa()), lancamento.getDValor(), "+" );
-        }
-        else
-        {
-          this.banco.subtrairDoSaldoCaixa( lancamento.getICodCaixa(), lancamento.getDValor() );
-          atualizarSaldoCadastroCaixa( this.banco.selectSNomeCaixa(lancamento.getICodCaixa()), lancamento.getDValor(), "-" );
-        }
-        
-        this.frame.removeLancamento( lancamento );
-        this.banco.excluirLancamento( lancamento );
+    else if( pObjeto.equals( "Lancamento" ) ) {
+      if( this.transacaoLancamento == 'I' ) {
         this.frame.limparCamposLancamento();
-        this.frame.setModoBotoesMovimento( "NAVEGACAO" );
-        this.transacaoLancamento = 'C';
-        this.frame.habilitarComponentesRecorrencia( true );
+        this.lancamentoAtual = null;
       }
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void cancelarLancamentoSelecionado()
-  {
-    try
-    {
-      this.frame.limparCamposLancamento();
-      this.frame.limparSelecaoMovimento();
-      this.frame.setModoBotoesMovimento( "NAVEGACAO" );
+      else {
+        this.frame.atualizarCampos( this.lancamentoAtual );
+      }
+      this.transacaoLancamento = 'C';
       this.frame.habilitarComponentesRecorrencia( true );
-      this.transacaoLancamento = 'I';
     }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void carregarLancamentoSelecionado()
-  {
-    try
-    {
-      this.frame.habilitarComponentesRecorrencia( false );
-
-      Lancamento lanc = this.frame.getLancamentoSelecionado( this.banco );
-      
-      this.frame.setTxfMovDescricao( lanc.getSDescricao() );
-      
-      if( lanc.getIDataQuitacao() == 0 )
-      {
-        this.frame.setDtcMovData( DateTools.parseDataIntToDate( lanc.getIDataVencimento() ) );
-        this.frame.setCkbMovPago( false );
-      }
-      else
-      {
-        this.frame.setDtcMovData( DateTools.parseDataIntToDate( lanc.getIDataQuitacao() ) );
-        this.frame.setCkbMovPago( true );
-      }
-      this.frame.setDbfMovValor( lanc.getDValor() );
-      
-      String nomeConta = this.banco.selectSNomeConta( lanc.getICodConta() );
-      String nomeCaixa = this.banco.selectSNomeCaixa( lanc.getICodCaixa() );
-      
-      this.frame.setCbxMovConta( nomeConta );
-      this.frame.setCbxMovCaixa( nomeCaixa );
-      
-      this.frame.setModoBotoesMovimento( "SELECIONADO" );
-      this.transacaoLancamento = 'A';
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void adicionarCaixa()
-  {
-    try
-    {
-      if( !this.bancoCriado )
-      {
-        Mensagem.aviso( "Não existe nenhum banco de dados criado!", this.frame );
-        return;
-      }
-
-      if( validarCamposCaixa() )
-      {
-        Caixa caixa = this.frame.getCaixaTela();
-        
-        this.frame.addCaixa( caixa );
-        this.banco.inserirCaixa( caixa );
-        this.frame.limparCamposCaixa();
-        this.frame.setModoBotoesCaixa( "NOVO" );
-      }
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void selecionarCaixaRecemAdicionado( Caixa caixaParam )
-  {
-    try
-    {
-      this.frame.selecionarCaixaHome( caixaParam.getSNome() );
-      
-      NumberFormat df = new DecimalFormat( "#,##0.00", new DecimalFormatSymbols (new Locale ("pt", "BR") ) );
-      this.frame.setLblResValorSaldoCaixa( "R$ " + df.format( caixaParam.getDSaldo() ).toString() );
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private boolean validarCamposCaixa()
-  {
-    try
-    {
-      boolean caixaValido = true;
-      String mensagemErro = "";
-
-      if( this.frame.getTxfNomeCaixa().isEmpty() )
-      {
-        caixaValido = false;
-        mensagemErro += "-> Nome do caixa inválido.\n";
-      }
-      
-      if( this.transacaoCaixa == 'I' )
-      {
-        Caixa caixa = this.frame.getCaixaTela();
-        int codCaixaNovo = this.banco.selectICodCaixa( caixa.getSNome() );
-        if( codCaixaNovo != 0 )
-        {
-          caixaValido = false;
-          mensagemErro += "-> Não é permitido dois caixas com o mesmo nome!\n";
-        }
-      }
-      
-      if( !caixaValido )
-      {
-        Mensagem.erro( "Erro ao adicionar caixa:\n" + mensagemErro, this.frame );
-      }
-      
-      return( caixaValido );
-    }
-    catch( HeadlessException e )
-    {
-      e.printStackTrace();
-      return( false );
-    }
-  }
-  private void editarCaixa()
-  {
-    try
-    {
-      if( validarCamposCaixa() )
-      {
-        Caixa caixaVelho = this.frame.getCaixaSelecionado();
-        Caixa caixaNovo  = new Caixa();
-        
-        caixaVelho.setICodCaixa( this.banco.selectICodCaixa( caixaVelho.getSNome() ) );
-        caixaNovo.setICodCaixa( caixaVelho.getICodCaixa() );
-        caixaNovo.setSNome( this.frame.getTxfNomeCaixa() );
-        caixaNovo.setDSaldo( this.frame.getDbfSaldoInicialCaixa() );
-        
-        this.frame.substituirCaixa( caixaVelho, caixaNovo );
-        this.banco.alterarCaixa( caixaNovo );
-        this.frame.limparCamposCaixa();
-        this.frame.setModoBotoesCaixa( "NOVO" );
-        this.transacaoCaixa = 'I';
-      }
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void excluirCaixa()
-  {
-    try
-    {
-      if( Mensagem.confirmacao( "Confirma exclusão do Caixa?", this.frame ) )
-      {
-        Caixa caixa = this.frame.getCaixaSelecionado();
-        caixa.setICodCaixa( this.banco.selectICodCaixa( caixa.getSNome() ) );
-        
-        this.frame.removeCaixa( caixa );
-        this.banco.excluirCaixa( caixa );
-        this.frame.limparCamposCaixa();
-        this.frame.setModoBotoesCaixa( "NOVO" );
-        this.transacaoCaixa = 'I';
-      }
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void cancelarCaixaSelecionado()
-  {
-    try
-    {
-      this.frame.limparCamposCaixa();
-      this.frame.limparSelecaoCaixa();
-      this.frame.setModoBotoesCaixa( "NOVO" );
-      this.transacaoCaixa = 'I';
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void carregarCaixaSelecionado()
-  {
-    try
-    {
-      Caixa caixa = this.frame.getCaixaSelecionado();
-      
-      this.frame.setModoBotoesCaixa( "SELECIONADO" );
-      this.frame.setTxfNomeCaixa( caixa.getSNome() );
-      this.frame.setDbfSaldoInicialCaixa( caixa.getDSaldo() );
-      this.transacaoCaixa= 'A';
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-    }
-  }
-  private void carregarCaixaHome()
-  {
-    if( !this.bancoCriado )
-    {
-      Mensagem.aviso( "Não existe nenhum banco de dados criado!", this.frame );
-      return;
+    else if( pObjeto.equals( "Transferencia" ) ) {
+      this.frame.limparCamposTransferencia();
     }
     
-    String caixaSelecionado = this.frame.getCbxResCaixa();
+    this.frame.mudarEstado( pObjeto, "NAVEGACAO" );
+    this.frame.lostFocus();
+  }
+  private void carregarSelecao( String pObjeto ) {
+    if( pObjeto.equals( "Caixa" ) ) {
+      Caixa caixa = this.frame.getCaixaSelecionado();
+
+      this.caixaAtual = caixa;
+      this.transacaoCaixa = 'A';
+      this.frame.atualizarCampos( caixa );
+    }
+    else if( pObjeto.equals( "Conta" ) ) {
+      Conta conta = this.frame.getContaSelecionada();
+
+      this.contaAtual = conta;
+      this.transacaoConta = 'A';
+      this.frame.atualizarCampos( conta );
+    }
+    else if( pObjeto.equals( "Lancamento" ) ) {
+      Lancamento lancamento = this.frame.getLancamentoSelecionado();
+      if( this.transacaoLancamento != 'I' ) {
+        this.lancamentoAtual = lancamento;
+        this.transacaoLancamento = 'A';
+      }
+      
+      this.frame.habilitarComponentesRecorrencia( this.transacaoLancamento == 'I' );
+      this.frame.atualizarCampos( lancamento );
+    }
+  }
+  private void solicitarResumoCaixa() {
+    Caixa caixaSelecionado = this.frame.getCbxResCaixa();
+    
+    if( caixaSelecionado == null ) {
+      return;
+    }
     
     // saldo do caixa
-    Double saldoSelecionado = this.banco.selectDSaldoCaixa( caixaSelecionado );
-    this.frame.setLblResValorSaldoCaixa( ValueTools.format( saldoSelecionado ) );
+    Double saldoSelecionado = this.caixaDAO.selectSaldo( caixaSelecionado.getCodCaixa() );
+    this.frame.setTxfResValorSaldoCaixa( saldoSelecionado );
+    
+    if( caixaSelecionado.getLimite().equals( 'S' ) ) {
+      double limitesTotais = this.caixaDAO.selectLimite( caixaSelecionado.getCodCaixa() );
+      this.frame.setTxfResSaldoCaixaLimite( saldoSelecionado + limitesTotais );
+    }
+    else {
+      this.frame.setCaixaResumoSemLimite();
+    }
     
     // total de entradas
-    double totalEntradas = this.banco.selectDTotalEntradaPorCaixa
-    (
-      caixaSelecionado,
+    double totalEntradas = this.caixaDAO.selectTotalEntrada(
+      caixaSelecionado.getCodCaixa(),
       DateTools.parseDateToInteger( this.perDataIni ),
       DateTools.parseDateToInteger( this.perDataFim ),
       this.frame.getCkbResumoCaixa()
     );
-    
-    if( totalEntradas != 0 )
-      this.frame.setLblResValTotEntrCaixa( ValueTools.format( totalEntradas ) );
-    else
-      this.frame.setLblResValTotEntrCaixa( "R$ 0,00" );
-    
+
+    this.frame.setTxfResValTotEntrCaixa( totalEntradas );
+
     // total de saidas
-    double totalSaidas = this.banco.selectDTotalSaidaPorCaixa
-    (
-      caixaSelecionado,
+    double totalSaidas = this.caixaDAO.selectTotalSaida(
+      caixaSelecionado.getCodCaixa(),
       DateTools.parseDateToInteger( this.perDataIni ),
       DateTools.parseDateToInteger( this.perDataFim ),
       this.frame.getCkbResumoCaixa()
     );
     
-    if( totalSaidas != 0 )
-      this.frame.setLblResValTotSaidaCaixa( ValueTools.format( totalSaidas ) );
-    else
-      this.frame.setLblResValTotSaidaCaixa( "R$ 0,00" );
+    this.frame.setTxfResValTotSaidaCaixa( totalSaidas );
     
     // tratar saldo provisionado
     /* se marcado provisao, obter os creditos e debitos provisionados */
-    if( this.frame.getCkbResumoCaixa() )
-    {
-      Double entradaProvisionada = this.banco.selectDTotalEntradaProvisionada
-      (
-        caixaSelecionado,
+    if( this.frame.getCkbResumoCaixa() ) {
+      Double entradaProvisionada = this.caixaDAO.selectTotalEntradaProvisionada(
+        caixaSelecionado.getCodCaixa(),
         DateTools.parseDateToInteger( this.perDataIni ),
         DateTools.parseDateToInteger( this.perDataFim )
       );
       
-      if( entradaProvisionada.equals( Double.NaN ) )
+      if( entradaProvisionada.equals( Double.NaN ) ) {
         entradaProvisionada = 0.0;
+      }
 
-      Double saidaProvisionada = this.banco.selectDTotalSaidaProvisionada
-      (
-        caixaSelecionado,
+      Double saidaProvisionada = this.caixaDAO.selectTotalSaidaProvisionada(
+        caixaSelecionado.getCodCaixa(),
         DateTools.parseDateToInteger( this.perDataIni ),
         DateTools.parseDateToInteger( this.perDataFim )
       );
       
-      if( saidaProvisionada.equals( Double.NaN ) )
+      if( saidaProvisionada.equals( Double.NaN ) ) {
         saidaProvisionada = 0.0;
-      
+      }
+
       saldoSelecionado = saldoSelecionado + entradaProvisionada - saidaProvisionada;
-      
-      this.frame.setLblResValorSaldoCaixa( ValueTools.format( saldoSelecionado ) );
+      this.frame.setTxfResValorSaldoCaixa( saldoSelecionado );
     }
-    
+
     carregarGrafico();
   }
-  private void carregarContaHome()
-  {
-    if( !this.bancoCriado )
-    {
-      Mensagem.aviso( "Não existe nenhum banco de dados criado!", this.frame );
+  private void solicitarResumoConta() {
+    Conta contaSelecionada = this.frame.getCbxResConta();
+
+    if( contaSelecionada == null ){
       return;
     }
-    
-    try
-    {
-      String contaSelecionada = this.frame.getCbxResConta();
-      int codConta = this.banco.selectICodConta( contaSelecionada );
-      char tipoConta = this.banco.selectCTipoConta( codConta );
-    
-      // total de saida/entrada
-      double totalMovPeriodo = this.banco.selectDTotalMovimentoPeriodo
-      (
-        tipoConta,
-        DateTools.parseDateToInteger( this.perDataIni ),
-        DateTools.parseDateToInteger( this.perDataFim ),
-        this.frame.getCkbResumoConta()
-      );
+
+    // total de saida/entrada
+    double totalMovPeriodo = this.lancamentoDAO.selectTotalMovimentoPeriodo(
+      contaSelecionada,
+      DateTools.parseDateToInteger( this.perDataIni ),
+      DateTools.parseDateToInteger( this.perDataFim ),
+      this.frame.getCkbResumoConta()
+    );
+
+    double totalContaPeriodo = this.contaDAO.selectTotalPeriodo(
+      contaSelecionada,
+      DateTools.parseDateToInteger( this.perDataIni ),
+      DateTools.parseDateToInteger( this.perDataFim ),
+      this.frame.getCkbResumoConta()
+    );
+
+    // valor do periodo
+    this.frame.setTxfResValorMovContaRs( totalContaPeriodo );
       
-      if( totalMovPeriodo == 0 )
-      {
-        this.frame.limparResumoConta();
-        return;
-      }
-      
-      double totalContaPeriodo = this.banco.selectDTotalContaPeriodo
-      (
-        codConta,
-        DateTools.parseDateToInteger( this.perDataIni ),
-        DateTools.parseDateToInteger( this.perDataFim ),
-        this.frame.getCkbResumoConta()
-      );
-        
-      if( totalContaPeriodo == 0 )
-      {
-        this.frame.limparResumoConta();
-        return;
-      }
-      
-      // porcentagem do periodo
+    // porcentagem do periodo
+    if( totalMovPeriodo > 0 ) {
       BigDecimal porcentagem = new BigDecimal( totalContaPeriodo ).divide( new BigDecimal( totalMovPeriodo ), 4, BigDecimal.ROUND_HALF_UP );
       Double porcentagemFinal = porcentagem.doubleValue() * 100;
-      String formatado = porcentagemFinal.toString();
-      
-      
-      if( formatado.length() - formatado.indexOf( "." ) >= 3 )
-      {
-        formatado = formatado.substring( 0, formatado.indexOf( "." )+3 );
-      }
-      else if( formatado.length() - formatado.indexOf( "." ) == 2 )
-      {
-        formatado = formatado + "0";
-      }
-      else if( formatado.length() - formatado.indexOf( "." ) == 1 )
-      {
-        formatado = formatado + "00";
-      }
 
-      this.frame.setLblResValorMovContaPc( formatado + " %" );
-      
-      // valor do periodo
-      this.frame.setLblResValorMovContaRs( ValueTools.format( totalContaPeriodo ) );
-    
-      // total do ano
-      String inicioAno = DateTools.getSAnoAtual() + "0101";
-      String fimAno    = DateTools.getSAnoAtual() + "1231";
-      
-      int inicioAnoInt = Integer.parseInt( inicioAno );
-      int fimAnoInt = Integer.parseInt( fimAno );
-      
-      double totalAnual = this.banco.selectDTotalContaPeriodo( codConta, inicioAnoInt, fimAnoInt, this.frame.getCkbResumoConta() );
+      this.frame.setTxfResValorMovContaPc( porcentagemFinal );
+    }
+    else {
+      this.frame.setTxfResValorMovContaPc( 0.0 );
+    }
 
-      if( totalAnual != 0 )
-        this.frame.setLblResValorMovContaAno( ValueTools.format( totalAnual ) );
-    }
-    catch( NumberFormatException e )
-    {
-      e.printStackTrace();
-    }
+    // total do ano
+    String inicioAno = DateTools.getSAnoAtual() + "0101";
+    String fimAno    = DateTools.getSAnoAtual() + "1231";
+
+    int inicioAnoInt = Integer.parseInt( inicioAno );
+    int fimAnoInt = Integer.parseInt( fimAno );
+
+    double totalAnual = this.contaDAO.selectTotalPeriodo( contaSelecionada, inicioAnoInt, fimAnoInt, this.frame.getCkbResumoConta() );
+
+    this.frame.setTxfResValorMovContaAno( totalAnual );
   }
-  public void decrementarPeriodo()
-  {
-    if( !this.bancoCriado )
-    {
-      Mensagem.aviso( "Não existe nenhum banco de dados criado!", this.frame );
-      return;
-    }
-    
-    Date dataIni = DateTools.somarSubtrairUmMes( this.perDataIni, '-' );
-    Date dataFim = DateTools.somarSubtrairUmMes( this.perDataFim, '-' );
+  private void mudarPeriodo( char pOpcao ) {
+    Date dataIni = DateTools.somarSubtrairUmMes( this.perDataIni, pOpcao );
+    Date dataFim = DateTools.somarSubtrairUmMes( this.perDataFim, pOpcao );
     
     this.perDataIni = dataIni;
     this.perDataFim = dataFim;
@@ -1252,122 +677,79 @@ public class Main
     this.frame.setDtcPeriodoIni( dataIni );
     this.frame.setDtcPeriodoFim( dataFim );
     
-    recarregarLancamentos();
+    recarregarDoBancoDeDados( "Lancamentos" );
   }
-  public void incrementarPeriodo()
-  {
-    if( !this.bancoCriado )
-    {
-      Mensagem.aviso( "Não existe nenhum banco de dados criado!", this.frame );
-      return;
+  private boolean validarCamposExtrato() {
+    boolean valido = true;
+    String mensagem = "";
+
+    if( this.frame.getCbxExtratoConta() == null ) {
+      valido = false;
+      mensagem += ">> Conta inválida.\n";
+    }
+    if( this.frame.getDtcExtratoIni() == null ) {
+      valido = false;
+      mensagem += ">> Data inicial inválida.\n";
+    }
+    if( this.frame.getDtcExtratoFim() == null ) {
+      valido = false;
+      mensagem += ">> Data final inválida.\n";
     }
 
-    Date dataIni = DateTools.somarSubtrairUmMes( this.perDataIni, '+' );
-    Date dataFim = DateTools.somarSubtrairUmMes( this.perDataFim, '+' );
-    
-    this.perDataIni = dataIni;
-    this.perDataFim = dataFim;
-    
-    this.frame.setDtcPeriodoIni( dataIni );
-    this.frame.setDtcPeriodoFim( dataFim );
-    
-    recarregarLancamentos();
-  }
-  private boolean validarCamposExtrato()
-  {
-    try
-    {
-      boolean valido = true;
-      String mensagem = "";
-      
-      if( this.frame.getCbxExtratoConta() == null )
-      {
-        valido = false;
-        mensagem += "Selecione uma conta.\n";
-      }
-      if( this.frame.getDtcExtratoIni() == null )
-      {
-        valido = false;
-        mensagem += "Período Inicial inválido.\n";
-      }
-      if( this.frame.getDtcExtratoFim() == null )
-      {
-        valido = false;
-        mensagem += "Período Final inválido.\n";
-      }
-      
-      if( !valido )
-      {
-        Mensagem.erro( "Erro ao solicitar extrato:\n" + mensagem, this.frame );
-      }
-      
-      return( valido );
-    }
-    catch( Exception e )
-    {
-      e.printStackTrace();
-      return( false );
-    }
-  }
-  private void obterExtratoConta()
-  {
-    if( !this.bancoCriado )
-    {
-      Mensagem.aviso( "Não existe nenhum banco de dados criado!", this.frame );
-      return;
+    if( !valido ) {
+      Mensagem.aviso( "Erro ao solicitar extrato:\n" + mensagem, this.frame );
     }
 
-    if( !validarCamposExtrato() )
-    {
+    return( valido );
+  }
+  private void solicitarExtrato() {
+    if( !validarCamposExtrato() ) {
       return;
     }
     
-    int codConta = this.banco.selectICodConta( this.frame.getCbxExtratoConta() );
+    Conta conta = this.frame.getCbxExtratoConta();
     
-    ArrayList<String[]> extratoList = this.banco.selectAlExtratoContaPeriodo
-    (
-      codConta,                                                       // conta
+    ArrayList<String[]> extratoList = this.contaDAO.selectListaExtratoPeriodo(
+      conta,                                                         // conta
       DateTools.parseDateToInteger( this.frame.getDtcExtratoIni() ),  // data inicial
       DateTools.parseDateToInteger( this.frame.getDtcExtratoFim() ),  // data final
-      this.frame.getCkbExtratoProvisao()                              // provisao?
+      this.frame.getCkbExtratoProvisao()                              // provisao
      );
     
-    if( extratoList.isEmpty() )
-    {
-      this.frame.setTxtExtrato( "Não existem lançamentos para esta conta." );
+    if( extratoList.isEmpty() ) {
+      this.frame.setTxtExtrato( "Nenhum lançamento para o período." );
       return;
     }
-    
+
     String dtEmissao  = "Data Vcto";
     String dtQuitacao = "Data Quitação";
     String descricao  = "Descrição";
     String valor      = "Valor";
     String caixa      = "Caixa";
-      
+
     dtEmissao  = String.format( "%1$-" + 15 + "s", dtEmissao );
     dtQuitacao = String.format( "%1$-" + 15 + "s", dtQuitacao );
-    descricao  = String.format( "%1$-" + 15 + "s", descricao );
+    descricao  = String.format( "%1$-" + 25 + "s", descricao );
     valor      = String.format( "%1$-" + 15 + "s", valor );
     caixa      = String.format( "%1$-" + 15 + "s", caixa );
-      
-    String cabecalho =
-      dtEmissao + dtQuitacao + descricao + valor + caixa;
+
+    String cabecalho = dtEmissao + dtQuitacao + descricao + valor + caixa;
 
     this.frame.setTxtExtrato( cabecalho );
-    
+
     Double totalGeral = new Double( 0.0 );
 
-    for( String[] linha : extratoList )
-    {
+    for( String[] linha : extratoList ) {
       String dtEmi = String.format( "%1$-" + 15 + "s", linha[0] );
       String dtQui = String.format( "%1$-" + 15 + "s", linha[1] );
-      String descr = String.format( "%1$-" + 15 + "s", linha[2] );
+      String descr = String.format( "%1$-" + 25 + "s", linha[2] );
       String val   = String.format( "%1$-" + 15 + "s", linha[3] );
       String cai   = String.format( "%1$-" + 15 + "s", linha[4] );
 
       // trata descricao para ter no maximo 15 caracteres
-      if( descr.length() > 15 )
-        descr = descr.substring( 0, 14 ) + " ";
+      if( descr.length() > 25 ) {
+        descr = descr.substring( 0, 24 ) + " ";
+      }
 
       totalGeral += ValueTools.unformat( val );
       String linhaFinal = dtEmi + dtQui + descr + val + cai;
@@ -1375,47 +757,43 @@ public class Main
     }
     
     // linha do total
-    String divisor = "---------------------------------------------------------------------------";
+    String divisor = "----------------------------------------------------------------------------------------";
     String ultimaLinha =
       String.format( "%1$-" + 15 + "s", " " ) +
       String.format( "%1$-" + 15 + "s", " " ) +
-      String.format( "%1$-" + 15 + "s", "TOTAL:" ) +
-      String.format( "%1$-" + 15 + "s", ValueTools.format( totalGeral ) ) +
-      String.format( "%1$-" + 15 + "s", " " );
+      String.format( "%1$-" + 15 + "s", " " ) +
+      String.format( "%1$-" + 10 + "s", "TOTAL:" ) +
+      //String.format( "%1$-" + 15 + "s", ValueTools.format( totalGeral ) );
+      ValueTools.format( totalGeral );
 
     this.frame.setTxtExtrato( this.frame.getTxtExtrato() + "\n" + divisor + "\n" + ultimaLinha );
   }
-  public void carregarGrafico()
-  {
-    String caixa = "";
+  public void carregarGrafico() {
+    Caixa caixa;
     
-    if( this.frame.getCbxResCaixa() != null )
+    if( this.frame.getCbxResCaixa() != null ) {
       caixa = this.frame.getCbxResCaixa();
-    else
-    {
+    }
+    else {
       this.frame.setGrafico( null );
       return;
     }
     
     DefaultPieDataset grafico = new DefaultPieDataset();
-    int codCaixa = this.banco.selectICodCaixa( caixa );
     
-    ArrayList<Object[]> dadosGrafico = this.banco.selectAlLancamentosGrafico
-    (
-      codCaixa,
+    ArrayList<Object[]> dadosGrafico = this.lancamentoDAO.selectLancamentosGrafico(
+      caixa.getCodCaixa(),
       DateTools.parseDateToInteger( this.perDataIni ),
       DateTools.parseDateToInteger( this.perDataFim ),
       this.frame.getCkbResumoCaixa()
     );
     
-    if( dadosGrafico.isEmpty() )
-    {
+    if( dadosGrafico.isEmpty() ) {
       this.frame.setGrafico( null );
       return;
     }
     
-    for( Object[] item : dadosGrafico )
-    {
+    for( Object[] item : dadosGrafico ) {
       String conta = (String) item[0];
       Double valor = (Double) item[1];
       
@@ -1429,109 +807,236 @@ public class Main
     
     this.frame.setGrafico( chart );
   }
-  private void incluirLancamento()
-  {
-    this.frame.setModoBotoesMovimento( "EDICAO" );
-    this.transacaoLancamento = 'I';
-    this.frame.limparCamposLancamento();
-  }
-  private void confirmarLancamento()
-  {
-    if( this.transacaoLancamento == 'I' )
-    {
-      confirmarIncluirLancamento();
+  private void confirmarAlterarLancamento() {
+    if( !validarCamposLancamento() ) {
+      return;
     }
-    else if( this.transacaoLancamento == 'A' )
-    {
-      confirmarAlterarLancamento();
-    }
-  }
-  private void confirmarAlterarLancamento()
-  {
-    try
-    {
-      if( validarCamposLancamento() )
-      {
-        Lancamento lancamentoVelho = this.frame.getLancamentoSelecionado( this.banco );
-        Lancamento lancamentoNovo  = this.frame.getLancamentoTela( this.banco );
-        lancamentoNovo.setICodLancamento( lancamentoVelho.getICodLancamento() );
-        
-        if( lancamentoNovo.getCTipo() != lancamentoVelho.getCTipo() )
-        {
-          Mensagem.erro( "Alteração não permidita: D -> C ou C-> D", this.frame );
-          return;
-        }
-        
-        if( lancamentoVelho.getIDataQuitacao() != 0 && !this.frame.getCkbMovPago() )
-        {
-          // transformar em provisao
-          lancamentoNovo.setIDataEmissao( lancamentoVelho.getIDataEmissao() );
-          lancamentoNovo.setIDataQuitacao( 0 );
-          // -> remover o valor do lancamento do caixa
-          if( lancamentoVelho.getCTipo() == 'D' )
-          {
-            // somar no caixa
-            this.banco.adicionarAoSaldoCaixa( lancamentoNovo.getICodCaixa(), lancamentoNovo.getDValor() );
-          }
-          else if( lancamentoVelho.getCTipo() == 'C' )
-          {
-            // debitar no caixa
-            this.banco.subtrairDoSaldoCaixa( lancamentoVelho.getICodCaixa(), lancamentoVelho.getDValor() );
-          }
-        }
-        else if( lancamentoVelho.getIDataQuitacao() == 0 && this.frame.getCkbMovPago() )
-        {
-          // transformat em lancamento a vista
-          lancamentoNovo.setIDataVencimento( lancamentoVelho.getIDataVencimento() );
-          // -> adicionar o valor do lancamento ao caixa
-          if( lancamentoVelho.getCTipo() == 'D' )
-          {
-            // debitar no caixa
-            this.banco.subtrairDoSaldoCaixa( lancamentoNovo.getICodCaixa(), lancamentoNovo.getDValor() );
-          }
-          else if( lancamentoVelho.getCTipo() == 'C' )
-          {
-            // somar no caixa
-            this.banco.adicionarAoSaldoCaixa( lancamentoNovo.getICodCaixa(), lancamentoNovo.getDValor() );
-          }
-        }
-        
-        this.frame.substituirLancamento( lancamentoVelho, lancamentoNovo );
-        this.banco.alterarLancamento( lancamentoNovo );
-        //this.frame.limparCamposLancamento();
-        this.frame.setModoBotoesMovimento( "NAVEGACAO" );
-        recarregarLancamentos();
-        this.transacaoLancamento = 'C';
-        Caixa caixa = this.banco.selectCaixa( lancamentoNovo.getICodCaixa() );
-        this.frame.atualizarSaldoCaixa( caixa );
-        this.frame.habilitarComponentesRecorrencia( true );
+    
+    double valorAntigo = this.lancamentoAtual.getValor();
+    double valorNovo = this.frame.getDbfMovValor();
+    
+    // seta no objeto os campos que podem ser alterado
+    this.lancamentoAtual.setDescricao( this.frame.getTxfMovDescricao() );
+    this.lancamentoAtual.setValor( this.frame.getDbfMovValor() );
+
+    if( this.lancamentoAtual.getDataQuitacao() > 0 && !this.frame.getCkbMovPago() ) {
+      System.out.println( "Transformando lançamento em provisão." );
+      // transformar em provisao
+      this.lancamentoAtual.setPago( 'N' );
+      this.lancamentoAtual.setDataQuitacao( 0 );
+      
+      // -> remover o valor do lancamento do caixa
+      if( this.lancamentoAtual.getConta().getTipo() == 'D' ) {
+        // somar no caixa
+        this.caixaDAO.adicionarAoSaldo( this.lancamentoAtual.getCaixa().getCodCaixa(), this.lancamentoAtual.getValor() );
+      }
+      else if( this.lancamentoAtual.getConta().getTipo() == 'C' ) {
+        // debitar no caixa
+        this.caixaDAO.subtrairDoSaldo( this.lancamentoAtual.getCaixa().getCodCaixa(), this.lancamentoAtual.getValor() );
       }
     }
-    catch( Exception e )
-    {
-      e.printStackTrace();
+    else if( this.lancamentoAtual.getDataQuitacao() == 0 && this.frame.getCkbMovPago() ) {
+      System.out.println( "Transformando lançamento provisionado em a vista." );
+      // transformat em lancamento a vista
+      this.lancamentoAtual.setPago( 'S' );
+      this.lancamentoAtual.setDataQuitacao( DateTools.getDataAtual() );
+      
+      // -> adicionar o valor do lancamento ao caixa
+      if( this.lancamentoAtual.getConta().getTipo() == 'D' )
+      {
+        // debitar no caixa
+        this.caixaDAO.subtrairDoSaldo( this.lancamentoAtual.getCaixa().getCodCaixa(), this.lancamentoAtual.getValor() );
+      }
+      else if( this.lancamentoAtual.getConta().getTipo() == 'C' )
+      {
+        // somar no caixa
+        this.caixaDAO.adicionarAoSaldo( this.lancamentoAtual.getCaixa().getCodCaixa(), this.lancamentoAtual.getValor() );
+      }
     }
-  }
-  private void incluirConta()
-  {
-    this.transacaoConta = 'I';
-    this.frame.limparCamposConta();
-    this.frame.setModoBotoesConta( "EDICAO" );
-  }
-  private void confirmarConta()
-  {
-    if( this.transacaoConta == 'I' )
-    {
-      confirmarIncluirConta();
+    else {
+      if( this.frame.getCkbMovPago() ) {
+        // apenas alterar o valor
+        this.caixaDAO.subtrairDoSaldo( this.lancamentoAtual.getCaixa().getCodCaixa(), valorAntigo );
+        this.caixaDAO.adicionarAoSaldo( this.lancamentoAtual.getCaixa().getCodCaixa(), valorNovo );
+        this.lancamentoAtual.setValor( valorNovo );
+      }
+      else {
+        // eh provisao, apenas alterar o valor do lancamento sem alterar o caixa
+        this.lancamentoAtual.setValor( valorNovo );
+      }
     }
-    else if( this.transacaoConta == 'A' )
-    {
-      confirmarAlterarConta();
-    }
+
+    this.lancamentoDAO.alterar( this.lancamentoAtual );
+    this.frame.mudarEstado( "Lancamento", "NAVEGACAO" );
+    recarregarDoBancoDeDados( "Lancamentos" );
+    recarregarDoBancoDeDados( "Caixas" );
+    this.transacaoLancamento = 'C';
+    this.frame.habilitarComponentesRecorrencia( true );
   }
-  public static void main( String[] s )
-  {
+  public static void main( String[] s ) {
     Main programa = new Main();
     programa.exec();
+  }
+  private void incluir( String pObjeto ) {
+    if( pObjeto.equals( "Caixa" ) ) {
+      this.transacaoCaixa = 'I';
+      this.frame.limparCamposCaixa();
+      this.frame.habilitarTipoCaixa( false );
+      this.frame.focoCaixa();
+    }
+    else if( pObjeto.equals( "Conta" ) ) {
+      this.transacaoConta = 'I';
+      this.frame.limparCamposConta();
+      this.frame.focoConta();
+    }
+    else if( pObjeto.equals( "Lancamento" ) ) {
+      this.transacaoLancamento = 'I';
+      this.frame.habilitarComponentesRecorrencia( true );
+      this.frame.limparCamposLancamento();
+      this.frame.focoLancamento();
+    }
+    else if( pObjeto.equals( "Transferencia" ) ) {
+      this.frame.limparCamposTransferencia();
+      this.frame.focoTransferencia();
+    }
+    
+    this.frame.habilitarCampoAlteracao( pObjeto, true );
+    this.frame.mudarEstado( pObjeto, "EDICAO" );
+    this.frame.habilitarTipoCaixa( false );
+  }
+  private void confirmar( String pObjeto ) {
+    if( pObjeto.equals( "Caixa" ) ) {
+      if( this.transacaoCaixa == 'I' ) {
+        confirmarIncluirCaixa();
+      }
+      else {
+        confirmarAlterarCaixa();
+      }
+    }
+    else if( pObjeto.equals( "Conta" ) ) {
+      if( this.transacaoConta == 'I' ) {
+        confirmarIncluirConta();
+      }
+      else {
+        confirmarAlterarConta();
+      }
+    }
+    else if( pObjeto.equals( "Lancamento" ) ) {
+      if( this.transacaoLancamento == 'I' ) {
+        confirmarIncluirLancamento();
+      }
+      else {
+        confirmarAlterarLancamento();
+      }
+    }
+    else if( pObjeto.equals( "Transferencia" ) ) {
+      confirmarIncluirTransferencia();
+    }
+  }
+  private void confirmarIncluirTransferencia() {
+    if( !validarCamposTransferencia() ) {
+      return;
+    }
+    
+    Lancamento transf = this.frame.getTransferenciaTela();
+    
+    if( transf.getPago() == 'S' ) {
+      // efetivar valores dos caixas
+      this.caixaDAO.adicionarAoSaldo( this.frame.getCbxTransfCaixaDestino().getCodCaixa(), transf.getValor() );
+      this.caixaDAO.subtrairDoSaldo( this.frame.getCbxTransfCaixaOrigem().getCodCaixa(), transf.getValor() );
+    }
+    
+    this.lancamentoDAO.inserir( transf );
+    
+    this.frame.mudarEstado( "Transferencia", "NAVEGACAO" );
+    recarregarDoBancoDeDados( "Lancamentos" );
+    recarregarDoBancoDeDados( "Caixas" );
+    
+    Mensagem.info( "Transferência incluída com sucesso.", this.frame );
+  }
+  private boolean validarCamposTransferencia() {
+    boolean ok = true;
+    String mensagem = "";
+    
+    if( this.frame.getCbxTransfCaixaOrigem() == null ) {
+      ok = false;
+      mensagem += ">> Caixa de origem inválido.\n";
+    }
+    
+    if( this.frame.getCbxTransfCaixaDestino() == null ) {
+      ok = false;
+      mensagem += ">> Caixa de destino inválido.\n";
+    }
+    
+    if( this.frame.getCbxTransfCaixaOrigem() != null && this.frame.getCbxTransfCaixaDestino() != null ) {
+      Caixa a = this.frame.getCbxTransfCaixaOrigem();
+      Caixa b = this.frame.getCbxTransfCaixaDestino();
+      
+      if( a.equals( b ) ) {
+        ok = false;
+        mensagem += ">> Caixas de origem e destino não podem ser iguais.\n";
+      }
+    }
+    
+    if( this.frame.getTxfTransfDescricao().isEmpty() ) {
+      ok = false;
+      mensagem += ">> Descrição inválida.\n";
+    }
+    
+    if( this.frame.getDtcTransfData() == null ) {
+      ok = false;
+      mensagem += ">> Data inválida.\n";
+    }
+    
+    if( this.frame.getDbfTransfValor() == 0.0 ) {
+      ok = false;
+      mensagem += ">> Valor inválido.\n";
+    }
+    
+    if( !ok ) {
+      Mensagem.info( "Erro ao inserir transferência:\n" + mensagem, frame);
+    }
+    
+    return( ok );
+  }
+  private void alterar( String pObjeto ) {
+    if( pObjeto.equals( "Caixa" ) ) {
+      if( this.caixaAtual == null ) {
+        Mensagem.info( "Selecione um caixa para alterar.", this.frame );
+        return;
+      }
+
+      this.transacaoCaixa = 'A';
+      this.frame.mudarEstado( pObjeto, "EDICAO" );
+      this.frame.habilitarCampoAlteracao( pObjeto, false );
+      this.frame.habilitarTipoCaixa( this.caixaAtual.getLimite() == 'S' );
+    }
+    else if( pObjeto.equals( "Conta" ) ) {
+      if( this.contaAtual == null ) {
+        Mensagem.info( "Selecione uma conta para alterar.", this.frame );
+        return;
+      }
+    
+      this.transacaoConta = 'A';
+      this.frame.mudarEstado( pObjeto, "EDICAO" );
+      this.frame.habilitarCampoAlteracao( pObjeto, false );
+    }
+    else if( pObjeto.equals( "Lancamento" ) ) {
+      if( this.lancamentoAtual == null ) {
+        Mensagem.info( "Selecione um lançamento para editar.", this.frame );
+        return;
+      }
+      
+      if( this.lancamentoAtual.getConta() == null ) {
+        // eh uma transferencia.. nao pode ser editada
+        Mensagem.info( "Não é possível editar uma transferência.", this.frame );
+        return;
+      }
+
+      this.transacaoLancamento = 'A';
+      this.frame.habilitarComponentesRecorrencia( false );
+      this.frame.mudarEstado( pObjeto, "EDICAO" );
+      this.frame.habilitarCampoAlteracao( pObjeto, false );
+    }
   }
 }

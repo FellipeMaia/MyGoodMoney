@@ -27,8 +27,7 @@ package mygoodmoney;
 /**
  * @enum EnumPeriodo
  */
-public enum EnumPeriodo
-{
+public enum EnumPeriodo {
   DIAS   ( 1, "Dia(s)" ),    /**< Define o valor 1 para DIAS */
   SEMANAS( 7, "Semana(s)" ), /**< Define o valor 7 para SEMANAS */
   MESES  ( 30, "Mês(es)" ),  /**< Define o valor 30 para MESES */
@@ -38,41 +37,37 @@ public enum EnumPeriodo
   private final String sDescricao;
   
   /**
-  * @brief Construtor do EnumPeriodo.
-  * @param piDias O número de dias no período.
-  * @param psDescricao A descrição do período.
-  */
-  private EnumPeriodo( int piDias, String psDescricao )
-  {
+   * @brief Construtor do EnumPeriodo.
+   * @param piDias O número de dias no período.
+   * @param psDescricao A descrição do período.
+   */
+  private EnumPeriodo( int piDias, String psDescricao ) {
     this.iDias = piDias;
     this.sDescricao = psDescricao;
   }
 
   /**
-  * @brief Obtém o número de dias do enum.
-  * @return O número de dias.
-  */
-  public int getIDias()
-  {
+   * @brief Obtém o número de dias do enum.
+   * @return O número de dias.
+   */
+  public int getIDias() {
     return( this.iDias );
   }
 
   /**
-  * @brief Obtém a descrição do enum.
-  * @return A descrição do enum.
-  */
-  public String getSDescricao()
-  {
+   * @brief Obtém a descrição do enum.
+   * @return A descrição do enum.
+   */
+  public String getSDescricao() {
     return( this.sDescricao );
   }
   
   /**
-  * @brief Converte o enum para String.
-  * @return A descrição do enum.
-  */
+   * @brief Converte o enum para String.
+   * @return A descrição do enum.
+   */
   @Override
-  public String toString()
-  {
+  public String toString() {
     return( this.sDescricao );
   }
 }

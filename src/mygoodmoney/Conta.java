@@ -24,70 +24,87 @@
 
 package mygoodmoney;
 
+import java.util.Objects;
+
 /**
-* @class Conta
-*/
-public class Conta
-{
-  int       iCodConta; /**< O código da Conta */
-  String    sNome;     /**< O nome da Conta */
-  Character cTipo;     /**< O tipo da Conta (D ou C) */
-  
+ * @class Conta
+ */
+public class Conta {
+  Integer   codConta; /**< O código da Conta */
+  String    nome;     /**< O nome da Conta */
+  Character tipo;     /**< O tipo da Conta (D ou C) */
+
   /**
-  * @brief Contrutor da classe Conta.
-  */
-  public Conta()
-  {
-    this.iCodConta = 0;
-    this.sNome     = "";
-    this.cTipo     = ' ';
+   * @brief Contrutor da classe Conta.
+   */
+  public Conta() {
+    this.codConta = 0;
+    this.nome     = "";
+    this.tipo     = ' ';
   }
   /**
-  * @brief Obtém o código da Conta.
-  * @return O código da conta.
-  */
-  public int getICodConta()
-  {
-    return( this.iCodConta );
+   * @brief Obtém o código da Conta.
+   * @return O código da conta.
+   */
+  public Integer getCodConta() {
+    return( this.codConta );
   }
   /**
-  * @brief Obtém o nome da Conta.
-  * @return O nome da Conta.
-  */
-  public String getSNome()
-  {
-    return( this.sNome );
+   * @brief Obtém o nome da Conta.
+   * @return O nome da Conta.
+   */
+  public String getNome() {
+    return( this.nome );
   }
   /**
-  * @brief Obtém o tipo da Conta.
-  * @return O Tipo da Conta (D ou C).
-  */
-  public Character getCTipo()
-  {
-    return( this.cTipo );
+   * @brief Obtém o tipo da Conta.
+   * @return O Tipo da Conta (D ou C).
+   */
+  public Character getTipo() {
+    return( this.tipo );
   }
   /**
-  * @brief Seta o código da Conta.
-  * @param piCodConta O código da Conta.
-  */
-  public void setICodConta( int piCodConta )
-  {
-    this.iCodConta = piCodConta;
+   * @brief Seta o código da Conta.
+   * @param pCodConta O código da Conta.
+   */
+  public void setCodConta( Integer pCodConta ) {
+    this.codConta = pCodConta;
   }
   /**
-  * @brief Seta o nome da Conta.
-  * @param psNome O nome da Conta.
-  */
-  public void setSNome( String psNome )
-  {
-    this.sNome = psNome;
+   * @brief Seta o nome da Conta.
+   * @param pNome O nome da Conta.
+   */
+  public void setNome( String pNome ) {
+    this.nome = pNome;
   }
   /**
-  * @brief Seta o tipo da Conta (D ou C).
-  * @param pcTipo O tipo da Conta.
-  */
-  public void setCTipo( Character pcTipo )
-  {
-    this.cTipo = pcTipo;
+   * @brief Seta o tipo da Conta (D ou C).
+   * @param pTipo O tipo da Conta.
+   */
+  public void setTipo( Character pTipo ) {
+    this.tipo = pTipo;
+  }
+
+  @Override
+  public String toString() {
+    return( this.nome );
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if( obj == null || getClass() != obj.getClass() ) {
+      return( false );
+    }
+    final Conta c = (Conta)obj;
+    return( getNome().equals( c.getNome() ) );
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    hash = 43 * hash + Objects.hashCode(this.codConta);
+    hash = 43 * hash + Objects.hashCode(this.nome);
+    hash = 43 * hash + Objects.hashCode(this.tipo);
+    return hash;
   }
 }

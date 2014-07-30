@@ -19,6 +19,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.text.DateFormat;
@@ -32,6 +35,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JWindow;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
@@ -83,7 +87,7 @@ public class JDateChooser extends JPanel {
     
     private final Color colorBackground = Color.WHITE;
     private final Color colorBackgroundError = new Color(0xFFAAAA);
-    private final Color colorBackgroundChange = new Color(0xFFFFAA);
+    private final Color colorBackgroundChange = Color.WHITE;
     
     /** Construct a JDateChooser initialized with selected date. */    
     public JDateChooser() {
@@ -101,6 +105,12 @@ public class JDateChooser extends JPanel {
         this.add(dateField);
         this.add(comboBoxButton);
         this.addAncestorListener(ancestorListener);
+        this.dateField.addFocusListener( new FocusAdapter() {
+          @Override
+          public void focusGained(FocusEvent e){
+            dateField.selectAll();
+          }
+        });
     }
     
     // UI FUNCTIONALITY    
@@ -130,12 +140,38 @@ public class JDateChooser extends JPanel {
 
     private final DocumentListener dateFieldDocumentListener = new DocumentListener() {
         @Override
-        public void insertUpdate(DocumentEvent e) { onTextChange(); }
+        public void insertUpdate(DocumentEvent e) { 
+          onTextChange();
+          format();
+        }
         @Override
-        public void removeUpdate(DocumentEvent e) { onTextChange(); }
+        public void removeUpdate(DocumentEvent e) { 
+          onTextChange();
+        }
         @Override
-        public void changedUpdate(DocumentEvent e) { onTextChange(); }
+        public void changedUpdate(DocumentEvent e) {
+          onTextChange();
+        }
     };
+    
+    public void format() {
+      String data = dateField.getText();
+      
+      if( data.length() == 8 ) {
+        try {
+          final DateFormat dfAtual = new SimpleDateFormat( "ddMMyyyy" );
+          final DateFormat dfCorreto = new SimpleDateFormat( "dd/MM/yyyy" );
+          final Date d = dfAtual.parse(data);
+          SwingUtilities.invokeLater( new Runnable() {
+            @Override
+            public void run(){
+              dateField.setText( dfCorreto.format( d ) );
+            }
+          });
+        }
+        catch( ParseException p ){}
+      }
+    }
     
     private final ComponentListener componentListener = new ComponentListener() {
         @Override
@@ -396,15 +432,23 @@ public class JDateChooser extends JPanel {
         return false;
     }
     
-    public void setText( String texto )
-    {
+    public void setText( String texto ) {
       this.dateField.setText( texto );
     }
     
-    public void setEditable( boolean ed )
-    {
+    public void setEditable( boolean ed ) {
       this.dateField.setEditable(ed);
       this.dateField.setEnabled(ed);
       this.comboBoxButton.setEnabled(ed);
+    }
+    
+    @Override
+    public void requestFocus() {
+      this.dateField.requestFocus();
+      this.dateField.selectAll();
+    }
+    
+    public JTextField getField() {
+      return( this.dateField );
     }
 }
