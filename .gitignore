@@ -6,5 +6,4 @@
 *.ear
 
 bin/
-*.txt
-*.sh
+lib/

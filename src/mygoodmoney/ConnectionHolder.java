@@ -33,14 +33,14 @@ public class ConnectionHolder {
   }
   public static Connection getConnection() {
     if( instance == null ) {
-      System.out.println( "Requisitando connection.." );
+      System.out.println( "Requisitando conexão.." );
       instance = new BD();
     }
     return( instance.getConnection() );
   }
   public static void criarTabelas() {
     if( instance == null ) {
-      System.out.println( "Requisitando connection.." );
+      System.out.println( "Requisitando conexão.." );
       instance = new BD();
     }
     try {

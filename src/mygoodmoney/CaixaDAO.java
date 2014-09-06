@@ -38,7 +38,7 @@ public class CaixaDAO {
   }
 
   public ArrayList<Caixa> selectListaTodosRegistros() {
-    ArrayList<Caixa> caixasList = new ArrayList<>();
+    ArrayList<Caixa> caixasList = new ArrayList<Caixa>();
 
     try {
       Statement st = this.connection.createStatement();

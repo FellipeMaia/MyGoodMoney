@@ -24,12 +24,14 @@
 
 package mygoodmoney;
 
-import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import javax.swing.BorderFactory;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.DocumentFilter;
 
@@ -44,33 +46,56 @@ public class JDoubleField extends JTextField {
   */
   public JDoubleField() {
     super( "0,00" );
+    this.valor = 0d;
+    
     setHorizontalAlignment( JLabel.RIGHT );
-    this.valor = new Double( 0.0 );
-    this.addFocusListener( new FocusListener() {
-      @Override
-      public void focusGained(FocusEvent e) {
-        //if( getText().equals( "0,00" ) ) {
-        //  setText( "" );
-        //}
-        //else {
-          selectAll();
-          setBorder( BorderFactory.createLineBorder( Color.gray ));
-        //}
-      }
-      @Override
-      public void focusLost(FocusEvent e) {
-        if( getText().isEmpty() || !valorValido( getText() ) ) {
-          setText( "0,00");
-        }
-        if( getText().indexOf( "." ) != -1 ) {
-          setText( getText().replaceAll( "\\.", "," ) );
-        }
-        valor = Double.parseDouble( getText().replaceAll( ",", "\\." ) );
-      }
-    });
+    setFont( new Font( "Verdana", 0, 12 ) );
+    adicionarListeners();
+    
     DocumentFilter filtro = new NumberDocumentFilter();
     ((AbstractDocument) this.getDocument()).setDocumentFilter( filtro );
-    // criar document listener
+  }
+  private void adicionarListeners() {
+    this.addFocusListener( new FocusAdapter() {
+      @Override
+      public void focusGained( FocusEvent e ) {
+        selectAll();
+      }
+    });
+    this.getDocument().addDocumentListener( new DocumentListener() {
+      @Override
+      public void insertUpdate(DocumentEvent de) {
+        atualizarValor();
+      }
+      @Override
+      public void removeUpdate(DocumentEvent de) {
+        atualizarValor();
+      }
+      @Override
+      public void changedUpdate(DocumentEvent de) {
+        atualizarValor();
+      }
+    });
+  }
+  public void atualizarValor() {
+    /*
+        if( getText().isEmpty() || !valorValido( getText() ) ) {
+          setText( "0,00" );
+        }
+        if( getText().indexOf( "." ) != -1 ) {
+          setText( getText().replaceAll( "\\.", "" ) );
+        }
+        if( getText().indexOf( "," ) != -1 ) {
+          setText( getText().replaceAll( "\\.", "" ) );
+        }
+    */
+    
+    try {
+      valor = Double.parseDouble( getText().replaceAll( ",", "." ) );
+    }
+    catch( NumberFormatException ex ) {
+      valor = 0D;
+    }
   }
 
   /**
@@ -98,6 +123,7 @@ public class JDoubleField extends JTextField {
   * @return O valor do campo.
   */
   public Double getValue() {
+    System.out.println("retornando: " + this.valor);
     return( this.valor );
   }
 
@@ -113,12 +139,6 @@ public class JDoubleField extends JTextField {
     }
     else {
       setText( ValueTools.format( pdValor ).replace( "R$","" ) );
-      //setText( valorParam.toString() );
     }
-  }
-  
-  @Override
-  public void requestFocus() {
-    super.requestFocus();
   }
 }

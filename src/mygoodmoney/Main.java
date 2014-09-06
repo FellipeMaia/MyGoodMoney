@@ -46,12 +46,17 @@ public class Main {
       SwingUtilities.invokeAndWait( new Runnable() {
         @Override
         public void run(){
-          frame = new Tela( "My Good Money - Controle Financeiro - Versão 3.1 (23/07/2014) - beta_release" );
+          frame = new Tela( "My Good Money - Controle Financeiro - Versão 3.2 (23/07/2014)" );
         }
       });
     }
-    catch( InterruptedException ex ) {}
-    catch( InvocationTargetException ex ) {}
+    catch( InterruptedException ex ) {
+      System.out.println( "InterruptedException: " + ex.getMessage() );
+    }
+    catch( InvocationTargetException ex ) {
+      System.out.println( "InvocationTargetException: " );
+      ex.printStackTrace();
+    }
   }
   public void exec() {
     iniciar();
@@ -563,7 +568,7 @@ public class Main {
     Double saldoSelecionado = this.caixaDAO.selectSaldo( caixaSelecionado.getCodCaixa() );
     this.frame.setTxfResValorSaldoCaixa( saldoSelecionado );
     
-    if( caixaSelecionado.getLimite().equals( 'S' ) ) {
+    if( caixaSelecionado.getLimite().equals( 'S' ) || caixaSelecionado.getNome().equals( "TODOS" ) ) {
       double limitesTotais = this.caixaDAO.selectLimite( caixaSelecionado.getCodCaixa() );
       this.frame.setTxfResSaldoCaixaLimite( saldoSelecionado + limitesTotais );
     }
@@ -856,8 +861,14 @@ public class Main {
     else {
       if( this.frame.getCkbMovPago() ) {
         // apenas alterar o valor
-        this.caixaDAO.subtrairDoSaldo( this.lancamentoAtual.getCaixa().getCodCaixa(), valorAntigo );
-        this.caixaDAO.adicionarAoSaldo( this.lancamentoAtual.getCaixa().getCodCaixa(), valorNovo );
+        if( this.lancamentoAtual.getConta().getTipo() == 'C' ) {
+          this.caixaDAO.subtrairDoSaldo( this.lancamentoAtual.getCaixa().getCodCaixa(), valorAntigo );
+          this.caixaDAO.adicionarAoSaldo( this.lancamentoAtual.getCaixa().getCodCaixa(), valorNovo );
+        }
+        else {
+          this.caixaDAO.adicionarAoSaldo( this.lancamentoAtual.getCaixa().getCodCaixa(), valorAntigo );
+          this.caixaDAO.subtrairDoSaldo( this.lancamentoAtual.getCaixa().getCodCaixa(), valorNovo );
+        }
         this.lancamentoAtual.setValor( valorNovo );
       }
       else {

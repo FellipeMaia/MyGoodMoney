@@ -241,7 +241,7 @@ public class DateTools {
    * @return Uma lista contendo os vencimentos calculados.
    */
   public static ArrayList<Integer> calcularVencimentos( int pVencBase, int pNumDeParcelas, int pPeriodo ) {
-    ArrayList<Integer> vencList = new ArrayList<>();
+    ArrayList<Integer> vencList = new ArrayList<Integer>();
 
     for( int i=0; i<pNumDeParcelas; i++ ) {
       int dataVcto = somarDiasData( pVencBase, (i * pPeriodo) );

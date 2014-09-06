@@ -24,10 +24,14 @@
 
 package mygoodmoney;
 
+import java.awt.Font;
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /**
  * @class JIntegerField
@@ -40,22 +44,39 @@ public class JIntegerField extends JTextField {
   */
   public JIntegerField() {
     super( "0" );
-    setHorizontalAlignment( JLabel.RIGHT );
     this.valor = 0;
-    this.addFocusListener( new FocusListener() {
+    setHorizontalAlignment( JLabel.RIGHT );
+    setFont( new Font( "Verdana", 0, 12 ) );
+    adicionarListeners();
+  }
+  private void adicionarListeners() {
+    this.addFocusListener( new FocusAdapter() {
       @Override
       public void focusGained( FocusEvent e ) {
-        if( getText().equals( "0" ) ) {
-          setText( "" );
-        }
-        else {
-          selectAll();
-        }
+        selectAll();
+      }
+    });
+    this.getDocument().addDocumentListener( new DocumentListener() {
+      @Override
+      public void insertUpdate(DocumentEvent de) {
+        atualizarValor();
       }
       @Override
-      public void focusLost( FocusEvent e ) {
+      public void removeUpdate(DocumentEvent de) {
+        atualizarValor();
+      }
+      @Override
+      public void changedUpdate(DocumentEvent de) {
+        atualizarValor();
+      }
+    });
+  }
+  public void atualizarValor() {
+    SwingUtilities.invokeLater( new Runnable() {
+      @Override
+      public void run() {
         if( getText().isEmpty() || !valorValido( getText() ) ) {
-          setText( "0");
+          setText( "0" );
         }
         if( getText().indexOf( "." ) != -1 ) {
           setText( getText().replaceAll( "\\.", "" ) );
@@ -63,9 +84,15 @@ public class JIntegerField extends JTextField {
         if( getText().indexOf( "," ) != -1 ) {
           setText( getText().replaceAll( "\\.", "" ) );
         }
-        valor = Integer.parseInt( getText() );
       }
     });
+    
+    try {
+      valor = Integer.parseInt( getText() );
+    }
+    catch( NumberFormatException ex ) {
+      valor = 0;
+    }
   }
   /**
    * @brief Verifica se o valor recebido no campo é valido.
@@ -106,7 +133,7 @@ public class JIntegerField extends JTextField {
       setText( "" );
     }
     else {
-      setText( new Integer( pValor ).toString() );
+      setText( String.valueOf( pValor ) );
     }
   }
 }

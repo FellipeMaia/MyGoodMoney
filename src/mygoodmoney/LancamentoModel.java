@@ -19,7 +19,7 @@ public class LancamentoModel extends AbstractTableModel {
   public static final int NUM_COLUNAS = 5;
   
   public LancamentoModel() {
-    this.linhas = new ArrayList<>();
+    this.linhas = new ArrayList<Lancamento>();
   }
 
   @Override

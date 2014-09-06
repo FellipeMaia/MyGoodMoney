@@ -25,7 +25,6 @@
 package mygoodmoney;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.*;
 
 /**
@@ -43,7 +42,7 @@ public class BD {
   }
   
   public String getDatabaseURL() {
-    if( System.getProperty( "os.name" ).toUpperCase().contains( "WIN") ) {
+    if( System.getProperty( "os.name" ).toUpperCase().contains( "WIN" ) ) {
       String base = System.getenv("APPDATA");
       File f = new File( base );
       if( f.exists() && f.isDirectory() ) {
@@ -54,15 +53,8 @@ public class BD {
       }
     }
     else {
-      String base = System.getProperty( "user.home" );
-      File f = new File( base + "/.MyGoodMoney/" );
-      if( f.exists() && f.isDirectory() ) {
-        return( "jdbc:sqlite:" + f.getAbsolutePath() + "/.MyGoodMoney/MyGoodMoney.db" );
-      }
-      else {
-        f.mkdir();
-        return( "jdbc:sqlite:" + f.getAbsolutePath() + "/.MyGoodMoney/MyGoodMoney.db" );
-      }
+      File f = new File( System.getProperty( "user.home" ) );
+      return( "jdbc:sqlite:" + f.getAbsolutePath() + "/.MyGoodMoney/MyGoodMoney.db" );
     }
   }
   
@@ -71,7 +63,7 @@ public class BD {
       Class.forName( "org.sqlite.JDBC" );
       System.out.println( "Driver: " + getDatabaseURL() );
       this.connection = DriverManager.getConnection( getDatabaseURL(), "", "" );
-      System.out.println( "Connexão estabelecida" );
+      System.out.println( "Connexão estabelecida!" );
     }
     catch( SQLException ex ) {
       System.out.println( "SQLException: " + ex.getLocalizedMessage() );

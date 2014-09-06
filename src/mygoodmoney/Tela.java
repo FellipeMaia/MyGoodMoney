@@ -68,11 +68,13 @@ public class Tela extends JFrame {
            private JTextField txfResValTotEntrCaixa;
            private JLabel     lblResTotSaidaCaixa;
            private JTextField txfResValTotSaidaCaixa;
+           private JLabel     lblResumoCaixaProvisao;
            private JCheckBox  ckbResumoCaixa;
            private ChartPanel     pnlGrafico;
         private JPanel     pnlResumoConta;
            private JLabel     lblResumoConta;
            private JLabel     lblResNomeConta;
+           private JLabel     lblResumoContaProvisao;
            private JComboBox  cbxResConta;
            private JButton    btnResConta;
            private JCheckBox  ckbResumoConta;
@@ -215,27 +217,6 @@ public class Tela extends JFrame {
       if( System.getProperty( "os.name").toUpperCase().contains(  "WIN" ) ) {
         UIManager.setLookAndFeel( "com.sun.java.swing.plaf.windows.WindowsLookAndFeel" );
       }
-      else {
-          setarLookAndFeelLinux();
-      }
-    }
-    catch( ClassNotFoundException ex ){
-      System.out.println( "ClassNotFoundException: " + ex.getLocalizedMessage() );
-    }
-    catch( InstantiationException ex ){
-      System.out.println( "InstantiationException: " + ex.getLocalizedMessage() );
-    }
-    catch( IllegalAccessException ex ){
-      System.out.println( "IllegalAccessException: " + ex.getLocalizedMessage() );
-    }
-    catch( UnsupportedLookAndFeelException ex ){
-      System.out.println( "UnsupportedLookAndFeelException: " + ex.getLocalizedMessage() );
-    }
-  }
-  
-  private void setarLookAndFeelLinux(){
-    try{
-      UIManager.setLookAndFeel( "com.sun.java.swing.plaf.gtk.GTKLookAndFeel" );
     }
     catch( ClassNotFoundException ex ){
       System.out.println( "ClassNotFoundException: " + ex.getLocalizedMessage() );
@@ -580,59 +561,64 @@ public class Tela extends JFrame {
     });
 
     this.lblResSaldoCaixa = new JLabel( "Saldo:" );
-    this.lblResSaldoCaixa.setBounds( 80, 66, 50, 21 ); // x = 130
+    this.lblResSaldoCaixa.setBounds( 100, 66, 50, 21 ); // x = 130
     this.lblResSaldoCaixa.setHorizontalAlignment( JLabel.RIGHT );
     this.lblResSaldoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     this.lblResSaldoCaixa.setName( "lblResSaldoCaixa" );
     
     this.txfResValorSaldoCaixa = new JTextField( ValueTools.formatToField( 0.0 ) );
-    this.txfResValorSaldoCaixa.setBounds( 135, 66, 120, 21 );
+    this.txfResValorSaldoCaixa.setBounds( 155, 66, 120, 21 );
     this.txfResValorSaldoCaixa.setHorizontalAlignment( JLabel.RIGHT );
     this.txfResValorSaldoCaixa.setFont( new Font( "Monospaced", 0, 12 ) );
     this.txfResValorSaldoCaixa.setEditable( false );
     this.txfResValorSaldoCaixa.setName( "txfResValorSaldoCaixa" );
     
     this.lblResSaldoCaixaLimite = new JLabel( "Saldo (C/Limite):" );
-    this.lblResSaldoCaixaLimite.setBounds( 10, 97, 120, 21 );
+    this.lblResSaldoCaixaLimite.setBounds( 30, 97, 120, 21 );
     this.lblResSaldoCaixaLimite.setHorizontalAlignment( JLabel.RIGHT );
     this.lblResSaldoCaixaLimite.setFont( new Font( "Verdana", 0, 12 ) );
     this.lblResSaldoCaixaLimite.setName( "lblResSaldoCaixaLimite" );
     
     this.txfResSaldoCaixaLimite = new JTextField( ValueTools.formatToField( 0.0 ) );
-    this.txfResSaldoCaixaLimite.setBounds( 135, 97, 120, 21 );
+    this.txfResSaldoCaixaLimite.setBounds( 155, 97, 120, 21 );
     this.txfResSaldoCaixaLimite.setHorizontalAlignment( JLabel.RIGHT );
     this.txfResSaldoCaixaLimite.setFont( new Font( "Monospaced", 0, 12 ) );
     this.txfResSaldoCaixaLimite.setEditable( false );
     this.txfResSaldoCaixaLimite.setName( "txfResSaldoCaixaLimite" );
     
     this.lblResTotEntrCaixa = new JLabel( "Total de Entradas: " );
-    this.lblResTotEntrCaixa.setBounds( 0, 128, 130, 21 ); // x = 130 - 97
+    this.lblResTotEntrCaixa.setBounds( 20, 128, 130, 21 ); // x = 130 - 97
     this.lblResTotEntrCaixa.setHorizontalAlignment( JLabel.RIGHT );
     this.lblResTotEntrCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     this.lblResTotEntrCaixa.setName( "lblResTotEntrCaixa" );
     
     this.txfResValTotEntrCaixa = new JTextField( ValueTools.formatToField( 0.0 ) );
-    this.txfResValTotEntrCaixa.setBounds( 135, 128, 120, 21 ); // 97
+    this.txfResValTotEntrCaixa.setBounds( 155, 128, 120, 21 ); // 97
     this.txfResValTotEntrCaixa.setHorizontalAlignment( JLabel.RIGHT );
     this.txfResValTotEntrCaixa.setFont( new Font( "Monospaced", 0, 12 ) );
     this.txfResValTotEntrCaixa.setEditable( false );
     this.txfResValTotEntrCaixa.setName( "txfResValTotEntrCaixa" );
     
     this.lblResTotSaidaCaixa = new JLabel( "Total de Saídas: " );
-    this.lblResTotSaidaCaixa.setBounds( 10, 159, 120, 21 ); // x = 130 - 128
+    this.lblResTotSaidaCaixa.setBounds( 30, 159, 120, 21 ); // x = 130 - 128
     this.lblResTotSaidaCaixa.setHorizontalAlignment( JLabel.RIGHT );
     this.lblResTotSaidaCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     this.lblResTotSaidaCaixa.setName( "lblResTotSaidaCaixa" );
     
     this.txfResValTotSaidaCaixa = new JTextField( ValueTools.formatToField( 0.0 ) );
-    this.txfResValTotSaidaCaixa.setBounds( 135, 159, 120, 21 ); // 128
+    this.txfResValTotSaidaCaixa.setBounds( 155, 159, 120, 21 ); // 128
     this.txfResValTotSaidaCaixa.setHorizontalAlignment( JLabel.RIGHT );
     this.txfResValTotSaidaCaixa.setFont( new Font( "Monospaced", 0, 12 ) );
     this.txfResValTotSaidaCaixa.setEditable( false );
     this.txfResValTotSaidaCaixa.setName( "txfResValTotSaidaCaixa" );
     
-    this.ckbResumoCaixa = new JCheckBox( " Considerar provisões" );
-    this.ckbResumoCaixa.setBounds( 135, 190, 170, 21 ); // 159
+    this.lblResumoCaixaProvisao = new JLabel( "Considerar provisões:" );
+    this.lblResumoCaixaProvisao.setBounds( 10, 190, 140, 21 ); // x = 150 - 128
+    this.lblResumoCaixaProvisao.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblResumoCaixaProvisao.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    this.ckbResumoCaixa = new JCheckBox();
+    this.ckbResumoCaixa.setBounds( 155, 190, 170, 21 ); // 159
     this.ckbResumoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
     this.ckbResumoCaixa.setName( "ckbResumoCaixa" );
     
@@ -654,13 +640,12 @@ public class Tela extends JFrame {
     this.lblResumoConta.setName( "lblResumoConta" );
     
     this.lblResNomeConta = new JLabel( "Conta:" );
-    this.lblResNomeConta.setBounds( 30, 45, 50, 21 );
+    this.lblResNomeConta.setBounds( 100, 45, 50, 21 );
     this.lblResNomeConta.setHorizontalAlignment( JLabel.RIGHT );
     this.lblResNomeConta.setFont( new Font( "Verdana", 0, 12 ) );
-    this.lblResNomeConta.setName( "lblResNomeConta" );
     
     this.cbxResConta = new JComboBox();
-    this.cbxResConta.setBounds( 85, 45, 230, 21 );
+    this.cbxResConta.setBounds( 155, 45, 160, 21 );
     this.cbxResConta.setFont( new Font( "Verdana", 0, 12 ) );
     this.cbxResConta.setName( "cbxResConta" );
     
@@ -675,10 +660,13 @@ public class Tela extends JFrame {
       }
     });
     
-    this.ckbResumoConta = new JCheckBox( " Considerar provisões" );
-    this.ckbResumoConta.setBounds( 85, 76, 200, 21 );
-    this.ckbResumoConta.setFont( new Font( "Verdana", 0, 12 ) );
-    this.ckbResumoConta.setName( "ckbResumoConta" );
+    this.lblResumoContaProvisao = new JLabel( "Considerar provisões:");
+    this.lblResumoContaProvisao.setBounds( 10, 76, 140, 21 );
+    this.lblResumoContaProvisao.setHorizontalAlignment( JLabel.RIGHT );
+    this.lblResumoContaProvisao.setFont( new Font( "Verdana", 0, 12 ) );
+    
+    this.ckbResumoConta = new JCheckBox();
+    this.ckbResumoConta.setBounds( 155, 76, 200, 21 );
     
     this.lblResMovContaPc = new JLabel( "Movim. no período (%):" );
     this.lblResMovContaPc.setBounds( 380, 25, 170, 21 ); // x = 450
@@ -933,12 +921,9 @@ public class Tela extends JFrame {
     this.lblRepetir.setBounds( 10, 247, 50, 21 );
     this.lblRepetir.setFont( new Font( "Verdana", 0, 12 ) );
     this.lblRepetir.setHorizontalAlignment( JLabel.RIGHT );
-    this.lblRepetir.setName( "lblRepetir" );
     
     this.itfNumVezes = new JIntegerField();
     this.itfNumVezes.setBounds( 65, 247, 40, 21 );
-    this.itfNumVezes.setFont( new Font( "Verdana", 0, 12 ) );
-    this.itfNumVezes.setName( "itfNumVezes" );
     
     this.lblVezes = new JLabel( "vezes" );
     this.lblVezes.setBounds( 110, 247, 40, 21 );
@@ -953,7 +938,6 @@ public class Tela extends JFrame {
     
     this.itfNumPeriodo = new JIntegerField();
     this.itfNumPeriodo.setBounds( 65, 278, 40, 21 );
-    this.itfNumPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
     this.itfNumPeriodo.setName( "itfNumPeriodo" );
 
     this.cbxPeriodo = new JComboBox();
@@ -1126,8 +1110,6 @@ public class Tela extends JFrame {
     
     this.dbfTransfValor = new JDoubleField();
     this.dbfTransfValor.setBounds( 90, 164, 120, 21 );
-    this.dbfTransfValor.setFont( new Font( "Monospaced", 0, 12 ) );
-    this.dbfTransfValor.setName( "dbfTransfValor" );
     
     this.ckbTransf = new JCheckBox( "Transferido" );
     this.ckbTransf.setBounds( 86, 195, 120, 21 );
@@ -1361,8 +1343,6 @@ public class Tela extends JFrame {
 
     this.dbfSaldoInicialCaixa = new JDoubleField();
     this.dbfSaldoInicialCaixa.setBounds( 60, 70, 100, 21 );
-    this.dbfSaldoInicialCaixa.setFont( new Font( "Verdana", 0, 12 ) );
-    this.dbfSaldoInicialCaixa.setName( "dbfSaldoInicialCaixa" );
     
     this.lblTipoCaixa = new JLabel( "Tipo:" );
     this.lblTipoCaixa.setBounds( 10, 100, 45, 21 );
@@ -1409,8 +1389,6 @@ public class Tela extends JFrame {
     
     this.dbfValorLimite = new JDoubleField();
     this.dbfValorLimite.setBounds( 60, 130, 100, 21 );
-    this.dbfValorLimite.setFont( new Font( "Verdana", 0, 12 ) );
-    this.dbfValorLimite.setName( "dbfValorLimite" );
     
     this.btnAddCaixa = new JButton( new ImageIcon( Tela.class.getResource( "incluir.png" ) ) );
     this.btnAddCaixa.setBounds( 5, 5, 30, 30 );
@@ -1507,8 +1485,14 @@ public class Tela extends JFrame {
     this.lblDiretorioBD.setHorizontalAlignment( JLabel.RIGHT );
     this.lblDiretorioBD.setName( "lblDiretorioBD" );
     
-    String caminho = new File( System.getenv( "APPDATA" ) ).getAbsolutePath();
-    this.txfDiretorioBD = new JTextField( caminho + "\\" );
+    String caminho;
+    if( System.getProperty( "os.name" ).toUpperCase().contains( "WIN" ) ) {
+      caminho = new File( System.getenv( "APPDATA" ) ).getAbsolutePath() + "\\";
+    }
+    else {
+      caminho = System.getProperty( "user.home" ) + "/.MyGoodMoney/";
+    }
+    this.txfDiretorioBD = new JTextField( caminho );
     this.txfDiretorioBD.setBounds( 85, 40, 600, 21 );
     this.txfDiretorioBD.setFont( new Font( "Verdana", 0, 12 ) );
     this.txfDiretorioBD.setEditable( false );
@@ -1572,9 +1556,9 @@ public class Tela extends JFrame {
     });
     
     this.lblPaginaOficial = new JLabel(
-      "<HTML>Site oficial: <FONT color=\"#000099\"><U>http://www.linuxafundo.com.br/mygoodmoney</U></FONT></HTML>"
+      "<HTML>Site oficial: <FONT color=\"#000099\"><U>http://www.linuxafundo.com.br/projects/mygoodmoney</U></FONT></HTML>"
     );
-    this.lblPaginaOficial.setBounds( 20, 85, 370, 21 );
+    this.lblPaginaOficial.setBounds( 20, 85, 470, 21 );
     this.lblPaginaOficial.setToolTipText( "Clique para abrir" );
     this.lblPaginaOficial.setFont( new Font( "Verdana", 0, 12 ) );
     this.lblPaginaOficial.addMouseListener( new MouseAdapter() {
@@ -1661,12 +1645,14 @@ public class Tela extends JFrame {
              this.pnlResumoCaixa.add( this.txfResValTotEntrCaixa );
              this.pnlResumoCaixa.add( this.lblResTotSaidaCaixa );
              this.pnlResumoCaixa.add( this.txfResValTotSaidaCaixa );
+             this.pnlResumoCaixa.add( this.lblResumoCaixaProvisao );
              this.pnlResumoCaixa.add( this.ckbResumoCaixa );
              this.pnlResumoCaixa.add( this.pnlGrafico );
           this.pnlHome.add( this.pnlResumoConta );
              this.pnlResumoConta.add( this.lblResumoConta );
              this.pnlResumoConta.add( this.lblResNomeConta );
              this.pnlResumoConta.add( this.cbxResConta );
+             this.pnlResumoConta.add( this.lblResumoContaProvisao );
              this.pnlResumoConta.add( this.ckbResumoConta );
              this.pnlResumoConta.add( this.btnResConta );
              this.pnlResumoConta.add( this.lblResMovContaPc );
@@ -2309,7 +2295,8 @@ public class Tela extends JFrame {
         }
       });
       }
-      catch( InvocationTargetException | InterruptedException ex ) {}
+      catch( InvocationTargetException excep ){}
+      catch( InterruptedException excep ) {}
     }
   }
   public void habilitarCampoAlteracao( String pObjeto, boolean hab )
