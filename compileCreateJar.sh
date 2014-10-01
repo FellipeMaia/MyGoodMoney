@@ -39,7 +39,7 @@ if [ ! -f lib/sqlite-jdbc-3.7.15-SNAPSHOT-2.jar ]; then
 fi
 
 if [ ! -d bin ]; then
-   "Creating bin folder"
+   echo "Creating bin folder"
    mkdir bin
 fi
 
