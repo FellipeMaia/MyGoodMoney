@@ -42,7 +42,7 @@ public class ContaDAO {
   }
 
   public ArrayList<Conta> selectListaRegistros( Character pTipoConta ) {
-    ArrayList<Conta> contasList = new ArrayList<Conta>();
+    ArrayList<Conta> contasList = new ArrayList<>();
 
     try {
       Statement st = this.connection.createStatement();
@@ -260,7 +260,7 @@ public class ContaDAO {
    * @return Uma lista contendo a data de vencimento, data de quitação, descrição e valor, ou lista vazia.
    */
   public ArrayList<String[]> selectListaExtratoPeriodo( Conta pConta, Integer pDataIni, Integer pDataFim, boolean pProvisao ) {
-    ArrayList<String[]> extratoList = new ArrayList<String[]>();
+    ArrayList<String[]> extratoList = new ArrayList<>();
     try {
       String sData1 = pDataIni.toString();
       String sData2 = pDataFim.toString();

@@ -1,0 +1,31 @@
+1.1
+-> Periodo foi para painel superior
+1.2
+-> Banco de dados totalmente modificado
+1.3
+-> Muitos bugs corrigidos e provisao funcionando
+1.4
+-> Grafico funcionando
+1.5
+-> Pode digitar a data sem o usar o mouse
+1.6
+-> Fazer transferencia
+2.0
+-> Novo layout modelo novo/editar/excluir (22/04/2014)
+2.1
+-> Eh possivel selecionar TODOS no painel Home (11/05/2014)
+3.0 - incluido:
+-> controle de limite
+-> mudança de layout dos botões
+-> transferencia funcionando
+3.1
+-> console suporta acentos
+-> bug ao alterar lançamento não alterava o valor
+-> não permite excluir conta ou caixa com registros
+-> BUG CONHECIDO: ao alterar valor do lançamento, tem que dar TAB fora do campo
+-> adicionado link clicavel no contato
+3.2
+-> Corrigido bug que não altera o valor
+-> Corrigido bug que tinha ao alterar valor do lancamento ficava errado
+-> Alterado label dos campos "Considerar proviões", "Pago/Receb" e "Transferido"
+-> Alterado painel sobre com caminho para pagina de projetos

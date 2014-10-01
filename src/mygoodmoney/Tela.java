@@ -2295,8 +2295,7 @@ public class Tela extends JFrame {
         }
       });
       }
-      catch( InvocationTargetException excep ){}
-      catch( InterruptedException excep ) {}
+      catch( InvocationTargetException | InterruptedException ex ) {}
     }
   }
   public void habilitarCampoAlteracao( String pObjeto, boolean hab )

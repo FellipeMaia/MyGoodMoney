@@ -34,7 +34,7 @@ public class ContaModel extends AbstractTableModel {
   public static final int NUM_COLUNAS = 2;
 
   public ContaModel() {
-    this.linhas = new ArrayList<Conta>();
+    this.linhas = new ArrayList<>();
   }
 
   @Override

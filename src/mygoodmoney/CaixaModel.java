@@ -35,7 +35,7 @@ public class CaixaModel extends AbstractTableModel {
   public static final int NUM_COLUNAS = 3;
 
   public CaixaModel() {
-    this.linhas = new ArrayList<Caixa>();
+    this.linhas = new ArrayList<>();
   }
 
   @Override

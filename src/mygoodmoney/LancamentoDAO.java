@@ -78,7 +78,7 @@ public class LancamentoDAO {
    * @return Uma lista de Lancamentos se houver, ou uma lista vazia.
    */
   public ArrayList<Lancamento> selectListaRegistrosPeriodo( int pDataIni, int pDataFim ) {
-    ArrayList<Lancamento> alLancamento = new ArrayList<Lancamento>();
+    ArrayList<Lancamento> alLancamento = new ArrayList<>();
 
     try {
       String data1 = pDataIni + "";
@@ -357,7 +357,7 @@ public class LancamentoDAO {
    * @return Uma lista com o nome de uma Conta e o valor total do período.
    */
   public ArrayList<Object[]> selectLancamentosGrafico( Integer pCodCaixa, int pDataIni, int pDataFim, boolean pProvisao ) {
-    ArrayList<Object[]> alObject = new ArrayList<Object[]>();
+    ArrayList<Object[]> alObject = new ArrayList<>();
 
     try {
       Statement st = this.connection.createStatement();

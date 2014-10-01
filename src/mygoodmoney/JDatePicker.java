@@ -36,7 +36,7 @@ public class JDatePicker extends JPanel {
     /** Month labels used in selecting the month */
     private static final String[] MONTH_LIST;
     static {
-        List<String> monthList = new ArrayList<String>();
+        List<String> monthList = new ArrayList<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM");
         Calendar calendar = Calendar.getInstance();
         for (int month = 0; month < 12; month++) {
