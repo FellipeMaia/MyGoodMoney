@@ -1,6 +1,6 @@
 /**
 * @file Lancamento.java
-* @brief ContÃ©m mÃ©todos de acesso Ã  classe Lancamento.
+* @brief Contém métodos de acesso à classe Lancamento.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -28,155 +28,155 @@ package mygoodmoney;
  * @class Lancamento
  */
 public class Lancamento {
-  private int    codLancamento;  /**< O CÃ³digo de um Lancamento. */
-  private int    dataEmissao;    /**< A data de emissÃ£o de um Lancamento. */
-  private int    dataVencimento; /**< A data de vencimento de um Lancamento. */
-  private int    dataQuitacao;   /**< A data de quitaÃ§Ã£o de um Lancamento (SerÃ¡ 0 para provisÃ£o). */
-  private String descricao;      /**< A descriÃ§Ã£o de um Lancamento. */
-  private double valor;          /**< O valor de um Lancamento. */
-  private char   pago;           /**< S se pago ou N se nÃ£o */
-  private Conta  conta;
-  private Caixa  caixa;
+	private int    codLancamento;  /**< O Código de um Lancamento. */
+	private int    dataEmissao;    /**< A data de emissão de um Lancamento. */
+	private int    dataVencimento; /**< A data de vencimento de um Lancamento. */
+	private int    dataQuitacao;   /**< A data de quitação de um Lancamento (Será 0 para provisão). */
+	private String descricao;      /**< A descrição de um Lancamento. */
+	private double valor;          /**< O valor de um Lancamento. */
+	private char   pago;           /**< S se pago ou N se não */
+	private Conta  conta;
+	private Caixa  caixa;
 
-  /**
-   * @brief Construtor da classe.
-   */
-  public Lancamento() {
-    this.codLancamento  = 0;
-    this.dataEmissao    = 0;
-    this.dataVencimento = 0;
-    this.dataQuitacao   = 0;
-    this.descricao      = "";
-    this.valor          = 0;
-    this.pago           = ' ';
-    this.conta          = null;
-    this.caixa          = null;
-  }
+	/**
+	 * @brief Construtor da classe.
+	 */
+	public Lancamento() {
+		this.codLancamento  = 0;
+		this.dataEmissao    = 0;
+		this.dataVencimento = 0;
+		this.dataQuitacao   = 0;
+		this.descricao      = "";
+		this.valor          = 0;
+		this.pago           = ' ';
+		this.conta          = null;
+		this.caixa          = null;
+	}
 
-  /**
-   * @brief ObtÃ©m o cÃ³digo do Lancamento.
-   * @return O cÃ³digo do Lancamento.
-   */
-  public int getCodLancamento() {
-    return( this.codLancamento );
-  }
-  /**
-   * @brief ObtÃ©m a data de emissÃ£o do Lancamento.
-   * @return A data de emissÃ£o do Lancamento.
-   */
-  public int getDataEmissao() {
-    return( this.dataEmissao );
-  }
-  /**
-   * @brief ObtÃ©m a data de vencimento do Lancamento.
-   * @return A data de vencimento do Lancamento.
-   */
-  public int getDataVencimento() {
-    return( this.dataVencimento );
-  }
-  /**
-   * @brief ObtÃ©m a data de quitaÃ§Ã£o do Lancamento.
-   * @return A data de quitaÃ§Ã£o do Lancamento.
-   */
-  public int getDataQuitacao() {
-    return( this.dataQuitacao );
-  }
-  /**
-   * @brief ObtÃ©m a descriÃ§Ã£o do Lancamento.
-   * @return A descriÃ§Ã£o do Lancamento.
-   */
-  public String getDescricao() {
-    return( this.descricao );
-  }
-  /**
-   * @brief ObtÃ©m o valor do Lancamento.
-   * @return O valor do Lancamento.
-   */
-  public double getValor() {
-    return( this.valor );
-  }
-  /**
-   * @brief Seta o cÃ³digo do Lancamento.
-   * @param pCodLancamento O cÃ³digo a ser setado.
-   */
-  public void setCodLancamento( int pCodLancamento ) {
-    this.codLancamento = pCodLancamento;
-  }
-  /**
-   * @brief Seta a data de emissÃ£o do Lancamento.
-   * @param pDataEmissao A data de emissÃ£o a ser setada.
-   */
-  public void setDataEmissao( int pDataEmissao ) {
-    this.dataEmissao = pDataEmissao;
-  }
-  /**
-   * @brief Seta a data de vencimento do Lancamento.
-   * @param pDataVencimento A data de vencimento a ser setada.
-   */
-  public void setDataVencimento( int pDataVencimento ) {
-    this.dataVencimento = pDataVencimento;
-  }
-  /**
-   * @brief Seta a data de quitaÃ§Ã£o do Lancamento.
-   * @param pDataQuitacao A data de quitaÃ§Ã£o a ser setada.
-   */
-  public void setDataQuitacao( int pDataQuitacao ) {
-    this.dataQuitacao = pDataQuitacao;
-  }
-  /**
-   * @brief Seta a descriÃ§Ã£o do Lancamento.
-   * @param pDescricao A descriÃ§Ã£o a ser setada.
-   */
-  public void setDescricao( String pDescricao ) {
-    this.descricao = pDescricao;
-  }
-  /**
-   * @brief Seta o valor do Lancamento.
-   * @param pValor O valor a ser setado.
-   */
-  public void setValor( double pValor ) {
-    this.valor = pValor;
-  }
-  /**
-   * @brief ObtÃ©m se um lanÃ§amento jÃ¡ foi pago.
-   * @return S se pago ou N se nÃ£o.
-   */
-  public char getPago() {
-    return( this.pago );
-  }
-  /**
-   * @brief ObtÃ©m a Conta do lanÃ§amento.
-   * @return A Conta do lanÃ§amento.
-   */
-  public Conta getConta() {
-    return( this.conta );
-  }
-  /**
-   * @brief Seta a Conta do lanÃ§amento
-   * @param pConta A Conta a ser setada.
-   */
-  public void setConta( Conta pConta ) {
-    this.conta = pConta;
-  }
-  /**
-   * @brief Seta se um lanÃ§amento foi pago ou nÃ£o.
-   * @param pPago O pagamento a ser setado, S ou N.
-   */
-  public void setPago( char pPago ) {
-    this.pago = pPago;
-  }
-  /**
-   * @brief ObtÃ©m o Caixa do lanÃ§amento.
-   * @return O Caixa do lanÃ§amento.
-   */
-  public Caixa getCaixa() {
-    return( this.caixa );
-  }
-  /**
-   * @brief Seta o Caixa do lanÃ§amento.
-   * @param pCaixa O Caixa a ser setado.
-   */
-  public void setCaixa( Caixa pCaixa ) {
-    this.caixa = pCaixa;
-  }
+	/**
+	 * @brief Obtém o código do Lancamento.
+	 * @return O código do Lancamento.
+	 */
+	public int getCodLancamento() {
+		return( this.codLancamento );
+	}
+	/**
+	 * @brief Obtém a data de emissão do Lancamento.
+	 * @return A data de emissão do Lancamento.
+	 */
+	public int getDataEmissao() {
+		return( this.dataEmissao );
+	}
+	/**
+	 * @brief Obtém a data de vencimento do Lancamento.
+	 * @return A data de vencimento do Lancamento.
+	 */
+	public int getDataVencimento() {
+		return( this.dataVencimento );
+	}
+	/**
+	 * @brief Obtém a data de quitação do Lancamento.
+	 * @return A data de quitação do Lancamento.
+	 */
+	public int getDataQuitacao() {
+		return( this.dataQuitacao );
+	}
+	/**
+	 * @brief Obtém a descrição do Lancamento.
+	 * @return A descrição do Lancamento.
+	 */
+	public String getDescricao() {
+		return( this.descricao );
+	}
+	/**
+	 * @brief Obtém o valor do Lancamento.
+	 * @return O valor do Lancamento.
+	 */
+	public double getValor() {
+		return( this.valor );
+	}
+	/**
+	 * @brief Seta o código do Lancamento.
+	 * @param pCodLancamento O código a ser setado.
+	 */
+	public void setCodLancamento( int pCodLancamento ) {
+		this.codLancamento = pCodLancamento;
+	}
+	/**
+	 * @brief Seta a data de emissão do Lancamento.
+	 * @param pDataEmissao A data de emissão a ser setada.
+	 */
+	public void setDataEmissao( int pDataEmissao ) {
+		this.dataEmissao = pDataEmissao;
+	}
+	/**
+	 * @brief Seta a data de vencimento do Lancamento.
+	 * @param pDataVencimento A data de vencimento a ser setada.
+	 */
+	public void setDataVencimento( int pDataVencimento ) {
+		this.dataVencimento = pDataVencimento;
+	}
+	/**
+	 * @brief Seta a data de quitação do Lancamento.
+	 * @param pDataQuitacao A data de quitação a ser setada.
+	 */
+	public void setDataQuitacao( int pDataQuitacao ) {
+	 this.dataQuitacao = pDataQuitacao;
+	}
+	/**
+	 * @brief Seta a descrição do Lancamento.
+	 * @param pDescricao A descrição a ser setada.
+	 */
+	public void setDescricao( String pDescricao ) {
+		this.descricao = pDescricao;
+	}
+	/**
+	 * @brief Seta o valor do Lancamento.
+	 * @param pValor O valor a ser setado.
+	 */
+	public void setValor( double pValor ) {
+		this.valor = pValor;
+	}
+	/**
+	 * @brief Obtém se um lançamento já foi pago.
+	 * @return S se pago ou N se nÃ£o.
+	 */
+	public char getPago() {
+	 return( this.pago );
+	}
+	/**
+	 * @brief Obtém a Conta do lançamento.
+	 * @return A Conta do lançamento.
+	 */
+	public Conta getConta() {
+		return( this.conta );
+	}
+	/**
+	 * @brief Seta a Conta do lançamento
+	 * @param pConta A Conta a ser setada.
+	 */
+	public void setConta( Conta pConta ) {
+		this.conta = pConta;
+	}
+	/**
+	 * @brief Seta se um lançamento foi pago ou não.
+	 * @param pPago O pagamento a ser setado, S ou N.
+	 */
+	public void setPago( char pPago ) {
+		this.pago = pPago;
+	}
+	/**
+	 * @brief Obtém o Caixa do lançamento.
+	 * @return O Caixa do lançamento.
+	 */
+	public Caixa getCaixa() {
+		return( this.caixa );
+	}
+	/**
+	 * @brief Seta o Caixa do lançamento.
+	 * @param pCaixa O Caixa a ser setado.
+	 */
+	public void setCaixa( Caixa pCaixa ) {
+		this.caixa = pCaixa;
+	}
 }

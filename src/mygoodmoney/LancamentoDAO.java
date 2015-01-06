@@ -1,6 +1,6 @@
 /**
  * @file LancamentoDAO.java
- * @brief Cont√©m m√©todos de acesso a entidade Conta do banco de dados.
+ * @brief ContÈm mÈtodos de acesso a entidade Conta do banco de dados.
  * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
  * @license Este projeto encontra-se sob a licensa GNU.
  */
@@ -31,446 +31,446 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 public class LancamentoDAO {
-  private final Connection connection;
-  
-  public LancamentoDAO() {
-    this.connection = ConnectionHolder.getConnection();
-  }
-  
-  /**
-   * @brief Altera todos os campos de um Lancamento baseado no c√≥digo do Lancamento.
-   * @param pLancamento Um Lancamento ja preenchido a ser alterado.
-   */
-  public void alterar( Lancamento pLancamento ) {
-    try {
-      Statement st = this.connection.createStatement();
-      String sQuery =
-        "UPDATE" +
-        " LANCAMENTOS " +
-        "SET" +
-        " DATA_EMISSAO = " + pLancamento.getDataEmissao() + "," +
-        " DATA_VENCIMENTO = " + pLancamento.getDataVencimento() + "," +
-        " DATA_QUITACAO = " + pLancamento.getDataQuitacao() + "," +
-        " DESCRICAO = '" + pLancamento.getDescricao() + "'," +
-        " VALOR = " + pLancamento.getValor() + "," +
-        " COD_CONTA = " + pLancamento.getConta().getCodConta() + "," +
-        " COD_CAIXA = " + pLancamento.getCaixa().getCodCaixa() + " " +
-        "WHERE" +
-        " COD_LANCAMENTO = " + pLancamento.getCodLancamento();
+	private final Connection connection;
 
-      System.out.println( "SQL: " + sQuery );
+	public LancamentoDAO() {
+		this.connection = ConnectionHolder.getConnection();
+	}
 
-      if( st.executeUpdate( sQuery ) == Statement.EXECUTE_FAILED ) {
-        System.out.println( "SQL: 0 Registros atualizados." );
-      }
-      else {
-        System.out.println( "SQL: 1 Registro atualizado." );
-      }
-    }
-    catch( SQLException e ) {
-      System.out.println( "SQL Exception: " + e.getLocalizedMessage() );
-    }
-  }
-  /**
-   * @brief Obt√©m todos os Lancamentos de um per√≠odo.
-   * @param pDataIni A data inicial do per√≠odo de consulta.
-   * @param pDataFim A data final do per√≠odo de consulta.
-   * @return Uma lista de Lancamentos se houver, ou uma lista vazia.
-   */
-  public ArrayList<Lancamento> selectListaRegistrosPeriodo( int pDataIni, int pDataFim ) {
-    ArrayList<Lancamento> alLancamento = new ArrayList<>();
+	/**
+	 * @brief Altera todos os campos de um Lancamento baseado no cÛdigo do Lancamento.
+	 * @param pLancamento Um Lancamento j· preenchido a ser alterado.
+	 */
+	public void alterar( Lancamento pLancamento ) {
+		try {
+			Statement st = this.connection.createStatement();
+			String sQuery =
+				"UPDATE" +
+				" LANCAMENTOS " +
+				"SET" +
+				" DATA_EMISSAO = " + pLancamento.getDataEmissao() + "," +
+				" DATA_VENCIMENTO = " + pLancamento.getDataVencimento() + "," +
+				" DATA_QUITACAO = " + pLancamento.getDataQuitacao() + "," +
+				" DESCRICAO = '" + pLancamento.getDescricao() + "'," +
+				" VALOR = " + pLancamento.getValor() + "," +
+				" COD_CONTA = " + pLancamento.getConta().getCodConta() + "," +
+				" COD_CAIXA = " + pLancamento.getCaixa().getCodCaixa() + " " +
+				"WHERE" +
+				" COD_LANCAMENTO = " + pLancamento.getCodLancamento();
 
-    try {
-      String data1 = pDataIni + "";
-      String data2 = pDataFim + "";
+			System.out.println( "SQL: " + sQuery );
 
-      if( data1.length() == 7 ) {
-        data1 = "0" + data1;
-      }
+			if( st.executeUpdate( sQuery ) == Statement.EXECUTE_FAILED ) {
+				System.out.println( "SQL: 0 Registros atualizados." );
+			}
+			else {
+				System.out.println( "SQL: 1 Registro atualizado." );
+			}
+		}
+		catch( SQLException e ) {
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * @brief ObtÈm todos os Lancamentos de um perÌodo.
+	 * @param pDataIni A data inicial do perÌodo de consulta.
+	 * @param pDataFim A data final do perÌodo de consulta.
+	 * @return Uma lista de Lancamentos se houver, ou uma lista vazia.
+	 */
+	public ArrayList<Lancamento> selectListaRegistrosPeriodo( int pDataIni, int pDataFim ) {
+		ArrayList<Lancamento> alLancamento = new ArrayList<>();
 
-      if( data2.length() == 7 ) {
-        data2 = "0" + data2;
-      }
+		try {
+			String data1 = pDataIni + "";
+			String data2 = pDataFim + "";
 
-      Statement st = this.connection.createStatement();
-      String sQuery =
-        "SELECT" +
-        " LANCAMENTOS.COD_LANCAMENTO AS COD_LANCAMENTO," +
-        " LANCAMENTOS.DATA_EMISSAO AS EMISSAO," +
-        " LANCAMENTOS.DATA_VENCIMENTO AS VENCIMENTO," +
-        " LANCAMENTOS.DATA_QUITACAO AS QUITACAO," +
-        " LANCAMENTOS.DESCRICAO AS DESCRICAO," +
-        " LANCAMENTOS.VALOR AS VALOR," +
-        " CONTAS.COD_CONTA AS COD_CONTA," +
-        " CONTAS.TIPO AS TIPO_CONTA," +
-        " CONTAS.NOME AS NOME_CONTA," +
-        " CAIXAS.COD_CAIXA AS COD_CAIXA," +
-        " CAIXAS.NOME AS NOME_CAIXA," +
-        " CAIXAS.SALDO AS SALDO_CAIXA " +
-        "FROM" +
-        " LANCAMENTOS LEFT JOIN CONTAS ON (CONTAS.COD_CONTA = LANCAMENTOS.COD_CONTA)" +
-        "             LEFT JOIN CAIXAS ON (CAIXAS.COD_CAIXA = LANCAMENTOS.COD_CAIXA) " +
-        "WHERE" +
-        " LANCAMENTOS.DATA_VENCIMENTO >= " + data1 + " AND" +
-        " LANCAMENTOS.DATA_VENCIMENTO <= " + data2 + " " +
-        "ORDER BY" +
-        " LANCAMENTOS.DATA_VENCIMENTO";
+			if( data1.length() == 7 ) {
+				data1 = "0" + data1;
+			}
 
-      System.out.println( "SQL: " + sQuery );
+			if( data2.length() == 7 ) {
+				data2 = "0" + data2;
+			}
 
-      ResultSet rs = st.executeQuery( sQuery );
+			Statement st = this.connection.createStatement();
+			String sQuery =
+				"SELECT" +
+				" LANCAMENTOS.COD_LANCAMENTO AS COD_LANCAMENTO," +
+				" LANCAMENTOS.DATA_EMISSAO AS EMISSAO," +
+				" LANCAMENTOS.DATA_VENCIMENTO AS VENCIMENTO," +
+				" LANCAMENTOS.DATA_QUITACAO AS QUITACAO," +
+				" LANCAMENTOS.DESCRICAO AS DESCRICAO," +
+				" LANCAMENTOS.VALOR AS VALOR," +
+				" CONTAS.COD_CONTA AS COD_CONTA," +
+				" CONTAS.TIPO AS TIPO_CONTA," +
+				" CONTAS.NOME AS NOME_CONTA," +
+				" CAIXAS.COD_CAIXA AS COD_CAIXA," +
+				" CAIXAS.NOME AS NOME_CAIXA," +
+				" CAIXAS.SALDO AS SALDO_CAIXA " +
+				"FROM" +
+				" LANCAMENTOS LEFT JOIN CONTAS ON (CONTAS.COD_CONTA = LANCAMENTOS.COD_CONTA)" +
+				"             LEFT JOIN CAIXAS ON (CAIXAS.COD_CAIXA = LANCAMENTOS.COD_CAIXA) " +
+				"WHERE" +
+				" LANCAMENTOS.DATA_VENCIMENTO >= " + data1 + " AND" +
+				" LANCAMENTOS.DATA_VENCIMENTO <= " + data2 + " " +
+				"ORDER BY" +
+				" LANCAMENTOS.DATA_VENCIMENTO";
 
-      if( rs.next() ) {
-        do {
-          Lancamento lancamento = new Lancamento();
-          Conta conta = new Conta();
-          Caixa caixa = new Caixa();
+			System.out.println( "SQL: " + sQuery );
 
-          if( rs.getInt( "EMISSAO" ) != 0 ) {
-            lancamento.setCodLancamento( rs.getInt( "COD_LANCAMENTO" ) );
-            lancamento.setDataEmissao( rs.getInt( "EMISSAO" ) );
-            lancamento.setDataVencimento( rs.getInt( "VENCIMENTO" ) );
-            lancamento.setDataQuitacao( rs.getInt( "QUITACAO" ) );
-            lancamento.setDescricao( rs.getString( "DESCRICAO" ) );
-            lancamento.setValor( rs.getDouble( "VALOR" ) );
-            lancamento.setPago( (rs.getInt( "QUITACAO" ) > 0)? 'S' : 'N' );
-            
-            conta.setCodConta( rs.getInt( "COD_CONTA" ) );
-            
-            if( conta.getCodConta() > 0 ) {
-              conta.setNome( rs.getString( "NOME_CONTA" ) );
-              conta.setTipo( rs.getString( "TIPO_CONTA" ).charAt( 0 ) );
-              lancamento.setConta( conta );
-            }
-            else {
-              lancamento.setConta( null );
-            }
-            
-            caixa.setCodCaixa( rs.getInt( "COD_CAIXA" ) );
-            caixa.setNome( rs.getString( "NOME_CAIXA" ) );
-            caixa.setSaldo( rs.getDouble( "SALDO_CAIXA" ) );
-            lancamento.setCaixa( caixa );
+			ResultSet rs = st.executeQuery( sQuery );
 
-            alLancamento.add( lancamento );
-          }
-        }
-        while( rs.next() );
+			if( rs.next() ) {
+				do {
+					Lancamento lancamento = new Lancamento();
+					Conta conta = new Conta();
+					Caixa caixa = new Caixa();
 
-        System.out.println( "SQL: " + alLancamento.size() + " Registro" );
-      }
-      else {
-        System.out.println( "SQL: 0 Registros" );
-      }
-      return( alLancamento );
-    }
-    catch( SQLException e ) {
-      System.out.println( "SQLException: " + e.getLocalizedMessage() );
-      if( e.getErrorCode() == 1 ) {
-        // 1 = SQLITE_ERROR = Error or missing database
-        System.out.println( "SQL: Banco de dados n√£o encontrado! Criando.." );
-        ConnectionHolder.criarTabelas();
-      }
-      return( alLancamento );
-    }
-  }
-  /**
-   * @brief Exluir um Lancamento do banco de dados.
-   * @param pLancamento Um Lancamento a ser exclu√≠do.
-   */
-  public void excluir( Lancamento pLancamento ) {
-    try {
-      Statement st = this.connection.createStatement();
-      String sQuery =
-        "DELETE FROM" +
-        " LANCAMENTOS " +
-        "WHERE" +
-        " LANCAMENTOS.COD_LANCAMENTO = " + pLancamento.getCodLancamento();
+					if( rs.getInt( "EMISSAO" ) != 0 ) {
+						lancamento.setCodLancamento( rs.getInt( "COD_LANCAMENTO" ) );
+						lancamento.setDataEmissao( rs.getInt( "EMISSAO" ) );
+						lancamento.setDataVencimento( rs.getInt( "VENCIMENTO" ) );
+						lancamento.setDataQuitacao( rs.getInt( "QUITACAO" ) );
+						lancamento.setDescricao( rs.getString( "DESCRICAO" ) );
+						lancamento.setValor( rs.getDouble( "VALOR" ) );
+						lancamento.setPago( (rs.getInt( "QUITACAO" ) > 0)? 'S' : 'N' );
 
-      System.out.println( "SQL: " + sQuery );
+						conta.setCodConta( rs.getInt( "COD_CONTA" ) );
 
-      if( st.executeUpdate( sQuery ) == Statement.EXECUTE_FAILED ) {
-        System.out.println( "SQL: 0 Registros excluidos." );
-      }
-      else {
-        System.out.println( "SQL: 1 Registro excluido." );
-      }
-    }
-    catch( SQLException e ) {
-      System.out.println( "SQL Exception: " + e.getLocalizedMessage() );
-    }
-  }
-  /**
-   * @brief Obt√©m o valor total de movimento por per√≠odo e tipo de conta.
-   * @param pConta O tipo de uma Conta 'C' ou 'D'.
-   * @param pDataIni A data inicial do per√≠odo de consulta.
-   * @param pDataFim A data final do per√≠odo de consulta.
-   * @param pProvisao Um boolean que se true, considera as provis√µes.
-   * @return O valor total para aquele tipo de conta, se maior do que 0, ou 0.
-   */
-  public double selectTotalMovimentoPeriodo( Conta pConta, int pDataIni, int pDataFim, boolean pProvisao ) {
-    try {
-      double total = 0;
-      Statement st = this.connection.createStatement();
-      String data1 = pDataIni + "";
-      String data2 = pDataFim + "";
+						if( conta.getCodConta() > 0 ) {
+							conta.setNome( rs.getString( "NOME_CONTA" ) );
+							conta.setTipo( rs.getString( "TIPO_CONTA" ).charAt( 0 ) );
+							lancamento.setConta( conta );
+						}
+						else {
+							lancamento.setConta( null );
+						}
 
-      if( data1.length() == 7 ) {
-        data1 = "0" + data1;
-      }
+						caixa.setCodCaixa( rs.getInt( "COD_CAIXA" ) );
+						caixa.setNome( rs.getString( "NOME_CAIXA" ) );
+						caixa.setSaldo( rs.getDouble( "SALDO_CAIXA" ) );
+						lancamento.setCaixa( caixa );
 
-      if( data2.length() == 7 ) {
-        data2 = "0" + data2;
-      }
+						alLancamento.add( lancamento );
+					}
+				}
+				while( rs.next() );
 
-      String sQuery =
-        "SELECT" +
-        " SUM(LANCAMENTOS.VALOR) " +
-        "FROM" +
-        " LANCAMENTOS INNER JOIN CONTAS ON (LANCAMENTOS.COD_CONTA = CONTAS.COD_CONTA) " +
-        "WHERE" +
-        " LANCAMENTOS.DATA_VENCIMENTO >= " + data1 + " AND" +
-        " LANCAMENTOS.DATA_VENCIMENTO <= " + data2 + " AND";
+				System.out.println( "SQL: " + alLancamento.size() + " Registro" );
+			}
+			else {
+				System.out.println( "SQL: 0 Registros" );
+			}
+			return( alLancamento );
+		}
+		catch( SQLException e ) {
+			e.printStackTrace();
+			if( e.getErrorCode() == 1 ) {
+				// 1 = SQLITE_ERROR = Error or missing database
+				System.out.println( "SQL: Banco de dados n√£o encontrado! Criando.." );
+				ConnectionHolder.criarTabelas();
+			}
+			return( alLancamento );
+		}
+	}
+	/**
+	 * @brief Exluir um Lancamento do banco de dados.
+	 * @param pLancamento Um Lancamento a ser excluÌdo.
+	 */
+	public void excluir( Lancamento pLancamento ) {
+		try {
+			Statement st = this.connection.createStatement();
+			String sQuery =
+				"DELETE FROM" +
+				" LANCAMENTOS " +
+				"WHERE" +
+				" LANCAMENTOS.COD_LANCAMENTO = " + pLancamento.getCodLancamento();
 
-      if( pProvisao ) {
-        sQuery += " LANCAMENTOS.DATA_QUITACAO >= 0 AND";
-      }
-      else {
-        sQuery += " LANCAMENTOS.DATA_QUITACAO > 0 AND";
-      }
+			System.out.println( "SQL: " + sQuery );
 
-      sQuery += " CONTAS.TIPO = '" + pConta.getTipo() + "'";
+			if( st.executeUpdate( sQuery ) == Statement.EXECUTE_FAILED ) {
+				System.out.println( "SQL: 0 Registros excluidos." );
+			}
+			else {
+				System.out.println( "SQL: 1 Registro excluido." );
+			}
+		}
+		catch( SQLException e ) {
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * @brief ObtÈm o valor total de movimento por perÌodo e tipo de conta.
+	 * @param pConta O tipo de uma Conta 'C' ou 'D'.
+	 * @param pDataIni A data inicial do perÌodo de consulta.
+	 * @param pDataFim A data final do perÌodo de consulta.
+	 * @param pProvisao Um boolean que se true, considera as provisıes.
+	 * @return O valor total para aquele tipo de conta, se maior do que 0, ou 0.
+	 */
+	public double selectTotalMovimentoPeriodo( Conta pConta, int pDataIni, int pDataFim, boolean pProvisao ) {
+		try {
+			double total = 0;
+			Statement st = this.connection.createStatement();
+			String data1 = pDataIni + "";
+			String data2 = pDataFim + "";
 
-      System.out.println( "SQL: " + sQuery );
+			if( data1.length() == 7 ) {
+				data1 = "0" + data1;
+			}
 
-      ResultSet rs = st.executeQuery( sQuery );
+			if( data2.length() == 7 ) {
+				data2 = "0" + data2;
+			}
 
-      if( rs.next() ) {
-        do {
-          if( rs.getDouble( 1 ) != 0 ) {
-            System.out.println( "SQL: 1 Registro" );
-            total = rs.getDouble( 1 );
-          }
-          else {
-            System.out.println( "SQL: 0 Registros" );
-          }
-          break;
-        }
-        while( rs.next() );
-      }
-      else {
-        System.out.println( "SQL: 0 Registros" );
-      }
-      return( total );
-    }
-    catch( SQLException e ) {
-      System.out.println( "SQL Exception: " + e.getLocalizedMessage() );
-      return( 0.0 );
-    }
-  }
-  /**
-   * @brief Obt√©m um Lancamento espec√≠fico.
-   * @param pCodLancamento A data de emiss√£o ou quita√ß√£o formatada do Lancamento.
-   * @return Um Lancamento v√°lido, se encontrado, ou Lancamento vazio se n√£o;
-   */
-  public Lancamento selectRegistro( Integer pCodLancamento ) {
-    Lancamento lancamento = new Lancamento();
+			String sQuery =
+				"SELECT" +
+				" SUM(LANCAMENTOS.VALOR) " +
+				"FROM" +
+				" LANCAMENTOS INNER JOIN CONTAS ON (LANCAMENTOS.COD_CONTA = CONTAS.COD_CONTA) " +
+				"WHERE" +
+				" LANCAMENTOS.DATA_VENCIMENTO >= " + data1 + " AND" +
+				" LANCAMENTOS.DATA_VENCIMENTO <= " + data2 + " AND";
 
-    try {
-      Statement st = this.connection.createStatement();
+			if( pProvisao ) {
+				sQuery += " LANCAMENTOS.DATA_QUITACAO >= 0 AND";
+			}
+			else {
+				sQuery += " LANCAMENTOS.DATA_QUITACAO > 0 AND";
+			}
 
-      String sQuery = 
-        "SELECT " +
-        " LANCAMENTOS.COD_LANCAMENTO AS COD_LANCAMENTO," +
-        " LANCAMENTOS.DATA_EMISSAO AS EMISSAO," +
-        " LANCAMENTOS.DATA_VENCIMENTO AS VENCIMENTO," +
-        " LANCAMENTOS.DATA_QUITACAO AS QUITACAO," +
-        " LANCAMENTOS.DESCRICAO AS DESCRICAO," +
-        " LANCAMENTOS.VALOR AS VALOR," +
-        " CONTAS.COD_CONTA AS COD_CONTA," +
-        " CONTAS.NOME AS NOME_CONTA," +
-        " CONTAS.TIPO AS TIPO_CONTA," +
-        " CAIXAS.COD_CAIXA AS COD_CAIXA," +
-        " CAIXAS.NOME AS NOME_CAIXA," +
-        " CAIXAS.SALDO AS SALDO_CAIXA " +
-        "FROM" +
-        " LANCAMENTOS INNER JOIN CONTAS ON (CONTAS.COD_CONTA = LANCAMENTOS.COD_CONTA)" +
-        "             INNER JOIN CAIXAS ON (CAIXAS.COD_CAIXA = LANCAMENTOS.COD_CAIXA)" +
-        "WHERE" +
-        " COD_LANCAMENTOS = " + pCodLancamento;
+			sQuery += " CONTAS.TIPO = '" + pConta.getTipo() + "'";
 
-      System.out.println( "SQL: " + sQuery );
+			System.out.println( "SQL: " + sQuery );
 
-      ResultSet rs = st.executeQuery( sQuery );
+			ResultSet rs = st.executeQuery( sQuery );
 
-      if( rs.next() ) {
-        do {
-          if( rs.getInt( 1 ) != 0 ) {
-            lancamento.setCodLancamento( rs.getInt( "COD_LANCAMENTO" ) );
-            lancamento.setDataEmissao( rs.getInt( "EMISSAO" ) );
-            lancamento.setDataVencimento( rs.getInt( "VENCIMENTO" ) );
-            lancamento.setDataQuitacao( rs.getInt( "QUITACAO" ) );
-            lancamento.setDescricao( rs.getString( "DESCRICAO" ) );
-            lancamento.setValor( rs.getDouble( "VALOR" ) );
-            Conta conta = new Conta();
-            conta.setCodConta( rs.getInt( "COD_CONTA" ) );
+			if( rs.next() ) {
+				do {
+					if( rs.getDouble( 1 ) != 0 ) {
+						System.out.println( "SQL: 1 Registro" );
+						total = rs.getDouble( 1 );
+					}
+					else {
+						System.out.println( "SQL: 0 Registros" );
+					}
+					break;
+				}
+				while( rs.next() );
+			}
+			else {
+				System.out.println( "SQL: 0 Registros" );
+			}
+			return( total );
+		}
+		catch( SQLException e ) {
+			e.printStackTrace();
+			return( 0.0 );
+		}
+	}
+	/**
+	 * @brief ObtÈm um Lancamento especÌfico.
+	 * @param pCodLancamento A data de emiss„o ou quitaÁ„o formatada do Lancamento.
+	 * @return Um Lancamento v·lido, se encontrado, ou Lancamento vazio se n„o;
+	 */
+	public Lancamento selectRegistro( Integer pCodLancamento ) {
+		Lancamento lancamento = new Lancamento();
 
-            if( conta.getCodConta() > 0 ) {
-              conta.setNome( rs.getString( "NOME_CONTA" ) );
-              conta.setTipo( rs.getString( "TIPO_CONTA" ).charAt(0) );
-              lancamento.setConta( conta );
-            }
-            else {
-              lancamento.setConta( null );
-            }
+		try {
+			Statement st = this.connection.createStatement();
 
-            Caixa caixa = new Caixa();
-            caixa.setCodCaixa( rs.getInt( "COD_CAIXA" ) );
-            caixa.setNome( rs.getString( "NOME_CAIXA" ) );
-            caixa.setSaldo( rs.getDouble( "SALDO_CAIXA" ) );
-            lancamento.setCaixa( caixa );
-            
-            System.out.println( "SQL: 1 Registro" );
-          }
-          else {
-            System.out.println( "SQL: 0 Registros" );
-          }
-          break;
-        }
-        while( rs.next() );
-      }
-      else {
-        System.out.println( "SQL: 0 Registros" );
-      }
-      return( lancamento );
-    }
-    catch( SQLException e ) {
-      System.out.println( "SQLException: " + e.getLocalizedMessage() );
-      return( lancamento );
-    }
-  }
-  /**
-   * @brief Obt√©m os Lancamentos para inserir no gr√°fico do painel Home.
-   * @param pCodCaixa O c√≥digo do Caixa a ser consultado.
-   * @param pDataIni A data inicial do per√≠odo a ser consultado.
-   * @param pDataFim A data final do per√≠odo a ser consultado.
-   * @param pProvisao Um boolean, que se true, considera as provis√µes.
-   * @return Uma lista com o nome de uma Conta e o valor total do per√≠odo.
-   */
-  public ArrayList<Object[]> selectLancamentosGrafico( Integer pCodCaixa, int pDataIni, int pDataFim, boolean pProvisao ) {
-    ArrayList<Object[]> alObject = new ArrayList<>();
+			String sQuery =
+				"SELECT " +
+				" LANCAMENTOS.COD_LANCAMENTO AS COD_LANCAMENTO," +
+				" LANCAMENTOS.DATA_EMISSAO AS EMISSAO," +
+				" LANCAMENTOS.DATA_VENCIMENTO AS VENCIMENTO," +
+				" LANCAMENTOS.DATA_QUITACAO AS QUITACAO," +
+				" LANCAMENTOS.DESCRICAO AS DESCRICAO," +
+				" LANCAMENTOS.VALOR AS VALOR," +
+				" CONTAS.COD_CONTA AS COD_CONTA," +
+				" CONTAS.NOME AS NOME_CONTA," +
+				" CONTAS.TIPO AS TIPO_CONTA," +
+				" CAIXAS.COD_CAIXA AS COD_CAIXA," +
+				" CAIXAS.NOME AS NOME_CAIXA," +
+				" CAIXAS.SALDO AS SALDO_CAIXA " +
+				"FROM" +
+				" LANCAMENTOS INNER JOIN CONTAS ON (CONTAS.COD_CONTA = LANCAMENTOS.COD_CONTA)" +
+				"             INNER JOIN CAIXAS ON (CAIXAS.COD_CAIXA = LANCAMENTOS.COD_CAIXA)" +
+				"WHERE" +
+				" COD_LANCAMENTOS = " + pCodLancamento;
 
-    try {
-      Statement st = this.connection.createStatement();
-      String sQuery;
-      
-      if( pCodCaixa == null ) {
-        sQuery = 
-          "SELECT" +
-          " CONTAS.NOME," +
-          " SUM(LANCAMENTOS.VALOR) " +
-          "FROM" +
-          " LANCAMENTOS INNER JOIN CONTAS ON (LANCAMENTOS.COD_CONTA = CONTAS.COD_CONTA) " +
-          "WHERE" +
-          " LANCAMENTOS.DATA_VENCIMENTO >= " + pDataIni + " AND" +
-          " LANCAMENTOS.DATA_VENCIMENTO <= " + pDataFim + " AND" +
-          " CONTAS.TIPO = 'D' AND";
-      }
-      else {
-        sQuery = 
-          "SELECT" +
-          " CONTAS.NOME," +
-          " SUM(LANCAMENTOS.VALOR) " +
-          "FROM" +
-          " LANCAMENTOS INNER JOIN CONTAS ON (LANCAMENTOS.COD_CONTA = CONTAS.COD_CONTA) " +
-          "WHERE" +
-          " LANCAMENTOS.COD_CAIXA = " + pCodCaixa + " AND" +
-          " LANCAMENTOS.DATA_VENCIMENTO >= " + pDataIni + " AND" +
-          " LANCAMENTOS.DATA_VENCIMENTO <= " + pDataFim + " AND" +
-          " CONTAS.TIPO = 'D' AND";
-      }
+			System.out.println( "SQL: " + sQuery );
 
-      if( pProvisao ) {
-        sQuery += " LANCAMENTOS.DATA_QUITACAO >= 0";
-      }
-      else {
-        sQuery += " LANCAMENTOS.DATA_QUITACAO > 0";
-      }
+			ResultSet rs = st.executeQuery( sQuery );
 
-      sQuery += " GROUP BY CONTAS.NOME";
+			if( rs.next() ) {
+				do {
+					if( rs.getInt( 1 ) != 0 ) {
+						lancamento.setCodLancamento( rs.getInt( "COD_LANCAMENTO" ) );
+						lancamento.setDataEmissao( rs.getInt( "EMISSAO" ) );
+						lancamento.setDataVencimento( rs.getInt( "VENCIMENTO" ) );
+						lancamento.setDataQuitacao( rs.getInt( "QUITACAO" ) );
+						lancamento.setDescricao( rs.getString( "DESCRICAO" ) );
+						lancamento.setValor( rs.getDouble( "VALOR" ) );
+						Conta conta = new Conta();
+						conta.setCodConta( rs.getInt( "COD_CONTA" ) );
 
-      System.out.println( "SQL: " + sQuery );
+						if( conta.getCodConta() > 0 ) {
+							conta.setNome( rs.getString( "NOME_CONTA" ) );
+							conta.setTipo( rs.getString( "TIPO_CONTA" ).charAt(0) );
+							lancamento.setConta( conta );
+						}
+						else {
+							lancamento.setConta( null );
+						}
 
-      ResultSet rs = st.executeQuery( sQuery );
+						Caixa caixa = new Caixa();
+						caixa.setCodCaixa( rs.getInt( "COD_CAIXA" ) );
+						caixa.setNome( rs.getString( "NOME_CAIXA" ) );
+						caixa.setSaldo( rs.getDouble( "SALDO_CAIXA" ) );
+						lancamento.setCaixa( caixa );
 
-      if( rs.next() ) {
-        do {
-          if( rs.getString( 1 ) != null ) {
-            Object[] select = new Object[2];
+						System.out.println( "SQL: 1 Registro" );
+					}
+					else {
+						System.out.println( "SQL: 0 Registros" );
+					}
+					break;
+				}
+				while( rs.next() );
+			}
+			else {
+				System.out.println( "SQL: 0 Registros" );
+			}
+			return( lancamento );
+		}
+		catch( SQLException e ) {
+			e.printStackTrace();
+			return( lancamento );
+		}
+	}
+	/**
+	 * @brief ObtÈm os Lancamentos para inserir no gr·fico do painel Home.
+	 * @param pCodCaixa O cÛdigo do Caixa a ser consultado.
+	 * @param pDataIni A data inicial do perÌodo a ser consultado.
+	 * @param pDataFim A data final do perÌodo a ser consultado.
+	 * @param pProvisao Um boolean, que se true, considera as provisıes.
+	 * @return Uma lista com o nome de uma Conta e o valor total do perÌodo.
+	 */
+	public ArrayList<Object[]> selectLancamentosGrafico( Integer pCodCaixa, int pDataIni, int pDataFim, boolean pProvisao ) {
+		ArrayList<Object[]> alObject = new ArrayList<>();
 
-            select[0] = rs.getString( 1 );
-            select[1] = rs.getDouble( 2 );
-            
-            alObject.add( select );
-          }
-          else {
-            System.out.println( "SQL: 0 Registros" );
-          }
-        }
-        while( rs.next() );
-        
-        System.out.println( "SQL: " + alObject.size() + " Registro(s)" );
-      }
-      else {
-        System.out.println( "SQL: 0 Registros" );
-      }
-      return( alObject );
-    }
-    catch( SQLException e ) {
-      System.out.println( "SQL Exception: " + e.getLocalizedMessage() );
-      return( alObject );
-    }
-  }
-  /**
-   * @brief Insere um Lancamento no banco de dados.
-   * @param pLancamento Lancamento a ser inserido.
-   */
-  public void inserir( Lancamento pLancamento ) {
-    try {
-      Statement st = this.connection.createStatement();
-      
-      Conta c;
-      
-      if( pLancamento.getConta() == null ) {
-        c = new Conta();
-        c.setCodConta( 0 );
-      }
-      else {
-        c = pLancamento.getConta();
-      }
-      
-      String sQuery =
-        "INSERT INTO LANCAMENTOS (DATA_EMISSAO, DATA_VENCIMENTO, DATA_QUITACAO, DESCRICAO, VALOR, COD_CONTA, COD_CAIXA)" +
-        " VALUES (" +
-        " " + pLancamento.getDataEmissao() + "," +    // DATA_EMISSAO
-        " " + pLancamento.getDataVencimento() + "," + // DATA_VENCIMENTO
-        " " + pLancamento.getDataQuitacao() + "," +   // DATA_QUITACAO
-        " '" + pLancamento.getDescricao() + "'," +    // DESCRICAO
-        " " + pLancamento.getValor() + "," +          // VALOR
-        " " + c.getCodConta() + "," +                 // CONTA
-        " " + pLancamento.getCaixa().getCodCaixa() +  // CAIXA
-        " )";
+		try {
+			Statement st = this.connection.createStatement();
+			String sQuery;
 
-      System.out.println( "SQL: " + sQuery );
+			if( pCodCaixa == null ) {
+				sQuery =
+					"SELECT" +
+					" CONTAS.NOME," +
+					" SUM(LANCAMENTOS.VALOR) " +
+					"FROM" +
+					" LANCAMENTOS INNER JOIN CONTAS ON (LANCAMENTOS.COD_CONTA = CONTAS.COD_CONTA) " +
+					"WHERE" +
+					" LANCAMENTOS.DATA_VENCIMENTO >= " + pDataIni + " AND" +
+					" LANCAMENTOS.DATA_VENCIMENTO <= " + pDataFim + " AND" +
+					" CONTAS.TIPO = 'D' AND";
+			}
+			else {
+				sQuery =
+					"SELECT" +
+					" CONTAS.NOME," +
+					" SUM(LANCAMENTOS.VALOR) " +
+					"FROM" +
+					" LANCAMENTOS INNER JOIN CONTAS ON (LANCAMENTOS.COD_CONTA = CONTAS.COD_CONTA) " +
+					"WHERE" +
+					" LANCAMENTOS.COD_CAIXA = " + pCodCaixa + " AND" +
+					" LANCAMENTOS.DATA_VENCIMENTO >= " + pDataIni + " AND" +
+					" LANCAMENTOS.DATA_VENCIMENTO <= " + pDataFim + " AND" +
+					" CONTAS.TIPO = 'D' AND";
+			}
 
-      if( st.executeUpdate( sQuery ) == Statement.EXECUTE_FAILED ) {
-        System.out.println( "SQL: 0 Registros Inseridos" );
-      }
-      else {
-        System.out.println( "SQL: 1 Registro Inserido" );
-      }
-    }
-    catch( SQLException e ) {
-      System.out.println( "SQLException: " + e.getLocalizedMessage() );
-    }
-  }
+			if( pProvisao ) {
+				sQuery += " LANCAMENTOS.DATA_QUITACAO >= 0";
+			}
+			else {
+				sQuery += " LANCAMENTOS.DATA_QUITACAO > 0";
+			}
+
+			sQuery += " GROUP BY CONTAS.NOME";
+
+			System.out.println( "SQL: " + sQuery );
+
+			ResultSet rs = st.executeQuery( sQuery );
+
+			if( rs.next() ) {
+				do {
+					if( rs.getString( 1 ) != null ) {
+						Object[] select = new Object[2];
+
+						select[0] = rs.getString( 1 );
+						select[1] = rs.getDouble( 2 );
+
+						alObject.add( select );
+					}
+					else {
+						System.out.println( "SQL: 0 Registros" );
+					}
+				}
+				while( rs.next() );
+
+				System.out.println( "SQL: " + alObject.size() + " Registro(s)" );
+			}
+			else {
+				System.out.println( "SQL: 0 Registros" );
+			}
+			return( alObject );
+		}
+		catch( SQLException e ) {
+			e.printStackTrace();
+			return( alObject );
+		}
+	}
+	/**
+	 * @brief Insere um Lancamento no banco de dados.
+	 * @param pLancamento Lancamento a ser inserido.
+	 */
+	public void inserir( Lancamento pLancamento ) {
+		try {
+			Statement st = this.connection.createStatement();
+
+			Conta c;
+
+			if( pLancamento.getConta() == null ) {
+				c = new Conta();
+				c.setCodConta( 0 );
+			}
+			else {
+				c = pLancamento.getConta();
+			}
+
+			String sQuery =
+				"INSERT INTO LANCAMENTOS (DATA_EMISSAO, DATA_VENCIMENTO, DATA_QUITACAO, DESCRICAO, VALOR, COD_CONTA, COD_CAIXA)" +
+				" VALUES (" +
+				" " + pLancamento.getDataEmissao() + "," +    // DATA_EMISSAO
+				" " + pLancamento.getDataVencimento() + "," + // DATA_VENCIMENTO
+				" " + pLancamento.getDataQuitacao() + "," +   // DATA_QUITACAO
+				" '" + pLancamento.getDescricao() + "'," +    // DESCRICAO
+				" " + pLancamento.getValor() + "," +          // VALOR
+				" " + c.getCodConta() + "," +                 // CONTA
+				" " + pLancamento.getCaixa().getCodCaixa() +  // CAIXA
+				" )";
+
+			System.out.println( "SQL: " + sQuery );
+
+			if( st.executeUpdate( sQuery ) == Statement.EXECUTE_FAILED ) {
+				System.out.println( "SQL: 0 Registros Inseridos" );
+			}
+			else {
+				System.out.println( "SQL: 1 Registro Inserido" );
+			}
+		}
+		catch( SQLException e ) {
+			e.printStackTrace();
+		}
+	}
 }

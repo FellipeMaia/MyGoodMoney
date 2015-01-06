@@ -22,49 +22,50 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 public class ValueTools {
-  public static String format( Double valorParam ) {
-    NumberFormat df = new DecimalFormat( "#,##0.00", new DecimalFormatSymbols (new Locale ("pt", "BR") ) );
-    return( "R$ " + df.format( valorParam ) );
-  }
-  public static String formatToField( double pValor ) {
-    // tamanho = 16
-    NumberFormat df = new DecimalFormat( "#,##0.00", new DecimalFormatSymbols (new Locale ("pt", "BR") ) );
-    String valorString = df.format( pValor );
-    
-    while( valorString.length() < 14 ) {
-      valorString = " " + valorString;
-    }
-    return( "R$" + valorString );
-  }
-  public static String formatToFieldPerc( double pValor ) {
-    // tamanho = 16
-    NumberFormat df = new DecimalFormat( "#,##0.00", new DecimalFormatSymbols (new Locale ("pt", "BR") ) );
-    String valorString = df.format( pValor );
-    while( valorString.length() < 15 ) {
-      valorString = " " + valorString;
-    }
-    return( "%" + valorString );
-  }
-  public static Double unformat( String valorParam ) {
-    if( valorParam.indexOf( "R$" ) != -1 )
-      valorParam = valorParam.replace( "R$", "" );
-    
-    valorParam = valorParam.replaceAll( ",", "." );
-    
-    String novoValor = "";
-    int totalPontos = 0;
+	public static String format( Double valorParam ) {
+		NumberFormat df = new DecimalFormat( "#,##0.00", new DecimalFormatSymbols (new Locale ("pt", "BR") ) );
+		return( "R$ " + df.format( valorParam ) );
+	}
+	public static String formatToField( double pValor ) {
+		// tamanho = 16
+		NumberFormat df = new DecimalFormat( "#,##0.00", new DecimalFormatSymbols (new Locale ("pt", "BR") ) );
+		String valorString = df.format( pValor );
 
-    for( int i=valorParam.length()-1; i>=0; i-- ) {
-      if( valorParam.charAt(i) == '.' ) {
-        totalPontos++;
-      }
-      
-      if( totalPontos > 1 && valorParam.charAt(i) == '.' ) {
-        continue;
-      }
-       
-      novoValor = valorParam.charAt(i) + "" + novoValor;
-    }
-    return( Double.parseDouble( novoValor ) );
-  }
+		while( valorString.length() < 14 ) {
+			valorString = " " + valorString;
+		}
+		return( "R$" + valorString );
+	}
+	public static String formatToFieldPerc( double pValor ) {
+		// tamanho = 16
+		NumberFormat df = new DecimalFormat( "#,##0.00", new DecimalFormatSymbols (new Locale ("pt", "BR") ) );
+		String valorString = df.format( pValor );
+
+		while( valorString.length() < 15 ) {
+			valorString = " " + valorString;
+		}
+		return( "%" + valorString );
+	}
+	public static Double unformat( String valorParam ) {
+		if( valorParam.indexOf( "R$" ) != -1 ) {
+			valorParam = valorParam.replace( "R$", "" );
+		}
+		valorParam = valorParam.replaceAll( ",", "." );
+
+		String novoValor = "";
+		int totalPontos = 0;
+
+		for( int i=valorParam.length()-1; i>=0; i-- ) {
+			if( valorParam.charAt(i) == '.' ) {
+				totalPontos++;
+			}
+
+			if( totalPontos > 1 && valorParam.charAt(i) == '.' ) {
+				continue;
+			}
+
+			novoValor = valorParam.charAt(i) + "" + novoValor;
+		}
+		return( Double.parseDouble( novoValor ) );
+	}
 }

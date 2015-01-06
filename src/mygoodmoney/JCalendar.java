@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2005-2006 Adam Lane
- * 
+ *
  * Licensed under the Academic Free License version 1.2
  */
 package mygoodmoney;
@@ -35,7 +35,7 @@ public class JCalendar extends JPanel {
     /** This action event name indicates that the cursor has moved between date cells
      * within the calendar. */
     public static final String ACTION_CURSOR_MOVED = "cursorMoved";
-    
+
     /** This action event name indicates that the calendar has been clicked.  */
     public static final String ACTION_CLICKED = "clicked";
 
@@ -46,8 +46,8 @@ public class JCalendar extends JPanel {
         private SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         private String textDate;
         public BasicDate(Date date) { textDate = format.format(date == null ? new Date(0) : date); }
-        public Date getDate() { 
-            try { 
+        public Date getDate() {
+            try {
                 return format.parse(textDate);
             } catch (ParseException e) {
                 return null;
@@ -74,7 +74,7 @@ public class JCalendar extends JPanel {
         }
         DAY_OF_WEEK_LABELS = dayList.toArray(new String[7]);
     }
-    
+
     /** Internal state variable - current visible month */
     private int month;
     /** Internal state variable - current visible year */
@@ -97,7 +97,7 @@ public class JCalendar extends JPanel {
     private Color colorDayHighlightLabel = Color.WHITE;
     private Color colorDayOfWeekLabel = Color.LIGHT_GRAY;
     private Color colorWeekOfYearLabel = Color.LIGHT_GRAY;
-    
+
     /** Construct a JCalendar initialized to display the current month and year. */
     public JCalendar() {
         // initialize with current month and year
@@ -115,7 +115,7 @@ public class JCalendar extends JPanel {
         this.addMouseListener(mouseListener);
     }
 
-    // UI FUNCTIONALITY    
+    // UI FUNCTIONALITY
     private MouseMotionListener mouseMotionListener = new MouseMotionListener() {
         public void mouseDragged(MouseEvent e) {}
 
@@ -210,7 +210,7 @@ public class JCalendar extends JPanel {
 
         return new BasicDate(returnDate).getDate();
     }
-    
+
     /** Paint the JCalendar.  Without the paint method, the component is pretty much nothing.
      * Labels days of the week, weeks of the year, and days of the month.  Also paints special
      * highlight colors in date cells.
@@ -351,7 +351,7 @@ public class JCalendar extends JPanel {
 
     /** Get a date which corresponds with the currently viewed month
      * on the JCalendar.  The date will be the beginning of the first
-     * day of the viewed month and year. 
+     * day of the viewed month and year.
      * @return a date representing the currently viewed month in the calendar */
     public Date getCalendarView() {
         Calendar calendar = Calendar.getInstance();
@@ -393,7 +393,7 @@ public class JCalendar extends JPanel {
         dateHighlightMap.clear();
     }
 
-    /** Get the date over which the mouse cursor is positioned or was at the beginning of 
+    /** Get the date over which the mouse cursor is positioned or was at the beginning of
      * a click.
      * @return the date that the mouse is over */
     public Date getCursorDate() {

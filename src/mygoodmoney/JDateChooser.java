@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2005-2006 Adam Lane
- * 
+ *
  * Licensed under the Academic Free License version 1.2
  */
 package mygoodmoney;
@@ -51,7 +51,7 @@ public class JDateChooser extends JPanel {
     /** Stores the last date formatter that successfully parsed a date */
     //protected static DateFormat lastDateFormat = new SimpleDateFormat("MM/dd/yyyy");
     protected static DateFormat lastDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-    
+
     /** A set of date formatters that could be used for parsing dates */
     protected static final SimpleDateFormat[] DATE_FORMATS = new SimpleDateFormat[] {
         new SimpleDateFormat("dd MMM yyyy"),
@@ -63,44 +63,44 @@ public class JDateChooser extends JPanel {
 
     /** Internal state varialble - date formatter for current local date format */
     protected DateFormat currentDateFormat = lastDateFormat;
-    
+
     /** Internal state varialble - the original selected date */
     protected Date originalDate = null;
-    
+
     /** Internal state varialble - the current selected date */
     protected Date date = null;
-    
+
     /** Internal state varialble - flag indicating whether the popup is visible or not */
     protected boolean datePickerVisible = false;
 
     /** Date field for editing the date manually */
     protected JTextField dateField;
-    
+
     /** The combo box toggle button */
     protected JButton comboBoxButton;
-    
+
     /** The popup window date chooser window*/
     protected JWindow datePickerWindow;
-    
+
     /** The date picker within the popup window */
     protected JDatePicker datePicker;
-    
+
     private final Color colorBackground = Color.WHITE;
     private final Color colorBackgroundError = new Color(0xFFAAAA);
     private final Color colorBackgroundChange = Color.WHITE;
-    
-    /** Construct a JDateChooser initialized with selected date. */    
+
+    /** Construct a JDateChooser initialized with selected date. */
     public JDateChooser() {
         dateField = new JTextField();
         comboBoxButton = new BasicArrowButton(BasicArrowButton.SOUTH, UIManager.getColor("ComboBox.buttonBackground"), UIManager.getColor("ComboBox.buttonShadow"), UIManager.getColor("ComboBox.buttonDarkShadow"), UIManager.getColor("ComboBox.buttonHighlight"));
         comboBoxButton.setName("ComboBox.arrowButton");
         comboBoxButton.addActionListener(onComboButtonClick);
-        
+
         dateField.addComponentListener(componentListener);
         dateField.getDocument().addDocumentListener(dateFieldDocumentListener);
         dateField.setBackground(colorBackground);
         dateField.setPreferredSize(new Dimension(125, dateField.getPreferredSize().height));
-        
+
         this.setLayout(new ComboBoxLayout());
         this.add(dateField);
         this.add(comboBoxButton);
@@ -112,8 +112,8 @@ public class JDateChooser extends JPanel {
           }
         });
     }
-    
-    // UI FUNCTIONALITY    
+
+    // UI FUNCTIONALITY
     private final Action onComboButtonClick = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -140,12 +140,12 @@ public class JDateChooser extends JPanel {
 
     private final DocumentListener dateFieldDocumentListener = new DocumentListener() {
         @Override
-        public void insertUpdate(DocumentEvent e) { 
+        public void insertUpdate(DocumentEvent e) {
           onTextChange();
           format();
         }
         @Override
-        public void removeUpdate(DocumentEvent e) { 
+        public void removeUpdate(DocumentEvent e) {
           onTextChange();
         }
         @Override
@@ -153,10 +153,10 @@ public class JDateChooser extends JPanel {
           onTextChange();
         }
     };
-    
+
     public void format() {
       String data = dateField.getText();
-      
+
       if( data.length() == 8 ) {
         try {
           final DateFormat dfAtual = new SimpleDateFormat( "ddMMyyyy" );
@@ -172,7 +172,7 @@ public class JDateChooser extends JPanel {
         catch( ParseException p ){}
       }
     }
-    
+
     private final ComponentListener componentListener = new ComponentListener() {
         @Override
         public void componentResized(ComponentEvent e) { hideDatePicker(); }
@@ -183,14 +183,14 @@ public class JDateChooser extends JPanel {
         @Override
         public void componentHidden(ComponentEvent e) { hideDatePicker(); }
     };
-    
+
     private final WindowFocusListener windowFocusListener = new WindowFocusListener() {
         @Override
         public void windowGainedFocus(WindowEvent e) { }
         @Override
         public void windowLostFocus(WindowEvent e) { hideDatePicker(); }
     };
-    
+
     private final AncestorListener ancestorListener = new AncestorListener() {
         @Override
         public void ancestorAdded(AncestorEvent event){ hideDatePicker(); }
@@ -204,7 +204,7 @@ public class JDateChooser extends JPanel {
         }
     };
 
-    /** Find the frame parent of the component. 
+    /** Find the frame parent of the component.
      * @param component the component whose frame is needed */
     private Frame getFrame(Component component) {
         if (component == null) component = this;
@@ -213,7 +213,7 @@ public class JDateChooser extends JPanel {
         }
         return getFrame(component.getParent());
     }
-    
+
     /** Toggle the visiblity of the date picker selection popup.  This is used as a response to the
      * combo box toggle button, but it can be manually toggled as well if there is some need. */
     public void showDatePicker() {
@@ -254,7 +254,7 @@ public class JDateChooser extends JPanel {
             datePickerVisible = false;
         }
     }
-    
+
     /** Handle parsing the text field date and updating the rest of the UI accorindingly. */
     private void onTextChange() {
         String text = dateField.getText();
@@ -281,7 +281,7 @@ public class JDateChooser extends JPanel {
                 dateField.setBackground(colorBackground);
             }
         }
-        
+
         ActionEvent event = new ActionEvent(JDateChooser.this, ActionEvent.ACTION_PERFORMED, "changed", System.currentTimeMillis(), 0);
         fireActionPerformed(event);
     }
@@ -308,7 +308,7 @@ public class JDateChooser extends JPanel {
             }
         }
     }
-    
+
     // DATE ACCESSORS
     /** Set the current selected date of the date chooser.  The date may be null.
      * This will update the text field and the rest of the UI to reflect the change.
@@ -321,7 +321,7 @@ public class JDateChooser extends JPanel {
         }
         onTextChange();
     }
-    
+
     /** Set the originally selected date.  Used in detecting changes in the date
      * selection of the component.
      * @param date the originally selected date */
@@ -329,22 +329,22 @@ public class JDateChooser extends JPanel {
         this.originalDate = date;
         onTextChange();
     }
-    
+
     /** Get the currently chosen date.
      * @return the date currently selected, or null if no date is selected (or if text date is invalid) */
     public Date getDate() {
         return (Date) date;
     }
-    
+
     /** Check to see if the currently selected date differs from the original date holder
-     * variable. 
+     * variable.
      * @return true if the date selection has changed, false otherwise */
-    public boolean isDateChanged() { 
+    public boolean isDateChanged() {
         if (date == null && originalDate == null) return false;
         if (originalDate == null) return true;
         return (date != null && !date.equals(originalDate));
     }
-    
+
     // COMBO BOX UI
     /** This class performs the ComboBox style layout of the component elements. */
     private class ComboBoxLayout implements LayoutManager {
@@ -416,7 +416,7 @@ public class JDateChooser extends JPanel {
             return new Dimension(w, h);
         }
     }
-    
+
     /** Try to determine if an event is within the popup window so that it
      * can be automatically closed if an event occurs outside of it.
      * @param source source component
@@ -431,23 +431,23 @@ public class JDateChooser extends JPanel {
         }
         return false;
     }
-    
+
     public void setText( String texto ) {
       this.dateField.setText( texto );
     }
-    
+
     public void setEditable( boolean ed ) {
       this.dateField.setEditable(ed);
       this.dateField.setEnabled(ed);
       this.comboBoxButton.setEnabled(ed);
     }
-    
+
     @Override
     public void requestFocus() {
       this.dateField.requestFocus();
       this.dateField.selectAll();
     }
-    
+
     public JTextField getField() {
       return( this.dateField );
     }

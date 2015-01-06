@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2005-2006 Adam Lane
- * 
+ *
  * Licensed under the Academic Free License version 1.2
  */
 package mygoodmoney;
@@ -30,9 +30,9 @@ import javax.swing.event.ChangeListener;
  * color indicating the date has change, or to be queried by other containers. */
 public class JDatePicker extends JPanel {
     /** Number of days in each month.  Used to adjust the day of the month near the boundary dates when
-     * switching the selected month. */ 
+     * switching the selected month. */
     private static final int[] DAYS_IN_MONTH_LIST = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-    
+
     /** Month labels used in selecting the month */
     private static final String[] MONTH_LIST;
     static {
@@ -52,20 +52,20 @@ public class JDatePicker extends JPanel {
 
     /** Internal state varialble - the actual current date stored in the component */
     private Date date = null;
-    
+
     /** Combo box to select the month */
     private final JComboBox monthComboBox;
-    
+
     /** Spinner to select the year */
     private final JSpinner yearSpinner;
-    
+
     /** Calendar component for displaying and selecting the date */
     private JCalendar calendarComponent;
 
     private final Color colorBackground = Color.WHITE;
     private final Color colorBackgroundChanged = new Color(0xFFFFAA);
     private final Color colorSelectedRange = Color.GREEN;
-    
+
     /** Construct a JDatePicker with no current selected date.  The month and
      * year defeault to the current month and year. */
     public JDatePicker() {
@@ -105,11 +105,11 @@ public class JDatePicker extends JPanel {
             }
         };
         yearSpinner.getModel().addChangeListener(yearChangeListener);
-        
+
         updateView();
     }
 
-    // UI FUNCTIONALITY    
+    // UI FUNCTIONALITY
     private final ActionListener calendarActions = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -139,7 +139,7 @@ public class JDatePicker extends JPanel {
         return focused;
     }
 
-    /** Update the calendar view.  Get the selected month in the combo box, 
+    /** Update the calendar view.  Get the selected month in the combo box,
      * get the selected year in the spinner, and show the appropriate month
      * in the JCalendar view. */
     private void updateCalendar() {
@@ -147,7 +147,7 @@ public class JDatePicker extends JPanel {
         if (getDate() != null) {
             calendarDate.setTime(getDate());
         }
-        
+
         int year = ((Integer) yearSpinner.getValue()).intValue();
         int month = monthComboBox.getSelectedIndex();
         Calendar calendar = Calendar.getInstance();
@@ -158,12 +158,12 @@ public class JDatePicker extends JPanel {
 
         int dayInMonth = calendarDate.get(Calendar.DAY_OF_MONTH);
         if (dayInMonth > DAYS_IN_MONTH_LIST[month]) dayInMonth = DAYS_IN_MONTH_LIST[month];
-        
+
         calendarDate.set(Calendar.DAY_OF_MONTH, 1);
         calendarDate.set(Calendar.YEAR, year);
         calendarDate.set(Calendar.MONTH, month);
         calendarDate.set(Calendar.DAY_OF_MONTH, dayInMonth);
-        
+
         if (getDate() != null) {
             setDate(calendarDate.getTime());
         }
@@ -189,7 +189,7 @@ public class JDatePicker extends JPanel {
     }
 
     /**  Set the selected month in the combo box, and the selected year in the
-     * spinner.  Update the calendar view to reflect the new selections, as 
+     * spinner.  Update the calendar view to reflect the new selections, as
      * well as the current date. */
     private void updateView() {
         Calendar calendar = Calendar.getInstance();

@@ -1,6 +1,6 @@
 /**
 * @file BD.java
-* @brief Cont√©m m√©todos de acesso ao banco de dados.
+* @brief ContÈm mÈtodos de acesso ao banco de dados.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -31,124 +31,123 @@ import java.sql.*;
 * @class BD
 */
 public class BD {
-  private Connection connection;
-  //private final String databaseURL = "jdbc:sqlite:" + cam.substring( 0, cam.length()-1 ) + "MyGoodMoney.db";
-  
-  /**
-  * @brief Construtor da classe BD
-  */
-  public BD() {
-    conectar();
-  }
-  
-  public String getDatabaseURL() {
-    if( System.getProperty( "os.name" ).toUpperCase().contains( "WIN" ) ) {
-      String base = System.getenv("APPDATA");
-      File f = new File( base );
-      if( f.exists() && f.isDirectory() ) {
-        return( "jdbc:sqlite:" + f.getAbsolutePath() + "\\MyGoodMoney.db" );
-      }
-      else {
-        return( "jdbc:sqlite:" + System.getProperty("user.home").substring( 0, System.getProperty("user.home").length()-1 ) + "\\MyGoodMoney.db" );
-      }
-    }
-    else {
-      File f = new File( System.getProperty( "user.home" ) );
-      return( "jdbc:sqlite:" + f.getAbsolutePath() + "/.MyGoodMoney/MyGoodMoney.db" );
-    }
-  }
-  
-  private void conectar() {
-    try {
-      Class.forName( "org.sqlite.JDBC" );
-      System.out.println( "Driver: " + getDatabaseURL() );
-      this.connection = DriverManager.getConnection( getDatabaseURL(), "", "" );
-      System.out.println( "Connex√£o estabelecida!" );
-    }
-    catch( SQLException ex ) {
-      System.out.println( "SQLException: " + ex.getLocalizedMessage() );
-    }
-    catch( ClassNotFoundException ex ) {
-      System.out.println( "ClassNotFoundException: " + ex.getLocalizedMessage() );
-    }
-  }
+	private Connection connection;
 
-  public Connection getConnection(){
-    return( this.connection );
-  }
+	/**
+	 * @brief Construtor da classe BD
+	 */
+	public BD() {
+		conectar();
+	}
 
-  /**
-  * @brief Fecha a conex√£o com o banco de dados.
-  */
-  public void fecharConexao() {
-    try {
-      this.connection.close();
-    }
-    catch( SQLException ex ) {
-      System.out.println( "SQL Exception: " + ex.getLocalizedMessage() );
-    }
-  }
+	public String getDatabaseURL() {
+		if( System.getProperty( "os.name" ).toUpperCase().contains( "WIN" ) ) {
+			String base = System.getenv("APPDATA");
+			File f = new File( base );
+			if( f.exists() && f.isDirectory() ) {
+				return( "jdbc:sqlite:" + f.getAbsolutePath() + "\\MyGoodMoney.db" );
+			}
+			else {
+				return( "jdbc:sqlite:" + System.getProperty("user.home").substring( 0, System.getProperty("user.home").length()-1 ) + "\\MyGoodMoney.db" );
+			}
+		}
+		else {
+			File f = new File( System.getProperty( "user.home" ) );
+			return( "jdbc:sqlite:" + f.getAbsolutePath() + "/.MyGoodMoney/MyGoodMoney.db" );
+		}
+	}
 
-  /**
-  * @brief Cria o banco de dados
-  * @param psCaminhoCompleto Cont√©m o caminho absoluto para o banco de dados mais o nome do arquivo.
-  * @throws ClassNotFoundException
-  */
-  public void criarBancoDeDados( String psCaminhoCompleto ) throws ClassNotFoundException {
-    try {
-      if( this.connection == null ) {
-        conectar();
-      }
+	private void conectar() {
+		try {
+			Class.forName( "org.sqlite.JDBC" );
+			System.out.println( "Driver: " + getDatabaseURL() );
+			this.connection = DriverManager.getConnection( getDatabaseURL(), "", "" );
+			System.out.println( "Conex„o estabelecida!" );
+		}
+		catch( SQLException ex ) {
+			ex.printStackTrace();
+		}
+		catch( ClassNotFoundException ex ) {
+			ex.printStackTrace();
+		}
+	}
 
-      System.out.println( "SQL: SQLite Conectado!" );
+	public Connection getConnection(){
+		return( this.connection );
+	}
 
-      String[] comandosSQL = {
-        "CREATE TABLE IF NOT EXISTS CONTAS " +
-        "(" +
-        " COD_CONTA INTEGER UNIQUE NOT NULL," +
-        " NOME VARCHAR(30) NOT NULL," +
-        " TIPO CHAR NOT NULL," +
-        " PRIMARY KEY(COD_CONTA) " +
-        ")",
-        "CREATE TABLE IF NOT EXISTS CAIXAS " +
-        "(" +
-        " COD_CAIXA INTEGER UNIQUE NOT NULL," +
-        " NOME VARCHAR(30) NOT NULL," +
-        " SALDO FLOAT NOT NULL," +
-        " LIMITE CHAR," +
-        " VALOR_LIMITE FLOAT," +
-        " PRIMARY KEY(COD_CAIXA) " +
-        ")",
-        "CREATE TABLE IF NOT EXISTS LANCAMENTOS " +
-        "(" +
-        " COD_LANCAMENTO INTEGER UNIQUE NOT NULL," +
-        " DATA_EMISSAO INTEGER NOT NULL," +
-        " DATA_VENCIMENTO INTEGER NOT NULL," +
-        " DATA_QUITACAO INTEGER NOT NULL," +
-        " DESCRICAO VARCHAR(50) NOT NULL," +
-        " VALOR FLOAT NOT NULL," +
-        " COD_CONTA INTEGER NOT NULL REFERENCES conta," +
-        " COD_CAIXA INTEGER NOT NULL REFERENCES caixa," +
-        " PRIMARY KEY(COD_LANCAMENTO) " +
-        ")"
-      };
+	/**
+	 * @brief Fecha a conex„o com o banco de dados.
+	 */
+	public void fecharConexao() {
+		try {
+			this.connection.close();
+		}
+		catch( SQLException ex ) {
+			ex.printStackTrace();
+		}
+	}
 
-      Statement st = this.connection.createStatement();
-      System.out.println( "SQL: Criando tabelas.." );
+	/**
+	 * @brief Cria o banco de dados
+	 * @param psCaminhoCompleto ContÈm o caminho absoluto para o banco de dados mais o nome do arquivo.
+	 * @throws ClassNotFoundException
+	 */
+	public void criarBancoDeDados( String psCaminhoCompleto ) throws ClassNotFoundException {
+		try {
+			if( this.connection == null ) {
+				conectar();
+			}
 
-      for( String querySQL : comandosSQL ) {
-        System.out.println( "SQL: " + querySQL );
+			System.out.println( "SQL: SQLite Conectado!" );
 
-        if( st.executeUpdate( querySQL ) == Statement.EXECUTE_FAILED ) {
-          System.out.println( "SQL: Erro ao executar: " + querySQL );
-          this.connection.rollback();
-          break;
-        }
-      }
-      this.connection.commit();
-    }
-    catch( SQLException e ) {
-      System.out.println( "SQLException: " + e.getLocalizedMessage() );
-    }
-  }
+			String[] comandosSQL = {
+				"CREATE TABLE IF NOT EXISTS CONTAS " +
+				"(" +
+				" COD_CONTA INTEGER UNIQUE NOT NULL," +
+				" NOME VARCHAR(30) NOT NULL," +
+				" TIPO CHAR NOT NULL," +
+				" PRIMARY KEY(COD_CONTA) " +
+				")",
+				"CREATE TABLE IF NOT EXISTS CAIXAS " +
+				"(" +
+				" COD_CAIXA INTEGER UNIQUE NOT NULL," +
+				" NOME VARCHAR(30) NOT NULL," +
+				" SALDO FLOAT NOT NULL," +
+				" LIMITE CHAR," +
+				" VALOR_LIMITE FLOAT," +
+				" PRIMARY KEY(COD_CAIXA) " +
+				")",
+				"CREATE TABLE IF NOT EXISTS LANCAMENTOS " +
+				"(" +
+				" COD_LANCAMENTO INTEGER UNIQUE NOT NULL," +
+				" DATA_EMISSAO INTEGER NOT NULL," +
+				" DATA_VENCIMENTO INTEGER NOT NULL," +
+				" DATA_QUITACAO INTEGER NOT NULL," +
+				" DESCRICAO VARCHAR(50) NOT NULL," +
+				" VALOR FLOAT NOT NULL," +
+				" COD_CONTA INTEGER NOT NULL REFERENCES conta," +
+				" COD_CAIXA INTEGER NOT NULL REFERENCES caixa," +
+				" PRIMARY KEY(COD_LANCAMENTO) " +
+				")"
+			};
+
+			Statement st = this.connection.createStatement();
+			System.out.println( "SQL: Criando tabelas.." );
+
+			for( String querySQL : comandosSQL ) {
+				System.out.println( "SQL: " + querySQL );
+
+				if( st.executeUpdate( querySQL ) == Statement.EXECUTE_FAILED ) {
+					System.out.println( "SQL: Erro ao executar: " + querySQL );
+					this.connection.rollback();
+					break;
+				}
+			}
+			this.connection.commit();
+		}
+		catch( SQLException e ) {
+			e.printStackTrace();
+		}
+	}
 }

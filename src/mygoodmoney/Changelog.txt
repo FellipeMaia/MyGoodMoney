@@ -16,16 +16,16 @@
 -> Eh possivel selecionar TODOS no painel Home (11/05/2014)
 3.0 - incluido:
 -> controle de limite
--> mudanÃ§a de layout dos botÃµes
+-> mudança de layout dos botões
 -> transferencia funcionando
 3.1
 -> console suporta acentos
--> bug ao alterar lanÃ§amento nÃ£o alterava o valor
--> nÃ£o permite excluir conta ou caixa com registros
--> BUG CONHECIDO: ao alterar valor do lanÃ§amento, tem que dar TAB fora do campo
+-> bug ao alterar lançamento não alterava o valor
+-> não permite excluir conta ou caixa com registros
+-> BUG CONHECIDO: ao alterar valor do lançamento, tem que dar TAB fora do campo
 -> adicionado link clicavel no contato
 3.2
--> Corrigido bug que nÃ£o altera o valor
+-> Corrigido bug que não altera o valor
 -> Corrigido bug que tinha ao alterar valor do lancamento ficava errado
--> Alterado label dos campos "Considerar proviÃµes", "Pago/Receb" e "Transferido"
+-> Alterado label dos campos "Considerar provisões", "Pago/Receb" e "Transferido"
 -> Alterado painel sobre com caminho para pagina de projetos

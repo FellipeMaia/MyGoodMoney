@@ -1,6 +1,6 @@
 /**
 * @file Mensagem.java
-* @brief Cont√©m m√©todos est√°ticos de mensagens (di√°logos) diversos.
+* @brief ContÈm mÈtodos est·ticos de mensagens (di·logos) diversos.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -33,66 +33,65 @@ import javax.swing.UIManager;
  * @class Mensagem
  */
 public class Mensagem {
-  /**
-   * @brief Exibe uma mensagem do tipo JOptionPane.INFORMATION_MESSAGE. 
-   * @param pMensagem A mensagem a ser exibida.
-   * @param pComponent O component vinculado ao di√°logo.
-   */
-  public static void info( String pMensagem, Component pComponent ) {
-    JOptionPane.showMessageDialog(
-      pComponent,
-      pMensagem,
-      "Informa√ß√£o",
-      JOptionPane.INFORMATION_MESSAGE
-    );
-  }
-  /**
-   * @brief Exibe uma mensagem to tipo JOptionPane.ERROR_MESSAGE. 
-   * @param pMensagem A mensagem a ser exibida.
-   * @param pComponent O component vinculado ao di√°logo.
-   */
-  public static void erro( String pMensagem, Component pComponent ) {
-    JOptionPane.showMessageDialog(
-      pComponent,
-      pMensagem,
-      "Erro",
-      JOptionPane.ERROR_MESSAGE
-    );
-  }
-  /**
-   * @brief Exibe uma mensagem do tipo confirma√ß√£o. 
-   * @param pMensagem A mensagem a ser exibida.
-   * @param pComponent O component vinculado ao di√°logo.
-   * @return true se resposta igual a JOptionPane.YES_OPTION ou false se n√£o.
-   */
-  public static boolean confirmacao( String pMensagem, Component pComponent ) {
-    //Mensagem.setFont();
-    int resposta =
-    JOptionPane.showConfirmDialog(
-      pComponent,
-      pMensagem,
-      "Confirma√ß√£o",
-      JOptionPane.YES_NO_OPTION
-    );
-    
-    return( resposta == JOptionPane.YES_OPTION );
-  }
-  /**
-   * @brief Exibe uma mensagem do tipo JOptionPane.WARNING_MESSAGE. 
-   * @param pMensagem A mensagem a ser exibida.
-   * @param pComponent O component vinculado ao di√°logo.
-   */
-  public static void aviso( String pMensagem, Component pComponent ) {
-    JOptionPane.showMessageDialog(
-      pComponent,
-      pMensagem,
-      "Aviso",
-      JOptionPane.WARNING_MESSAGE
-    );
-  }
-  public static void setFont(){
-    UIManager.put( "OptionPane.font", new Font( "Verdana", 0, 12 ) );
-    UIManager.put( "OptionPane.messageFont", new Font( "Verdana", 0, 12 ) );
-  }
-  
+	/**
+	 * @brief Exibe uma mensagem do tipo JOptionPane.INFORMATION_MESSAGE.
+	 * @param pMensagem A mensagem a ser exibida.
+	 * @param pComponent O component vinculado ao di·logo.
+	 */
+	public static void info( final String pMensagem, final Component pComponent ) {
+		JOptionPane.showMessageDialog(
+			pComponent,
+			pMensagem,
+			"InformaÁ„o",
+			JOptionPane.INFORMATION_MESSAGE
+		);
+	}
+	/**
+	 * @brief Exibe uma mensagem to tipo JOptionPane.ERROR_MESSAGE.
+	 * @param pMensagem A mensagem a ser exibida.
+	 * @param pComponent O component vinculado ao di·logo.
+	 */
+	public static void erro( final String pMensagem, final Component pComponent ) {
+		JOptionPane.showMessageDialog(
+			pComponent,
+			pMensagem,
+			"Erro",
+			JOptionPane.ERROR_MESSAGE
+		);
+	}
+	/**
+	 * @brief Exibe uma mensagem do tipo confirmaÁ„o.
+	 * @param pMensagem A mensagem a ser exibida.
+	 * @param pComponent O component vinculado ao di·logo.
+	 * @return true se resposta igual a JOptionPane.YES_OPTION ou false se n„o.
+	 */
+	public static boolean confirmacao( final String pMensagem, final Component pComponent ) {
+		//Mensagem.setFont();
+		int resposta =
+		JOptionPane.showConfirmDialog(
+			pComponent,
+			pMensagem,
+			"ConfirmaÁ„o",
+			JOptionPane.YES_NO_OPTION
+		);
+
+		return( resposta == JOptionPane.YES_OPTION );
+	}
+	/**
+	 * @brief Exibe uma mensagem do tipo JOptionPane.WARNING_MESSAGE.
+	 * @param pMensagem A mensagem a ser exibida.
+	 * @param pComponent O component vinculado ao di·logo.
+	 */
+	public static void aviso( final String pMensagem, final Component pComponent ) {
+		JOptionPane.showMessageDialog(
+			pComponent,
+			pMensagem,
+			"Aviso",
+			JOptionPane.WARNING_MESSAGE
+		);
+	}
+	public static void setFont(){
+		UIManager.put( "OptionPane.font", new Font( "Verdana", 0, 12 ) );
+		UIManager.put( "OptionPane.messageFont", new Font( "Verdana", 0, 12 ) );
+	}
 }

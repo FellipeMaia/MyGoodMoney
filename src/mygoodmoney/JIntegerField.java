@@ -1,6 +1,6 @@
 /**
 * @file JIntegerField.java
-* @brief ContÃ©m a classe e mÃ©todos da classe JIntegerField, um JTextField formatado.
+* @brief Contém a classe e métodos da classe JIntegerField, um JTextField formatado.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -37,103 +37,103 @@ import javax.swing.event.DocumentListener;
  * @class JIntegerField
  */
 public class JIntegerField extends JTextField {
-  private int valor;  /**< O valor armazenado no JTextField em formato inteiro. */
+	private int valor;  /**< O valor armazenado no JTextField em formato inteiro. */
 
-  /**
-  * @brief Construtor da classe.
-  */
-  public JIntegerField() {
-    super( "0" );
-    this.valor = 0;
-    setHorizontalAlignment( JLabel.RIGHT );
-    setFont( new Font( "Verdana", 0, 12 ) );
-    adicionarListeners();
-  }
-  private void adicionarListeners() {
-    this.addFocusListener( new FocusAdapter() {
-      @Override
-      public void focusGained( FocusEvent e ) {
-        selectAll();
-      }
-    });
-    this.getDocument().addDocumentListener( new DocumentListener() {
-      @Override
-      public void insertUpdate(DocumentEvent de) {
-        atualizarValor();
-      }
-      @Override
-      public void removeUpdate(DocumentEvent de) {
-        atualizarValor();
-      }
-      @Override
-      public void changedUpdate(DocumentEvent de) {
-        atualizarValor();
-      }
-    });
-  }
-  public void atualizarValor() {
-    SwingUtilities.invokeLater( new Runnable() {
-      @Override
-      public void run() {
-        if( getText().isEmpty() || !valorValido( getText() ) ) {
-          setText( "0" );
-        }
-        if( getText().indexOf( "." ) != -1 ) {
-          setText( getText().replaceAll( "\\.", "" ) );
-        }
-        if( getText().indexOf( "," ) != -1 ) {
-          setText( getText().replaceAll( "\\.", "" ) );
-        }
-      }
-    });
-    
-    try {
-      valor = Integer.parseInt( getText() );
-    }
-    catch( NumberFormatException ex ) {
-      valor = 0;
-    }
-  }
-  /**
-   * @brief Verifica se o valor recebido no campo Ã© valido.
-   * @param pValor O valor recebido.
-   * @return true se sim, ou false se nÃ£o.
-   */
-  private boolean valorValido( String pValor ) {
-    try {
-      if( pValor.indexOf( "," ) != -1 ) {
-        pValor = pValor.replaceAll( ",", "" );
-      }
-      if( pValor.indexOf( "." ) != -1 ) {
-        pValor = pValor.replaceAll( "\\.", "" );
-      }
-      
-      int valorValido = Integer.parseInt( pValor );
-      return( true );
-    }
-    catch( NumberFormatException e ) {
-      System.out.println( "ERRO: O valor " + valor + " nÃ£o Ã© um int vÃ¡lido." );
-      return( false );
-    }
-  }
-  /**
-   * @brief ObtÃ©m o valor do campo.
-   * @return O valor do campo.
-   */
-  public int getValue() {
-    return( this.valor );
-  }
-  /**
-   * @brief Seta o valor no campo texto.
-   * @param pValor O valor a ser setado.
-   */
-  public void setValue( int pValor ) {
-    this.valor = pValor;
-    if( pValor == 0 ) {
-      setText( "" );
-    }
-    else {
-      setText( String.valueOf( pValor ) );
-    }
-  }
+	/**
+	 * @brief Construtor da classe.
+	 */
+	public JIntegerField() {
+		super( "0" );
+		this.valor = 0;
+		setHorizontalAlignment( JLabel.RIGHT );
+		setFont( new Font( "Verdana", 0, 12 ) );
+		adicionarListeners();
+	}
+	private void adicionarListeners() {
+		this.addFocusListener( new FocusAdapter() {
+			@Override
+			public void focusGained( FocusEvent e ) {
+				selectAll();
+			}
+		});
+		this.getDocument().addDocumentListener( new DocumentListener() {
+			@Override
+			public void insertUpdate(DocumentEvent de) {
+				atualizarValor();
+			}
+			@Override
+			public void removeUpdate(DocumentEvent de) {
+				atualizarValor();
+			}
+			@Override
+			public void changedUpdate(DocumentEvent de) {
+				atualizarValor();
+			}
+		});
+	}
+	public void atualizarValor() {
+		SwingUtilities.invokeLater( new Runnable() {
+			@Override
+			public void run() {
+				if( getText().isEmpty() || !valorValido( getText() ) ) {
+					setText( "0" );
+				}
+				if( getText().indexOf( "." ) != -1 ) {
+					setText( getText().replaceAll( "\\.", "" ) );
+				}
+				if( getText().indexOf( "," ) != -1 ) {
+					setText( getText().replaceAll( "\\.", "" ) );
+				}
+			}
+		});
+
+		try {
+			valor = Integer.parseInt( getText() );
+		}
+		catch( NumberFormatException ex ) {
+			valor = 0;
+		}
+	}
+	/**
+	 * @brief Verifica se o valor recebido no campo é válido.
+	 * @param pValor O valor recebido.
+	 * @return true se sim, ou false se não.
+	 */
+	private boolean valorValido( String pValor ) {
+		try {
+			if( pValor.indexOf( "," ) != -1 ) {
+				pValor = pValor.replaceAll( ",", "" );
+			}
+			if( pValor.indexOf( "." ) != -1 ) {
+				pValor = pValor.replaceAll( "\\.", "" );
+			}
+
+			int valorValido = Integer.parseInt( pValor );
+			return( true );
+		}
+		catch( NumberFormatException e ) {
+			System.out.println( "NumberFormatException: " + e.getMessage() );
+			return( false );
+		}
+	}
+	/**
+	 * @brief Obtém o valor do campo.
+	 * @return O valor do campo.
+	 */
+	public int getValue() {
+		return( this.valor );
+	}
+	/**
+     * @brief Seta o valor no campo texto.
+     * @param pValor O valor a ser setado.
+     */
+	public void setValue( int pValor ) {
+		this.valor = pValor;
+		if( pValor == 0 ) {
+			setText( "" );
+		}
+		else {
+			setText( String.valueOf( pValor ) );
+		}
+	}
 }

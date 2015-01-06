@@ -19,10 +19,10 @@ import javax.swing.text.DefaultCaret;
  * @author Daniel
  */
 public class FrConsole extends javax.swing.JFrame {
-    
+
     private ConsoleSaida console = null;
     private JFileChooser fileChooser;
-    
+
     public FrConsole() {
         initComponents();
         this.setTitle("Console");

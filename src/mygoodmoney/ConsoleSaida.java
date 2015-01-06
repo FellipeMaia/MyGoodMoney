@@ -17,39 +17,39 @@ import javax.swing.JTextArea;
  * @author Daniel
  */
 public class ConsoleSaida {
-    
+
     private final boolean m_autoSave = false;
     private JTextArea saida = null;
     private String m_traceFilename = "";
-    
+
     public ConsoleSaida(String nomeArquivo){
         this.m_traceFilename = nomeArquivo;
     }
-    
+
     public ConsoleSaida(JTextArea saida){
         this.saida = saida;
     }
-    
+
     public ConsoleSaida(String nomeArquivo, JTextArea saida){
         this.m_traceFilename = nomeArquivo;
         this.saida = saida;
     }
-    
+
     /**
      * Default output stream.
      */
     private static final PrintStream STDOUT = System.out;
-    
+
     /**
      * Out print stream.
      */
     private final transient PrintStream  m_stdoutPS = new PrintStream(new ConsoleOutStream(new ByteArrayOutputStream()));
-    
+
     /**
      * Error print stream.
      */
     private final transient PrintStream  m_stderrPS = new PrintStream(new ConsoleOutStream(new ByteArrayOutputStream()));
-    
+
     /**
      * Attachs the new streams to stdout and stderr.
      */
