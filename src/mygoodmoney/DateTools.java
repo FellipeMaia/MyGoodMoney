@@ -290,9 +290,12 @@ public class DateTools {
 			case 7:
 			case 8:
 			case 10:
+			case 12:{ ultimoDia = "31/"; break; }
+			case 2: { ultimoDia = "28/"; break; }
 			case 4:
 			case 6:
 			case 9:
+			case 11:{ ultimoDia = "30/"; break; }
 		}
 		return( diaMesAno.parse( ultimoDia + mesAnoStr ) );
 	}
