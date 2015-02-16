@@ -46,7 +46,7 @@ public class Main {
 			SwingUtilities.invokeAndWait( new Runnable() {
 				@Override
 				public void run(){
-					frame = new Tela( "My Good Money - Controle Financeiro - Versão 3.2 (23/07/2014)" );
+					frame = new Tela( "My Good Money - Controle Financeiro - Versão 5.0" );
 				}
 			});
 		}
@@ -196,7 +196,7 @@ public class Main {
 		recarregarDoBancoDeDados("Lancamentos" );
 	}
 	private void confirmarIncluirConta() {
-		if( !validarCamposConta() ) {
+		if( !Mensagem.confirmacao( "Confirma inclusão da conta?", this.frame ) || !validarCamposConta() ) {
 			return;
 		}
 
@@ -206,8 +206,6 @@ public class Main {
 		this.frame.limparCamposConta();
 		this.frame.mudarEstado( "Conta", "NAVEGACAO" );
 		recarregarDoBancoDeDados("Contas" );
-
-		Mensagem.info( "Conta incluída com sucesso.", this.frame );
 	}
 	private void recarregarDoBancoDeDados( String pObjeto) {
 		if( pObjeto.equals( "Contas" ) ) {
@@ -265,7 +263,7 @@ public class Main {
 		return( contaValida );
 	}
 	private void confirmarIncluirLancamento() {
-		if( !validarCamposLancamento() ) {
+		if( !Mensagem.confirmacao( "Confirma incluir o lançamento?", this.frame ) || !validarCamposLancamento() ) {
 			return;
 		}
 
@@ -325,8 +323,6 @@ public class Main {
 		this.frame.mudarEstado( "Lancamento", "NAVEGACAO" );
 		recarregarDoBancoDeDados( "Lancamentos" );
 		recarregarDoBancoDeDados( "Caixas" );
-
-		Mensagem.info( "Lançamento incluído com sucesso!" , this.frame);
 	}
 	private boolean validarCamposLancamento() {
 		boolean lancamentoValido = true;
@@ -372,7 +368,7 @@ public class Main {
 		return( lancamentoValido );
 	}
 	private void confirmarIncluirCaixa() {
-		if( !validarCamposCaixa() ) {
+		if( !Mensagem.confirmacao( "Confirma incluir o caixa?", this.frame ) || !validarCamposCaixa() ) {
 			return;
 		}
 
@@ -382,8 +378,6 @@ public class Main {
 		this.frame.limparCamposCaixa();
 		this.frame.mudarEstado( "Caixa", "NAVEGACAO" );
 		recarregarDoBancoDeDados("Caixas" );
-
-		Mensagem.info( "Caixa incluído com sucesso.", this.frame );
 	}
 	private boolean validarCamposCaixa() {
 		boolean caixaValido = true;
