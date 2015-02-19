@@ -230,7 +230,7 @@ public class ContaDAO {
 	* @param pProvisao Um boolean que se true, considera as provisões.
 	* @return Uma lista contendo a data de vencimento, data de quitação, descrição e valor, ou lista vazia.
 	*/
-	public ArrayList<String[]> selectListaExtratoPeriodo( Conta pConta, Integer pDataIni, Integer pDataFim, boolean pProvisao ) {
+	public ArrayList<String[]> selectListaExtratoPeriodo( Conta pConta, Caixa pCaixa, Integer pDataIni, Integer pDataFim, boolean pProvisao ) {
 		ArrayList<String[]> extratoList = new ArrayList<>();
 		try {
 			String sData1 = pDataIni.toString();
@@ -243,18 +243,18 @@ public class ContaDAO {
 			}
 			Statement st = this.connection.createStatement();
 			String sQuery =
-			"SELECT" +
-			" LANCAMENTOS.DATA_VENCIMENTO," +
-			" LANCAMENTOS.DATA_QUITACAO," +
-			" LANCAMENTOS.DESCRICAO," +
-			" LANCAMENTOS.VALOR," +
-			" CAIXAS.NOME " +
-			"FROM" +
-			" LANCAMENTOS INNER JOIN CAIXAS ON (CAIXAS.COD_CAIXA = LANCAMENTOS.COD_CAIXA)" +
-			"			  INNER JOIN CONTAS ON (CONTAS.COD_CONTA = LANCAMENTOS.COD_CONTA) " +
-			"WHERE" +
-			" LANCAMENTOS.DATA_VENCIMENTO >= " + sData1 + " AND" +
-			" LANCAMENTOS.DATA_VENCIMENTO <= " + sData2;
+				"SELECT" +
+				" LANCAMENTOS.DATA_VENCIMENTO," +
+				" LANCAMENTOS.DATA_QUITACAO," +
+				" LANCAMENTOS.DESCRICAO," +
+				" LANCAMENTOS.VALOR," +
+				" CAIXAS.NOME " +
+				"FROM" +
+				" LANCAMENTOS INNER JOIN CAIXAS ON (CAIXAS.COD_CAIXA = LANCAMENTOS.COD_CAIXA)" +
+				"			  INNER JOIN CONTAS ON (CONTAS.COD_CONTA = LANCAMENTOS.COD_CONTA) " +
+				"WHERE" +
+				" LANCAMENTOS.DATA_VENCIMENTO >= " + sData1 + " AND" +
+				" LANCAMENTOS.DATA_VENCIMENTO <= " + sData2;
 			if( pProvisao ) {
 				sQuery += " AND LANCAMENTOS.DATA_QUITACAO >= 0";
 			}
@@ -267,9 +267,12 @@ public class ContaDAO {
 			else {
 				sQuery += " AND CONTAS.TIPO = '" + pConta.getTipo() + "'";
 			}
+			if( pCaixa.getCodCaixa() != null ) {
+				sQuery += " AND LANCAMENTOS.COD_CAIXA = " + pCaixa.getCodCaixa();
+			}
 			sQuery +=
-			" ORDER BY" +
-			" LANCAMENTOS.DATA_VENCIMENTO";
+				" ORDER BY" +
+				" LANCAMENTOS.DATA_VENCIMENTO";
 			System.out.println( "SQL: " + sQuery );
 			ResultSet rs = st.executeQuery( sQuery );
 			if( rs.next() ) {

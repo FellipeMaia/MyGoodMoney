@@ -135,6 +135,8 @@ public class Tela extends JFrame {
 	private JPanel pnlExtrato;
 	private JLabel lblExtratoConta;
 	private JComboBox cbxExtratoConta;
+	private JLabel lblExtratoCaixa;
+	private JComboBox cbxExtratoCaixa;
 	private JLabel lblExtratoPeriodo;
 	private JDateChooser dtcExtratoIni;
 	private JLabel lblExtratoHifen;
@@ -1071,6 +1073,15 @@ public class Tela extends JFrame {
 		this.cbxExtratoConta.setBounds( 110, 15, cbxMovConta.getWidth(), 21 );
 		this.cbxExtratoConta.setFont( new Font( "Verdana", 0, 12 ) );
 
+		this.lblExtratoCaixa = new JLabel( "Caixa:" );
+		this.lblExtratoCaixa.setBounds( 60, 40, 45, 21 );
+		this.lblExtratoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+		this.lblExtratoCaixa.setHorizontalAlignment( JLabel.RIGHT );
+
+		this.cbxExtratoCaixa = new JComboBox();
+		this.cbxExtratoCaixa.setBounds( 110, 40, cbxMovConta.getWidth(), 21 );
+		this.cbxExtratoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
+
 		this.lblExtratoPeriodo = new JLabel( "Período: " );
 		this.lblExtratoPeriodo.setBounds( 270, 15, 60, 21 );
 		this.lblExtratoPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
@@ -1102,7 +1113,7 @@ public class Tela extends JFrame {
 		});
 
 		this.ckbExtratoProvisao = new JCheckBox( " Considerar provisões" );
-		this.ckbExtratoProvisao.setBounds( 270, 42, 200, 21 );
+		this.ckbExtratoProvisao.setBounds( 270, 40, 200, 21 );
 		this.ckbExtratoProvisao.setFont( new Font( "Verdana", 0, 12 ) );
 
 		this.txtExtrato = new JTextPane();
@@ -1581,6 +1592,8 @@ public class Tela extends JFrame {
 		this.pnlExtratos.add( this.pnlExtrato );
 		this.pnlExtrato.add( this.lblExtratoConta );
 		this.pnlExtrato.add( this.cbxExtratoConta );
+		this.pnlExtrato.add( this.lblExtratoCaixa );
+		this.pnlExtrato.add( this.cbxExtratoCaixa );
 		this.pnlExtrato.add( this.lblExtratoPeriodo );
 		this.pnlExtrato.add( this.dtcExtratoIni );
 		this.pnlExtrato.add( this.lblExtratoHifen );
@@ -1950,6 +1963,23 @@ public class Tela extends JFrame {
 		}
 		return( null );
 	}
+	public Caixa getCbxExtratoCaixa() {
+		if( this.cbxExtratoCaixa.getSelectedIndex() >= 0 ) {
+			Caixa c;
+
+			try {
+				c = (Caixa) this.cbxExtratoCaixa.getSelectedItem();
+			}
+			catch( ClassCastException ex ) {
+				String opcao = (String) this.cbxExtratoCaixa.getSelectedItem();
+				c = new Caixa();
+				c.setCodCaixa( null );
+				c.setNome(opcao);
+			}
+			return( c );
+		}
+		return( null );
+	}
 	public Date getDtcExtratoIni() {
 		return( this.dtcExtratoIni.getDate() );
 	}
@@ -1998,7 +2028,7 @@ public class Tela extends JFrame {
 	}
 	public void addCaixaHomeTODOS() {
 		this.cbxResCaixa.addItem( "TODOS" );
-		this.cbxResCaixa.setSelectedIndex( -1 );
+		this.cbxExtratoCaixa.addItem( "TODOS" );
 	}
 	public void addContaHomeTODOS() {
 		this.cbxResConta.addItem( "TODOS CRÉDITO" );
@@ -2034,6 +2064,7 @@ public class Tela extends JFrame {
 		this.cbxMovCaixa.removeAllItems();
 		this.cbxTransfCaixaOrigem.removeAllItems();
 		this.cbxTransfCaixaDestino.removeAllItems();
+		this.cbxExtratoCaixa.removeAllItems();
 
 		this.caixasModel.limpar();
 
@@ -2042,6 +2073,7 @@ public class Tela extends JFrame {
 			this.cbxMovCaixa.addItem( c );
 			this.cbxTransfCaixaOrigem.addItem( c );
 			this.cbxTransfCaixaDestino.addItem( c );
+			this.cbxExtratoCaixa.addItem( c );
 		}
 
 		this.caixasModel.setLinhas( caixas );

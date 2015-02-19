@@ -12,4 +12,4 @@ Implementada: Sim [v5.0]
 Descrição: Possibilitar tirar extrato de um caixa
 Solicitado por: Ricardo
 Data solicitação: 16/02/2015
-Implementada: Não
+Implementada: Sim [v5.1]

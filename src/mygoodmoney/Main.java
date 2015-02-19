@@ -46,7 +46,7 @@ public class Main {
 			SwingUtilities.invokeAndWait( new Runnable() {
 				@Override
 				public void run(){
-					frame = new Tela( "My Good Money - Controle Financeiro - Versão 5.0" );
+					frame = new Tela( "My Good Money - Controle Financeiro - Versão 5.1" );
 				}
 			});
 		}
@@ -704,10 +704,12 @@ public class Main {
 			return;
 		}
 
-		Conta conta = this.frame.getCbxExtratoConta();
+		Conta contaExtrato = this.frame.getCbxExtratoConta();
+		Caixa caixaExtrato = this.frame.getCbxExtratoCaixa();
 
 		ArrayList<String[]> extratoList = this.contaDAO.selectListaExtratoPeriodo(
-			conta,                                                          // conta
+			contaExtrato,                                                          // conta
+			caixaExtrato,                                                          // caixa
 			DateTools.parseDateToInteger( this.frame.getDtcExtratoIni() ),  // data inicial
 			DateTools.parseDateToInteger( this.frame.getDtcExtratoFim() ),  // data final
 			this.frame.getCkbExtratoProvisao()                              // provisao
