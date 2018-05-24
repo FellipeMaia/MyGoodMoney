@@ -22,13 +22,14 @@
 * along with this program.	If not, see <http://www.gnu.org/licenses/>.
 */
 
-package mygoodmoney;
+package mygoodmoney.dao;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import mygoodmoney.model.Caixa;
 
 public class CaixaDAO {
 	private final Connection connection;

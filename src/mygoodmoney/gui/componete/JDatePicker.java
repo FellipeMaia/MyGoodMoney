@@ -3,8 +3,9 @@
  *
  * Licensed under the Academic Free License version 1.2
  */
-package mygoodmoney;
+package mygoodmoney.gui.componete;
 
+import mygoodmoney.gui.componete.JCalendar;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

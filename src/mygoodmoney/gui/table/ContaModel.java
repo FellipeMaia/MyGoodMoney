@@ -1,6 +1,6 @@
 /**
-* @file CaixaModel.java
-* @brief ContXm mXtodos de acesso e tratamento para a tabela de caixas.
+* @file ContaModel.java
+* @brief ContXm mXtodos de acesso e tratamento para a tabela de contas.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -22,27 +22,26 @@
 * along with this program.	If not, see <http://www.gnu.org/licenses/>.
 */
 
-package mygoodmoney;
+package mygoodmoney.gui.table;
 
+import mygoodmoney.model.Conta;
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
-public class CaixaModel extends AbstractTableModel {
-	private ArrayList<Caixa> linhas;
+public class ContaModel extends AbstractTableModel {
+	private ArrayList<Conta> linhas;
 	public static final int COL_NOME = 0;
-	public static final int COL_SALDO = 1;
-	public static final int COL_LIMITE = 2;
-	public static final int NUM_COLUNAS = 3;
-	public CaixaModel() {
+	public static final int COL_TIPO = 1;
+	public static final int NUM_COLUNAS = 2;
+	public ContaModel() {
 		this.linhas = new ArrayList<>();
 	}
 	@Override
 	public Class getColumnClass( int column ) {
 		switch( column ) {
-			case COL_NOME:	 return( String.class );
-			case COL_SALDO:	 return( Double.class );
-			case COL_LIMITE: return( Double.class );
-			default:		 return( String.class );
+			case COL_NOME: return( String.class );
+			case COL_TIPO: return( Character.class );
+			default:	   return( String.class );
 		}
 	}
 	@Override
@@ -52,16 +51,15 @@ public class CaixaModel extends AbstractTableModel {
 	@Override
 	public String getColumnName( int column ) {
 		switch( column ) {
-			case COL_NOME:	 return( "Nome" );
-			case COL_SALDO:	 return( "Saldo" );
-			case COL_LIMITE: return( "Limite" );
-			default:		 return( "" );
+			case COL_NOME: return( "Nome" );
+			case COL_TIPO: return( "Tipo" );
+			default:	   return( "" );
 		}
 	}
-	public Caixa getLinha( int row ) {
+	public Conta getLinha( int row ) {
 		return( this.linhas.get( row ) );
 	}
-	public ArrayList<Caixa> getLinhas() {
+	public ArrayList<Conta> getLinhas() {
 		return( this.linhas );
 	}
 	@Override
@@ -70,12 +68,11 @@ public class CaixaModel extends AbstractTableModel {
 	}
 	@Override
 	public Object getValueAt( int row, int column ) {
-		Caixa caixa = this.linhas.get( row );
+		Conta conta = this.linhas.get( row );
 		switch( column ) {
-			case COL_NOME:	 return( caixa.getNome() );
-			case COL_SALDO:	 return( caixa.getSaldo() );
-			case COL_LIMITE: return( caixa.getValorLimite() );
-			default:		 return( "" );
+			case COL_NOME: return( conta.getNome() );
+			case COL_TIPO: return( conta.getTipo() );
+			default:	   return( "" );
 		}
 	}
 	@Override
@@ -86,14 +83,14 @@ public class CaixaModel extends AbstractTableModel {
 		this.linhas.clear();
 		fireTableDataChanged();
 	}
-	public void setLinhas( ArrayList<Caixa> linhas ) {
+	public void setLinhas( ArrayList<Conta> linhas ) {
 		this.linhas = linhas;
 		fireTableDataChanged();
 	}
-	public void addLinha( Caixa pCaixa ) {
-		this.linhas.add( pCaixa );
+	public void addLinha( Conta pConta ) {
+		this.linhas.add( pConta );
 	}
-	public void removeLinha( Caixa pCaixa ) {
-		this.linhas.remove( pCaixa );
+	public void removeLinha( Conta pConta ) {
+		this.linhas.remove( pConta );
 	}
 }

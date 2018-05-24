@@ -22,7 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mygoodmoney;
+package mygoodmoney.gui;
 
 import javax.swing.JOptionPane;
 import java.awt.Component;
@@ -42,7 +42,7 @@ public class Mensagem {
 		JOptionPane.showMessageDialog(
 			pComponent,
 			pMensagem,
-			"InformaXXo",
+			"Informação",
 			JOptionPane.INFORMATION_MESSAGE
 		);
 	}
@@ -71,7 +71,7 @@ public class Mensagem {
 		JOptionPane.showConfirmDialog(
 			pComponent,
 			pMensagem,
-			"ConfirmaXXo",
+			"Confirmação",
 			JOptionPane.YES_NO_OPTION
 		);
 

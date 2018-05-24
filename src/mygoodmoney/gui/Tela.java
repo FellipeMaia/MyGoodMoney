@@ -22,8 +22,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mygoodmoney;
+package mygoodmoney.gui;
 
+import mygoodmoney.gui.table.ContaModel;
+import mygoodmoney.gui.table.CaixaModel;
+import mygoodmoney.gui.table.LancamentoModel;
+import mygoodmoney.gui.componete.JDoubleField;
+import mygoodmoney.gui.componete.JIntegerField;
+import mygoodmoney.gui.componete.JDateChooser;
+import mygoodmoney.gui.Mensagem;
+import mygoodmoney.model.Lancamento;
+import mygoodmoney.model.Conta;
+import mygoodmoney.model.Caixa;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -39,13 +49,17 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.DefaultTableCellRenderer;
+import mygoodmoney.factory.DateTools;
+import mygoodmoney.FrConsole;
+import mygoodmoney.factory.ValueTools;
+import mygoodmoney.gui.img.Imagem;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 
 public class Tela extends JFrame {
 	private String comando; /**< ContXm o comando a ser executado, disparado por eventos */
 	private FrConsole console;
-
+        
 	private JPanel pnlSuperior;
 	private JLabel lblPeriodo;
 	private JButton btnMenosPeriodo;
@@ -209,8 +223,8 @@ public class Tela extends JFrame {
 		criarModelCaixas();
 		obterImagemPrograma();
 		habilitarRecorrencia( false );
-		criarListener();
-		iniciarConsole();
+//		criarListener();
+//		iniciarConsole();
 		Mensagem.setFont();
 	}
 
@@ -431,7 +445,7 @@ public class Tela extends JFrame {
 
 	private void obterImagemPrograma() {
 		try {
-			setIconImage( new ImageIcon( Tela.class.getResource( "money.png" ) ).getImage() );
+			setIconImage( new ImageIcon( Imagem.IMG_DINHEIRO ).getImage() );
 		}
 		catch( Exception ex ) {
 			ex.printStackTrace();
@@ -471,7 +485,7 @@ public class Tela extends JFrame {
 		this.lblPeriodo.setHorizontalAlignment( JLabel.RIGHT );
 		this.lblPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
 
-		this.btnMenosPeriodo = new JButton( new ImageIcon( getClass().getResource( "seta_e.png" ) ) );
+		this.btnMenosPeriodo = new JButton( new ImageIcon( Imagem.IMG_SETA_ESQUERDA ) );
 		this.btnMenosPeriodo.setBounds( 145, 20, 45, 21 );
 		this.btnMenosPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnMenosPeriodo.setFocusable( false );
@@ -507,7 +521,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.btnMaisPeriodo = new JButton( new ImageIcon( getClass().getResource( "seta_d.png" ) ) );
+		this.btnMaisPeriodo = new JButton( new ImageIcon( Imagem.IMG_SETA_DIREITA ) );
 		this.btnMaisPeriodo.setBounds( 500, 20, 45, 21 );
 		this.btnMaisPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnMaisPeriodo.setFocusable( false );
@@ -538,7 +552,7 @@ public class Tela extends JFrame {
 		this.cbxResCaixa.setFont( new Font( "Verdana", 0, 12 ) );
 
 		this.btnResCaixa = new JButton();
-		this.btnResCaixa.setIcon( new ImageIcon( Tela.class.getResource( "atualizar.png" ) ) );
+		this.btnResCaixa.setIcon( new ImageIcon( Imagem.IMG_ATUALIZAR ) );
 		this.btnResCaixa.setFocusable( false );
 		this.btnResCaixa.setBounds( 310, 30, 30, 30 );
 		this.btnResCaixa.addActionListener( new ActionListener() {
@@ -624,7 +638,7 @@ public class Tela extends JFrame {
 		this.cbxResConta.setBounds( 155, 45, 160, 21 );
 		this.cbxResConta.setFont( new Font( "Verdana", 0, 12 ) );
 
-		this.btnResConta = new JButton( new ImageIcon( Tela.class.getResource( "atualizar.png" ) ) );
+		this.btnResConta = new JButton( new ImageIcon(Imagem.IMG_ATUALIZAR) );
 		this.btnResConta.setBounds( 320, 40, 30, 30 );
 		this.btnResConta.setFocusable( false );
 		this.btnResConta.addActionListener(new ActionListener() {
@@ -736,7 +750,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.lblInfoData = new JLabel( new ImageIcon( Tela.class.getResource( "infoiconn.png" ) ) );
+		this.lblInfoData = new JLabel( new ImageIcon( Imagem.IMG_INFO ) );
 		this.lblInfoData.setBounds( 200, 71, 21, 21 );
 		String infoData =
 			"<html>" +
@@ -896,7 +910,7 @@ public class Tela extends JFrame {
 			this.cbxPeriodo.addItem( periodo );
 		}
 
-		this.btnMovAdd = new JButton( new ImageIcon( Tela.class.getResource( "incluir.png" ) ) );
+		this.btnMovAdd = new JButton( new ImageIcon( Imagem.IMG_INCLUIR ) );
 		this.btnMovAdd.setBounds( 5, 5, 30, 30 );
 		this.btnMovAdd.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnMovAdd.setToolTipText( "Novo" );
@@ -908,7 +922,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.btnMovEditar = new JButton( new ImageIcon( Tela.class.getResource( "editar.png" ) ) );
+		this.btnMovEditar = new JButton( new ImageIcon(Imagem.IMG_EDITAR ) );
 		this.btnMovEditar.setBounds( 35, 5, 30, 30 );
 		this.btnMovEditar.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnMovEditar.setToolTipText( "Alterar" );
@@ -920,7 +934,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.btnMovExcluir = new JButton( new ImageIcon( Tela.class.getResource( "deletar.gif" ) ) );
+		this.btnMovExcluir = new JButton( new ImageIcon( Imagem.IMG_DELETAR ) );
 		this.btnMovExcluir.setBounds( 65, 5, 30, 30 );
 		this.btnMovExcluir.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnMovExcluir.setToolTipText( "Excluir" );
@@ -932,7 +946,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.btnMovConfirmar = new JButton( new ImageIcon( Tela.class.getResource( "confirmar.png" ) ) );
+		this.btnMovConfirmar = new JButton( new ImageIcon( Imagem.IMG_CONFIRMAR ) );
 		this.btnMovConfirmar.setBounds( 95, 5, 30, 30 );
 		this.btnMovConfirmar.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnMovConfirmar.setToolTipText( "Confirmar" );
@@ -944,7 +958,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.btnMovCancelar = new JButton( new ImageIcon( Tela.class.getResource( "cancelar.png" ) ) );
+		this.btnMovCancelar = new JButton( new ImageIcon(Imagem.IMG_CANCELAR) );
 		this.btnMovCancelar.setBounds( 125, 5, 30, 30 );
 		this.btnMovCancelar.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnMovCancelar.setToolTipText( "Cancelar" );
@@ -959,7 +973,7 @@ public class Tela extends JFrame {
 		this.pnlTransferencia = new JPanel();
 		this.pnlTransferencia.setLayout( null );
 
-		this.btnTransfAdd = new JButton( new ImageIcon( Tela.class.getResource( "incluir.png" ) ) );
+		this.btnTransfAdd = new JButton( new ImageIcon( Imagem.IMG_INCLUIR ) );
 		this.btnTransfAdd.setBounds( 5, 5, 30, 30 );
 		this.btnTransfAdd.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnTransfAdd.setToolTipText( "Novo" );
@@ -971,7 +985,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.btnTransfConfirmar = new JButton( new ImageIcon( Tela.class.getResource( "confirmar.png" ) ) );
+		this.btnTransfConfirmar = new JButton( new ImageIcon( Imagem.IMG_CONFIRMAR ) );
 		this.btnTransfConfirmar.setBounds( 35, 5, 30, 30 );
 		this.btnTransfConfirmar.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnTransfConfirmar.setToolTipText( "Confirmar" );
@@ -983,7 +997,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.btnTransfCancelar = new JButton( new ImageIcon( Tela.class.getResource( "cancelar.png" ) ) );
+		this.btnTransfCancelar = new JButton( new ImageIcon(Imagem.IMG_CANCELAR) );
 		this.btnTransfCancelar.setBounds( 65, 5, 30, 30 );
 		this.btnTransfCancelar.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnTransfCancelar.setToolTipText( "Cancelar" );
@@ -1102,7 +1116,7 @@ public class Tela extends JFrame {
 		this.dtcExtratoFim.setFont( new Font( "Verdana", 0, 12 ) );
 		this.dtcExtratoFim.setDate( new Date() );
 
-		this.btnExtrato = new JButton( new ImageIcon( Tela.class.getResource( "confirmar.png" ) ) );
+		this.btnExtrato = new JButton( new ImageIcon( Imagem.IMG_CONFIRMAR ) );
 		this.btnExtrato.setBounds( 610, 10, 30, 30 );
 		this.btnExtrato.setFocusable( false );
 		this.btnExtrato.addActionListener(new ActionListener() {
@@ -1163,7 +1177,7 @@ public class Tela extends JFrame {
 			cbxTipoConta.addItem( tipo );
 		}
 
-		this.btnAddConta = new JButton( new ImageIcon( Tela.class.getResource( "incluir.png" ) ) );
+		this.btnAddConta = new JButton( new ImageIcon( Imagem.IMG_INCLUIR ) );
 		this.btnAddConta.setBounds( 5, 5, 30, 30 );
 		this.btnAddConta.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnAddConta.setToolTipText( "Novo" );
@@ -1175,7 +1189,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.btnEditarConta = new JButton( new ImageIcon( Tela.class.getResource( "editar.png" ) ) );
+		this.btnEditarConta = new JButton( new ImageIcon(Imagem.IMG_EDITAR ) );
 		this.btnEditarConta.setBounds( 35, 5, 30, 30 );
 		this.btnEditarConta.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnEditarConta.setToolTipText( "Alterar" );
@@ -1187,7 +1201,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.btnExcluirConta = new JButton( new ImageIcon( Tela.class.getResource( "deletar.gif" ) ) );
+		this.btnExcluirConta = new JButton( new ImageIcon( Imagem.IMG_DELETAR ) );
 		this.btnExcluirConta.setBounds( 65, 5, 30, 30 );
 		this.btnExcluirConta.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnExcluirConta.setToolTipText( "Excluir" );
@@ -1199,7 +1213,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.btnConfirmarConta = new JButton( new ImageIcon( Tela.class.getResource( "confirmar.png" ) ) );
+		this.btnConfirmarConta = new JButton( new ImageIcon( Imagem.IMG_CONFIRMAR ) );
 		this.btnConfirmarConta.setBounds( 95, 5, 30, 30 );
 		this.btnConfirmarConta.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnConfirmarConta.setToolTipText( "Confirmar" );
@@ -1211,7 +1225,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.btnCancelarConta = new JButton( new ImageIcon( Tela.class.getResource( "cancelar.png" ) ) );
+		this.btnCancelarConta = new JButton( new ImageIcon( Imagem.IMG_CANCELAR ) );
 		this.btnCancelarConta.setBounds( 125, 5, 30, 30 );
 		this.btnCancelarConta.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnCancelarConta.setToolTipText( "Cancelar" );
@@ -1296,7 +1310,7 @@ public class Tela extends JFrame {
 		this.dbfValorLimite = new JDoubleField();
 		this.dbfValorLimite.setBounds( 60, 130, 100, 21 );
 
-		this.btnAddCaixa = new JButton( new ImageIcon( Tela.class.getResource( "incluir.png" ) ) );
+		this.btnAddCaixa = new JButton( new ImageIcon( Imagem.IMG_INCLUIR ) );
 		this.btnAddCaixa.setBounds( 5, 5, 30, 30 );
 		this.btnAddCaixa.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnAddCaixa.setToolTipText( "Novo" );
@@ -1308,7 +1322,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.btnEditarCaixa = new JButton( new ImageIcon( Tela.class.getResource( "editar.png" ) ) );
+		this.btnEditarCaixa = new JButton( new ImageIcon(Imagem.IMG_EDITAR ) );
 		this.btnEditarCaixa.setBounds( 35, 5, 30, 30 );
 		this.btnEditarCaixa.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnEditarCaixa.setToolTipText( "Alterar" );
@@ -1320,7 +1334,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.btnExcluirCaixa = new JButton( new ImageIcon( Tela.class.getResource( "deletar.gif" ) ) );
+		this.btnExcluirCaixa = new JButton( new ImageIcon( Imagem.IMG_DELETAR ) );
 		this.btnExcluirCaixa.setBounds( 65, 5, 30, 30 );
 		this.btnExcluirCaixa.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnExcluirCaixa.setToolTipText( "Excluir" );
@@ -1332,7 +1346,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.btnConfirmarCaixa = new JButton( new ImageIcon( Tela.class.getResource( "confirmar.png" ) ) );
+		this.btnConfirmarCaixa = new JButton( new ImageIcon( Imagem.IMG_CONFIRMAR ) );
 		this.btnConfirmarCaixa.setBounds( 95, 5, 30, 30 );
 		this.btnConfirmarCaixa.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnConfirmarCaixa.setToolTipText( "Confirmar" );
@@ -1344,7 +1358,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.btnCancelarCaixa = new JButton( new ImageIcon( Tela.class.getResource( "cancelar.png" ) ) );
+		this.btnCancelarCaixa = new JButton( new ImageIcon( Imagem.IMG_CANCELAR ) );
 		this.btnCancelarCaixa.setBounds( 125, 5, 30, 30 );
 		this.btnCancelarCaixa.setFont( new Font( "Verdana", 0, 12 ) );
 		this.btnCancelarCaixa.setToolTipText( "Cancelar" );
@@ -2237,33 +2251,33 @@ public class Tela extends JFrame {
 	public void perderFocoCaixa() {
 		this.pnlCadCaixa.requestFocus();
 	}
-	private void criarListener() {
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
-			@Override
-			public boolean dispatchKeyEvent(KeyEvent e) {
-				try {
-					AOPRESSIONARTecla(e);
-				}
-				catch( Exception exc ) {
-					exc.printStackTrace();
-				}
-				return false;
-			}
-		});
-	}
-	public void AOPRESSIONARTecla( KeyEvent e ) {
-		if( e.isControlDown() && e.getKeyCode() == KeyEvent.VK_I && e.getID() == KeyEvent.KEY_PRESSED ) {
-			if( this.console.isVisible() ) {
-				this.console.setVisible( false );
-			}
-			else {
-				this.console.setVisible( true );
-			}
-		}
-	}
-	private void iniciarConsole() {
-		this.console = new FrConsole();
-	}
+//	private void criarListener() {
+//		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+//			@Override
+//			public boolean dispatchKeyEvent(KeyEvent e) {
+//				try {
+//					AOPRESSIONARTecla(e);
+//				}
+//				catch( Exception exc ) {
+//					exc.printStackTrace();
+//				}
+//				return false;
+//			}
+//		});
+//	}
+//	public void AOPRESSIONARTecla( KeyEvent e ) {
+//		if( e.isControlDown() && e.getKeyCode() == KeyEvent.VK_I && e.getID() == KeyEvent.KEY_PRESSED ) {
+//			if( this.console.isVisible() ) {
+//				this.console.setVisible( false );
+//			}
+//			else {
+//				this.console.setVisible( true );
+//			}
+//		}
+//	}
+//	private void iniciarConsole() {
+//		this.console = new FrConsole();
+//	}
 	public void setCaixaResumoSemLimite() {
 		this.txfResSaldoCaixaLimite.setText( "R$           -- " );
 	}

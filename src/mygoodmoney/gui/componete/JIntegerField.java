@@ -22,7 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mygoodmoney;
+package mygoodmoney.gui.componete;
 
 import java.awt.Font;
 import java.awt.event.FocusAdapter;

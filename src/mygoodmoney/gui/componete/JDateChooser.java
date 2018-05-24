@@ -3,7 +3,7 @@
  *
  * Licensed under the Academic Free License version 1.2
  */
-package mygoodmoney;
+package mygoodmoney.gui.componete;
 
 import java.applet.Applet;
 import java.awt.Color;

@@ -22,8 +22,9 @@
 * along with this program.	If not, see <http://www.gnu.org/licenses/>.
 */
 
-package mygoodmoney;
+package mygoodmoney.gui.componete;
 
+import mygoodmoney.factory.ValueTools;
 import java.awt.Font;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -34,6 +35,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.DocumentFilter;
+import mygoodmoney.NumberDocumentFilter;
 
 /**
 * @class JDoubleField

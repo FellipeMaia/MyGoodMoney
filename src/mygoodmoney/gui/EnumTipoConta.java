@@ -22,14 +22,14 @@
 * along with this program.	If not, see <http://www.gnu.org/licenses/>.
 */
 
-package mygoodmoney;
+package mygoodmoney.gui;
 
 /**
 * @enum EnumTipoConta
 */
 public enum EnumTipoConta {
-	CREDITO('C',"CrXdito"),	 /**< Define 'C' para CREDITO */
-	DEBITO('D',"DXbito");	 /**< Define 'D' para DEBITO */
+	CREDITO('C',"Credito"),	 /**< Define 'C' para CREDITO */
+	DEBITO('D',"Debito");	 /**< Define 'D' para DEBITO */
 	private final char	 codigo;
 	private final String descricao;
 	/**

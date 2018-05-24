@@ -4,10 +4,12 @@
  * and open the template in the editor.
  */
 
-package mygoodmoney;
+package mygoodmoney.gui.table;
 
+import mygoodmoney.model.Lancamento;
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
+import mygoodmoney.model.Lancamento;
 
 public class LancamentoModel extends AbstractTableModel {
 	private ArrayList<Lancamento> linhas;
