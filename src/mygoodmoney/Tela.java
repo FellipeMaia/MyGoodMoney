@@ -1,6 +1,6 @@
 /**
 * @file Tela.java
-* @brief Contém métodos de acesso e rotinas utilitárias da Tela Gráfica.
+* @brief ContXm mXtodos de acesso e rotinas utilitXrias da Tela GrXfica.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -43,7 +43,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 
 public class Tela extends JFrame {
-	private String comando; /**< Contém o comando a ser executado, disparado por eventos */
+	private String comando; /**< ContXm o comando a ser executado, disparado por eventos */
 	private FrConsole console;
 
 	private JPanel pnlSuperior;
@@ -466,7 +466,7 @@ public class Tela extends JFrame {
 		this.pnlHome.setBorder( BorderFactory.createEtchedBorder() );
 		this.pnlHome.setFont( new Font( "Verdana", 0, 12 ) );
 
-		this.lblPeriodo = new JLabel( "Período:" );
+		this.lblPeriodo = new JLabel( "PerXodo:" );
 		this.lblPeriodo.setBounds( 80, 20, 60, 21 );
 		this.lblPeriodo.setHorizontalAlignment( JLabel.RIGHT );
 		this.lblPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
@@ -492,7 +492,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.lblPeriodoA = new JLabel( "à" );
+		this.lblPeriodoA = new JLabel( "X" );
 		this.lblPeriodoA.setBounds( 340, 20, 15, 21 );
 		this.lblPeriodoA.setFont( new Font( "Verdana", 0, 12 ) );
 		this.lblPeriodoA.setHorizontalAlignment( JLabel.CENTER );
@@ -523,7 +523,7 @@ public class Tela extends JFrame {
 		this.pnlResumoCaixa.setBounds( 10, 10, 710, 240 );
 		this.pnlResumoCaixa.setBorder( BorderFactory.createEtchedBorder() );
 
-		this.lblResumoCaixa = new JLabel( "Resumo Caixa (no Período)" );
+		this.lblResumoCaixa = new JLabel( "Resumo Caixa (no PerXodo)" );
 		this.lblResumoCaixa.setBounds( 265, 5, 180, 21 );
 		this.lblResumoCaixa.setHorizontalAlignment( JLabel.CENTER );
 		this.lblResumoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
@@ -581,7 +581,7 @@ public class Tela extends JFrame {
 		this.txfResValTotEntrCaixa.setFont( new Font( "Monospaced", 0, 12 ) );
 		this.txfResValTotEntrCaixa.setEditable( false );
 
-		this.lblResTotSaidaCaixa = new JLabel( "Total de Saídas: " );
+		this.lblResTotSaidaCaixa = new JLabel( "Total de SaXdas: " );
 		this.lblResTotSaidaCaixa.setBounds( 30, 159, 120, 21 ); // x = 130 - 128
 		this.lblResTotSaidaCaixa.setHorizontalAlignment( JLabel.RIGHT );
 		this.lblResTotSaidaCaixa.setFont( new Font( "Verdana", 0, 12 ) );
@@ -592,7 +592,7 @@ public class Tela extends JFrame {
 		this.txfResValTotSaidaCaixa.setFont( new Font( "Monospaced", 0, 12 ) );
 		this.txfResValTotSaidaCaixa.setEditable( false );
 
-		this.lblResumoCaixaProvisao = new JLabel( "Considerar provisões:" );
+		this.lblResumoCaixaProvisao = new JLabel( "Considerar provisXes:" );
 		this.lblResumoCaixaProvisao.setBounds( 10, 190, 140, 21 ); // x = 150 - 128
 		this.lblResumoCaixaProvisao.setHorizontalAlignment( JLabel.RIGHT );
 		this.lblResumoCaixaProvisao.setFont( new Font( "Verdana", 0, 12 ) );
@@ -610,7 +610,7 @@ public class Tela extends JFrame {
 		this.pnlResumoConta.setBounds( 10, 260, 710, 120 );
 		this.pnlResumoConta.setBorder( BorderFactory.createEtchedBorder() );
 
-		this.lblResumoConta = new JLabel( "Resumo Conta (no Período)" );
+		this.lblResumoConta = new JLabel( "Resumo Conta (no PerXodo)" );
 		this.lblResumoConta.setBounds( 265, 5, 180, 21 );
 		this.lblResumoConta.setHorizontalAlignment( JLabel.CENTER );
 		this.lblResumoConta.setFont( new Font( "Verdana", 0, 12 ) );
@@ -634,7 +634,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.lblResumoContaProvisao = new JLabel( "Considerar provisões:");
+		this.lblResumoContaProvisao = new JLabel( "Considerar provisXes:");
 		this.lblResumoContaProvisao.setBounds( 10, 76, 140, 21 );
 		this.lblResumoContaProvisao.setHorizontalAlignment( JLabel.RIGHT );
 		this.lblResumoContaProvisao.setFont( new Font( "Verdana", 0, 12 ) );
@@ -642,7 +642,7 @@ public class Tela extends JFrame {
 		this.ckbResumoConta = new JCheckBox();
 		this.ckbResumoConta.setBounds( 155, 76, 200, 21 );
 
-		this.lblResMovContaPc = new JLabel( "Movim. no período (%):" );
+		this.lblResMovContaPc = new JLabel( "Movim. no perXodo (%):" );
 		this.lblResMovContaPc.setBounds( 380, 25, 170, 21 ); // x = 450
 		this.lblResMovContaPc.setHorizontalAlignment( JLabel.RIGHT );
 		this.lblResMovContaPc.setFont( new Font( "Verdana", 0, 12 ) );
@@ -653,7 +653,7 @@ public class Tela extends JFrame {
 		this.txfResValorMovContaPc.setFont( new Font( "Monospaced", 0, 12 ) );
 		this.txfResValorMovContaPc.setEditable( false );
 
-		this.lblResMovContaRs = new JLabel( "Movim. no período (R$):" );
+		this.lblResMovContaRs = new JLabel( "Movim. no perXodo (R$):" );
 		this.lblResMovContaRs.setBounds( 380, 55, 170, 21 ); // x = 450
 		this.lblResMovContaRs.setHorizontalAlignment( JLabel.RIGHT );
 		this.lblResMovContaRs.setFont( new Font( "Verdana", 0, 12 ) );
@@ -693,7 +693,7 @@ public class Tela extends JFrame {
 		this.pnlCadastroMov.setBorder( BorderFactory.createEtchedBorder() );
 		this.pnlCadastroMov.setFont( new Font( "Verdana", 0, 12 ) );
 
-		this.lblMovDescricao = new JLabel( "Descrição:" );
+		this.lblMovDescricao = new JLabel( "DescriXXo:" );
 		this.lblMovDescricao.setBounds( 15, 40, 70, 21 );
 		this.lblMovDescricao.setFont( new Font( "Verdana", 0, 12 ) );
 		this.lblMovDescricao.setHorizontalAlignment( JLabel.RIGHT );
@@ -701,7 +701,7 @@ public class Tela extends JFrame {
 		this.txfMovDescricao = new JTextField();
 		this.txfMovDescricao.setBounds( 90, 40, 150, 21 );
 		this.txfMovDescricao.setFont( new Font( "Verdana", 0, 12 ) );
-		this.txfMovDescricao.setToolTipText( "Descrição do lançamento" );
+		this.txfMovDescricao.setToolTipText( "DescriXXo do lanXamento" );
 		this.txfMovDescricao.addKeyListener( new KeyAdapter() {
 			@Override
 			public void keyPressed( KeyEvent k ) {
@@ -726,7 +726,7 @@ public class Tela extends JFrame {
 		this.dtcMovData.setDate( new Date() );
 		this.dtcMovData.setBounds( 90, 71, 100, 21 );
 		this.dtcMovData.setFont( new Font( "Verdana", 0, 12 ) );
-		this.dtcMovData.setToolTipText( "Data do lançamento" );
+		this.dtcMovData.setToolTipText( "Data do lanXamento" );
 		this.dtcMovData.getField().addKeyListener( new KeyAdapter() {
 			@Override
 			public void keyPressed( KeyEvent k ) {
@@ -740,9 +740,9 @@ public class Tela extends JFrame {
 		this.lblInfoData.setBounds( 200, 71, 21, 21 );
 		String infoData =
 			"<html>" +
-			 "Informação:<br>" +
-			 "Para lançamento à vista, preencher a data do pagamento.<br>" +
-			 "Para lançamento provisionado, preencher a data de vencimento." +
+			 "InformaXXo:<br>" +
+			 "Para lanXamento X vista, preencher a data do pagamento.<br>" +
+			 "Para lanXamento provisionado, preencher a data de vencimento." +
 			 "</html>";
 		this.lblInfoData.setToolTipText( infoData );
 
@@ -754,7 +754,7 @@ public class Tela extends JFrame {
 		this.dbfMovValor = new JDoubleField();
 		this.dbfMovValor.setBounds( 90, 102, 120, 21 );
 		this.dbfMovValor.setFont( new Font( "Monospaced", 0, 12 ) );
-		this.dbfMovValor.setToolTipText( "Valor do lançamento" );
+		this.dbfMovValor.setToolTipText( "Valor do lanXamento" );
 		this.dbfMovValor.addKeyListener( new KeyAdapter() {
 			@Override
 			public void keyPressed( KeyEvent k ) {
@@ -816,7 +816,7 @@ public class Tela extends JFrame {
 		this.ckbMovPago.setSelected( false );
 		this.ckbMovPago.setBounds( 86, 192, 130, 21 );
 		this.ckbMovPago.setFont( new Font( "Verdana", 0, 12 ) );
-		this.ckbMovPago.setToolTipText( "Desmarcar para um lançamento futuro" );
+		this.ckbMovPago.setToolTipText( "Desmarcar para um lanXamento futuro" );
 		this.ckbMovPago.addKeyListener( new KeyAdapter() {
 			@Override
 			public void keyPressed( KeyEvent k ) {
@@ -826,7 +826,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.lblMovRecorrencia = new JLabel( "Recorrência:" );
+		this.lblMovRecorrencia = new JLabel( "RecorrXncia:" );
 		this.lblMovRecorrencia.setBounds( 5, 216, 80, 21 );
 		this.lblMovRecorrencia.setFont( new Font( "Verdana", 0, 12 ) );
 		this.lblMovRecorrencia.setHorizontalAlignment( JLabel.RIGHT );
@@ -843,7 +843,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.rbtMovRecorrenciaNao = new JRadioButton( "Não" );
+		this.rbtMovRecorrenciaNao = new JRadioButton( "NXo" );
 		this.rbtMovRecorrenciaNao.setSelected( true );
 		this.rbtMovRecorrenciaNao.setBounds( 140, 216, 50, 21 );
 		this.rbtMovRecorrenciaNao.setFont( new Font( "Verdana", 0, 12 ) );
@@ -1015,7 +1015,7 @@ public class Tela extends JFrame {
 		this.cbxTransfCaixaDestino.setFont( new Font( "Verdana", 0, 12 ) );
 		this.cbxTransfCaixaDestino.setEditable( false );
 
-		this.lblTransfDescricao = new JLabel( "Descrição:" );
+		this.lblTransfDescricao = new JLabel( "DescriXXo:" );
 		this.lblTransfDescricao.setBounds( 15, 102, 70, 21 );
 		this.lblTransfDescricao.setFont( new Font( "Verdana", 0, 12 ) );
 		this.lblTransfDescricao.setHorizontalAlignment( JLabel.RIGHT );
@@ -1082,7 +1082,7 @@ public class Tela extends JFrame {
 		this.cbxExtratoCaixa.setBounds( 110, 40, cbxMovConta.getWidth(), 21 );
 		this.cbxExtratoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
 
-		this.lblExtratoPeriodo = new JLabel( "Período: " );
+		this.lblExtratoPeriodo = new JLabel( "PerXodo: " );
 		this.lblExtratoPeriodo.setBounds( 270, 15, 60, 21 );
 		this.lblExtratoPeriodo.setFont( new Font( "Verdana", 0, 12 ) );
 		this.lblExtratoPeriodo.setHorizontalAlignment( JLabel.RIGHT );
@@ -1112,7 +1112,7 @@ public class Tela extends JFrame {
 			}
 		});
 
-		this.ckbExtratoProvisao = new JCheckBox( " Considerar provisões" );
+		this.ckbExtratoProvisao = new JCheckBox( " Considerar provisXes" );
 		this.ckbExtratoProvisao.setBounds( 270, 40, 200, 21 );
 		this.ckbExtratoProvisao.setFont( new Font( "Verdana", 0, 12 ) );
 
@@ -1259,10 +1259,10 @@ public class Tela extends JFrame {
 		this.lblTipoCaixa.setFont( new Font( "Verdana", 0, 12 ) );
 		this.lblTipoCaixa.setHorizontalAlignment( JLabel.RIGHT );
 
-		this.rbtTipoCaixaCartao = new JRadioButton( "Cartão/Banco" );
+		this.rbtTipoCaixaCartao = new JRadioButton( "CartXo/Banco" );
 		this.rbtTipoCaixaCartao.setBounds( 60, 100, 120, 21 );
 		this.rbtTipoCaixaCartao.setFont( new Font( "Verdana", 0, 12 ) );
-		this.rbtTipoCaixaCartao.setToolTipText( "Tipo cartão de crédito ou conta bancária." );
+		this.rbtTipoCaixaCartao.setToolTipText( "Tipo cartXo de crXdito ou conta bancXria." );
 		this.rbtTipoCaixaCartao.setSelected( false );
 		this.rbtTipoCaixaCartao.addActionListener( new ActionListener() {
 			@Override
@@ -1363,7 +1363,7 @@ public class Tela extends JFrame {
 		this.pnlConfig = new JPanel();
 		this.pnlConfig.setLayout( null );
 		this.pnlConfig.setBounds( new Rectangle( 0, 0, 740, 420 ) );
-		this.pnlConfig.setName( "Configurações" );
+		this.pnlConfig.setName( "ConfiguraXXes" );
 		this.pnlConfig.setBorder( BorderFactory.createEtchedBorder() );
 		this.pnlConfig.setFont( new Font( "Verdana", 0, 12 ) );
 
@@ -1377,7 +1377,7 @@ public class Tela extends JFrame {
 		this.lblBD.setBounds( 10, 10, 110, 21 );
 		this.lblBD.setFont( new Font( "Verdana", 0, 12 ) );
 
-		this.lblDiretorioBD = new JLabel( "Diretório:" );
+		this.lblDiretorioBD = new JLabel( "DiretXrio:" );
 		this.lblDiretorioBD.setBounds( 20, 40, 60, 21 );
 		this.lblDiretorioBD.setFont( new Font( "Verdana", 0, 12 ) );
 		this.lblDiretorioBD.setHorizontalAlignment( JLabel.RIGHT );
@@ -1469,31 +1469,31 @@ public class Tela extends JFrame {
 
 		String texto =
 			"   O QUE ESTE PROGRAMA OFERECE:\n\n" +
-			"Este programa visa oferecer um controle financeiro pessoal a nível\n" +
-			"intermediário, através de movimentações e agendamentos de valores. É\n" +
-			"possível cadastrar cada uma de suas contas, (Ex: Aluguel, Internet) e\n" +
-			"caixas (Ex: Carteira, Conta Bancária) a fim de obter um breve resumo\n" +
-			"em um dado período.\n\n" +
-			"   Na versão atual não é possível gerenciar de maneira clara o fluxo\n" +
-			"de caixa. Todavia, através das totalizações de entrada e saída por\n" +
-			"período, é possível obter um resumo prático e simples que oferece\n" +
-			"informações precisas baseadas nos lançamentos feitos.\n\n" +
-			"   Além dos totalizadores, este programa oferece uma interface para\n" +
-			"obtenção de um extrato de uma determinada conta. Que mostra detalha-\n" +
-			"damente todas as movimentaçõees referente àquela conta num período\n" +
+			"Este programa visa oferecer um controle financeiro pessoal a nXvel\n" +
+			"intermediXrio, atravXs de movimentaXXes e agendamentos de valores. X\n" +
+			"possXvel cadastrar cada uma de suas contas, (Ex: Aluguel, Internet) e\n" +
+			"caixas (Ex: Carteira, Conta BancXria) a fim de obter um breve resumo\n" +
+			"em um dado perXodo.\n\n" +
+			"   Na versXo atual nXo X possXvel gerenciar de maneira clara o fluxo\n" +
+			"de caixa. Todavia, atravXs das totalizaXXes de entrada e saXda por\n" +
+			"perXodo, X possXvel obter um resumo prXtico e simples que oferece\n" +
+			"informaXXes precisas baseadas nos lanXamentos feitos.\n\n" +
+			"   AlXm dos totalizadores, este programa oferece uma interface para\n" +
+			"obtenXXo de um extrato de uma determinada conta. Que mostra detalha-\n" +
+			"damente todas as movimentaXXees referente Xquela conta num perXodo\n" +
 			"selecionado.\n\n" +
 			"COMO USAR:\n\n" +
-			"   Antes de iniciar o uso do programa, é necessária a criação de um\n" +
-			"sistema de armazenamento para os dados do programa. Isso é feito automa-\n" +
-			"ticamente quando o programa é iniciado e nenhum banco de dados foi localizado.\n" +
-			"  O uso, incluindo exemplos, está demonstrado no manual do programa.\n" +
+			"   Antes de iniciar o uso do programa, X necessXria a criaXXo de um\n" +
+			"sistema de armazenamento para os dados do programa. Isso X feito automa-\n" +
+			"ticamente quando o programa X iniciado e nenhum banco de dados foi localizado.\n" +
+			"  O uso, incluindo exemplos, estX demonstrado no manual do programa.\n" +
 			"Para obter o manual de uso do programa, acesse o website\n" +
-			"http://www.linuxafundo.com.br/mygoodmoney. O manual está disponível\n" +
-			"na versão online e futuramente poderá ser baixado em PDF.\n\n" +
-			"   Este software encontra-se sob a licença GPL v3, a qual lhe permite\n" +
-			"executar para qualquer propósito, estudar o funcionamento, redistri-\n" +
-			"buir e aperfeiçoar da maneira que melhor julgar.\n" +
-			 "O código fonte pode ser obtido em: https://github.com/RMCampos/MyGoodMoney";
+			"http://www.linuxafundo.com.br/mygoodmoney. O manual estX disponXvel\n" +
+			"na versXo online e futuramente poderX ser baixado em PDF.\n\n" +
+			"   Este software encontra-se sob a licenXa GPL v3, a qual lhe permite\n" +
+			"executar para qualquer propXsito, estudar o funcionamento, redistri-\n" +
+			"buir e aperfeiXoar da maneira que melhor julgar.\n" +
+			 "O cXdigo fonte pode ser obtido em: https://github.com/RMCampos/MyGoodMoney";
 
 		JTextPane txtTexto = new JTextPane();
 		txtTexto.setText( texto );
@@ -1647,8 +1647,8 @@ public class Tela extends JFrame {
 		this.pnlSobre.add( this.pnlTexto );
 		this.pnlTexto.add( textoJ );
 
-		this.tbpMovimento.setTitleAt( 0, "Lançamentos" );
-		this.tbpMovimento.setTitleAt( 1, "Transferência" );
+		this.tbpMovimento.setTitleAt( 0, "LanXamentos" );
+		this.tbpMovimento.setTitleAt( 1, "TransferXncia" );
 	}
 	public void abrirLink( String dest ) {
 		try{
@@ -1861,7 +1861,7 @@ public class Tela extends JFrame {
 				c = new Conta();
 				c.setCodConta( null );
 				c.setNome(opcao);
-				c.setTipo( (opcao.equals("TODOS DÉBITO"))? 'D' : 'C' );
+				c.setTipo( (opcao.equals("TODOS DXBITO"))? 'D' : 'C' );
 			}
 			return( c );
 		}
@@ -1957,7 +1957,7 @@ public class Tela extends JFrame {
 				c = new Conta();
 				c.setCodConta( null );
 				c.setNome(opcao);
-				c.setTipo( (opcao.equals("TODOS DÉBITO"))? 'D' : 'C' );
+				c.setTipo( (opcao.equals("TODOS DXBITO"))? 'D' : 'C' );
 			}
 			return( c );
 		}
@@ -2031,10 +2031,10 @@ public class Tela extends JFrame {
 		this.cbxExtratoCaixa.addItem( "TODOS" );
 	}
 	public void addContaHomeTODOS() {
-		this.cbxResConta.addItem( "TODOS CRÉDITO" );
-		this.cbxResConta.addItem( "TODOS DÉBITO" );
-		this.cbxExtratoConta.addItem( "TODOS CRÉDITO" );
-		this.cbxExtratoConta.addItem( "TODOS DÉBITO" );
+		this.cbxResConta.addItem( "TODOS CRXDITO" );
+		this.cbxResConta.addItem( "TODOS DXBITO" );
+		this.cbxExtratoConta.addItem( "TODOS CRXDITO" );
+		this.cbxExtratoConta.addItem( "TODOS DXBITO" );
 	}
 	public void setLancamentos( ArrayList<Lancamento> pLancList ) {
 		this.movimentoModel.setLinhas( pLancList );

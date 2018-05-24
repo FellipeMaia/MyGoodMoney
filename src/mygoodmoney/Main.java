@@ -46,7 +46,7 @@ public class Main {
 			SwingUtilities.invokeAndWait( new Runnable() {
 				@Override
 				public void run(){
-					frame = new Tela( "My Good Money - Controle Financeiro - Versão 5.1" );
+					frame = new Tela( "My Good Money - Controle Financeiro - VersXo 5.1" );
 				}
 			});
 		}
@@ -196,7 +196,7 @@ public class Main {
 		recarregarDoBancoDeDados("Lancamentos" );
 	}
 	private void confirmarIncluirConta() {
-		if( !Mensagem.confirmacao( "Confirma inclusão da conta?", this.frame ) || !validarCamposConta() ) {
+		if( !Mensagem.confirmacao( "Confirma inclusXo da conta?", this.frame ) || !validarCamposConta() ) {
 			return;
 		}
 
@@ -248,12 +248,12 @@ public class Main {
 
 		if( frame.getTxfNomeConta().isEmpty() ) {
 			contaValida = false;
-			mensagemErro += ">> Nome inválido.\n";
+			mensagemErro += ">> Nome invXlido.\n";
 		}
 
 		if( frame.getCbxTipoConta() == null ) {
 			contaValida = false;
-			mensagemErro += ">> Tipo inválido.\n";
+			mensagemErro += ">> Tipo invXlido.\n";
 		}
 
 		if( !contaValida ) {
@@ -263,7 +263,7 @@ public class Main {
 		return( contaValida );
 	}
 	private void confirmarIncluirLancamento() {
-		if( !Mensagem.confirmacao( "Confirma incluir o lançamento?", this.frame ) || !validarCamposLancamento() ) {
+		if( !Mensagem.confirmacao( "Confirma incluir o lanXamento?", this.frame ) || !validarCamposLancamento() ) {
 			return;
 		}
 
@@ -330,39 +330,39 @@ public class Main {
 
 		if( this.frame.getTxfMovDescricao().isEmpty() ) {
 			lancamentoValido = false;
-			msg += ">> Descrição inválida.\n";
+			msg += ">> DescriXXo invXlida.\n";
 		}
 
 		if( this.frame.getDtcMovData() == null ) {
 			lancamentoValido = false;
-			msg += ">> Data inválida.\n";
+			msg += ">> Data invXlida.\n";
 		}
 
 		if( this.frame.getDbfMovValor() == 0.0 ) {
 			lancamentoValido = false;
-			msg += ">> Valor inválido.\n";
+			msg += ">> Valor invXlido.\n";
 		}
 
 		if( this.frame.getCbxMovConta() == null ) {
 			lancamentoValido = false;
-			msg += ">> Conta inválida.\n";
+			msg += ">> Conta invXlida.\n";
 		}
 
 		if( this.frame.getCbxMovCaixa() == null ) {
 			lancamentoValido = false;
-			msg += ">> Caixa inválida.\n";
+			msg += ">> Caixa invXlida.\n";
 		}
 
 		if( this.frame.getDtcMovData() != null  && this.frame.getCbxMovConta() != null && this.frame.getCbxMovCaixa() != null && this.transacaoLancamento == 'I' ) {
 			Lancamento lanc = this.frame.getLancamentoTela();
 			if( lanc.getCodLancamento() != 0 ) {
-				Mensagem.info( "Já existe um lançamento para este vencimento, valor, conta e caixa.", this.frame );
+				Mensagem.info( "JX existe um lanXamento para este vencimento, valor, conta e caixa.", this.frame );
 				return( false );
 			}
 		}
 
 		if( !lancamentoValido ) {
-			Mensagem.info( "Erro ao inserir lançamento:\n" + msg, this.frame );
+			Mensagem.info( "Erro ao inserir lanXamento:\n" + msg, this.frame );
 		}
 
 		return( lancamentoValido );
@@ -385,7 +385,7 @@ public class Main {
 
 		if( this.frame.getTxfNomeCaixa().isEmpty() ) {
 			caixaValido = false;
-			mensagemErro += ">> Nome inválido.\n";
+			mensagemErro += ">> Nome invXlido.\n";
 		}
 
 		if( !caixaValido ) {
@@ -420,11 +420,11 @@ public class Main {
 			}
 
 			if( this.caixaDAO.existeRegistro( this.caixaAtual ) ) {
-				Mensagem.info( "Não é possível excluir.\nCaixa com movimentação.", this.frame );
+				Mensagem.info( "NXo X possXvel excluir.\nCaixa com movimentaXXo.", this.frame );
 				return;
 			}
 
-			if( !Mensagem.confirmacao( "Confirma exclusão do Caixa?", this.frame ) ) {
+			if( !Mensagem.confirmacao( "Confirma exclusXo do Caixa?", this.frame ) ) {
 				return;
 			}
 
@@ -441,11 +441,11 @@ public class Main {
 			}
 
 			if( this.contaDAO.existeRegistro( this.contaAtual ) ) {
-				Mensagem.info( "Não é possível excluir.\nConta com movimentação.", this.frame );
+				Mensagem.info( "NXo X possXvel excluir.\nConta com movimentaXXo.", this.frame );
 				return;
 			}
 
-			if( !Mensagem.confirmacao( "Confirma exclusão da conta?", this.frame ) ) {
+			if( !Mensagem.confirmacao( "Confirma exclusXo da conta?", this.frame ) ) {
 				return;
 			}
 
@@ -457,11 +457,11 @@ public class Main {
 		}
 		else if( pObjeto.equals( "Lancamento" ) ) {
 			if( this.lancamentoAtual == null ) {
-				Mensagem.info( "Selecione um lançamento para excluir.", this.frame );
+				Mensagem.info( "Selecione um lanXamento para excluir.", this.frame );
 				return;
 			}
 
-			if( !Mensagem.confirmacao( "Confirma exclusão do lançamento?", this.frame ) ) {
+			if( !Mensagem.confirmacao( "Confirma exclusXo do lanXamento?", this.frame ) ) {
 				return;
 			}
 
@@ -682,15 +682,15 @@ public class Main {
 
 		if( this.frame.getCbxExtratoConta() == null ) {
 			valido = false;
-			mensagem += ">> Conta inválida.\n";
+			mensagem += ">> Conta invXlida.\n";
 		}
 		if( this.frame.getDtcExtratoIni() == null ) {
 			valido = false;
-			mensagem += ">> Data inicial inválida.\n";
+			mensagem += ">> Data inicial invXlida.\n";
 		}
 		if( this.frame.getDtcExtratoFim() == null ) {
 			valido = false;
-			mensagem += ">> Data final inválida.\n";
+			mensagem += ">> Data final invXlida.\n";
 		}
 
 		if( !valido ) {
@@ -716,13 +716,13 @@ public class Main {
 		);
 
 		if( extratoList.isEmpty() ) {
-			this.frame.setTxtExtrato( "Nenhum lançamento para o período." );
+			this.frame.setTxtExtrato( "Nenhum lanXamento para o perXodo." );
 			return;
 		}
 
 		String dtEmissao  = "Data Vcto";
-		String dtQuitacao = "Data Quitação";
-		String descricao  = "Descrição";
+		String dtQuitacao = "Data QuitaXXo";
+		String descricao  = "DescriXXo";
 		String valor      = "Valor";
 		String caixa      = "Caixa";
 
@@ -819,7 +819,7 @@ public class Main {
 		this.lancamentoAtual.setValor( this.frame.getDbfMovValor() );
 
 		if( this.lancamentoAtual.getDataQuitacao() > 0 && !this.frame.getCkbMovPago() ) {
-			System.out.println( "Transformando lançamento em provisão." );
+			System.out.println( "Transformando lanXamento em provisXo." );
 			// transformar em provisao
 			this.lancamentoAtual.setPago( 'N' );
 			this.lancamentoAtual.setDataQuitacao( 0 );
@@ -835,7 +835,7 @@ public class Main {
 			}
 		}
 		else if( this.lancamentoAtual.getDataQuitacao() == 0 && this.frame.getCkbMovPago() ) {
-			System.out.println( "Transformando lançamento provisionado em a vista." );
+			System.out.println( "Transformando lanXamento provisionado em a vista." );
 			// transformat em lancamento a vista
 			this.lancamentoAtual.setPago( 'S' );
 			this.lancamentoAtual.setDataQuitacao( DateTools.getDataAtual() );
@@ -955,7 +955,7 @@ public class Main {
 		recarregarDoBancoDeDados( "Lancamentos" );
 		recarregarDoBancoDeDados( "Caixas" );
 
-		Mensagem.info( "Transferência incluída com sucesso.", this.frame );
+		Mensagem.info( "TransferXncia incluXda com sucesso.", this.frame );
 	}
 	private boolean validarCamposTransferencia() {
 		boolean ok = true;
@@ -963,12 +963,12 @@ public class Main {
 
 		if( this.frame.getCbxTransfCaixaOrigem() == null ) {
 			ok = false;
-			mensagem += ">> Caixa de origem inválido.\n";
+			mensagem += ">> Caixa de origem invXlido.\n";
 		}
 
 		if( this.frame.getCbxTransfCaixaDestino() == null ) {
 			ok = false;
-			mensagem += ">> Caixa de destino inválido.\n";
+			mensagem += ">> Caixa de destino invXlido.\n";
 		}
 
 		if( this.frame.getCbxTransfCaixaOrigem() != null && this.frame.getCbxTransfCaixaDestino() != null ) {
@@ -977,27 +977,27 @@ public class Main {
 
 			if( a.equals( b ) ) {
 				ok = false;
-				mensagem += ">> Caixas de origem e destino não podem ser iguais.\n";
+				mensagem += ">> Caixas de origem e destino nXo podem ser iguais.\n";
 			}
 		}
 
 		if( this.frame.getTxfTransfDescricao().isEmpty() ) {
 			ok = false;
-			mensagem += ">> Descrição inválida.\n";
+			mensagem += ">> DescriXXo invXlida.\n";
 		}
 
 		if( this.frame.getDtcTransfData() == null ) {
 			ok = false;
-			mensagem += ">> Data inválida.\n";
+			mensagem += ">> Data invXlida.\n";
 		}
 
 		if( this.frame.getDbfTransfValor() == 0.0 ) {
 			ok = false;
-			mensagem += ">> Valor inválido.\n";
+			mensagem += ">> Valor invXlido.\n";
 		}
 
 		if( !ok ) {
-			Mensagem.info( "Erro ao inserir transferência:\n" + mensagem, frame);
+			Mensagem.info( "Erro ao inserir transferXncia:\n" + mensagem, frame);
 		}
 
 		return( ok );
@@ -1026,13 +1026,13 @@ public class Main {
 		}
 		else if( pObjeto.equals( "Lancamento" ) ) {
 			if( this.lancamentoAtual == null ) {
-				Mensagem.info( "Selecione um lançamento para editar.", this.frame );
+				Mensagem.info( "Selecione um lanXamento para editar.", this.frame );
 				return;
 			}
 
 			if( this.lancamentoAtual.getConta() == null ) {
 				// eh uma transferencia.. nao pode ser editada
-				Mensagem.info( "Não é possível editar uma transferência.", this.frame );
+				Mensagem.info( "NXo X possXvel editar uma transferXncia.", this.frame );
 				return;
 			}
 

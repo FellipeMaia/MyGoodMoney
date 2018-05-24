@@ -1,6 +1,6 @@
 /**
 * @file Conta.java
-* @brief Contém métodos de acesso ao objeto Conta.
+* @brief ContXm mXtodos de acesso ao objeto Conta.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -30,7 +30,7 @@ import java.util.Objects;
 * @class Conta
 */
 public class Conta {
-	Integer	  codConta; /**< O código da Conta */
+	Integer	  codConta; /**< O cXdigo da Conta */
 	String	  nome;		/**< O nome da Conta */
 	Character tipo;		/**< O tipo da Conta (D ou C) */
 	/**
@@ -42,29 +42,29 @@ public class Conta {
 		this.tipo	  = ' ';
 	}
 	/**
-	* @brief Obtém o código da Conta.
-	* @return O código da conta.
+	* @brief ObtXm o cXdigo da Conta.
+	* @return O cXdigo da conta.
 	*/
 	public Integer getCodConta() {
 		return( this.codConta );
 	}
 	/**
-	* @brief Obtém o nome da Conta.
+	* @brief ObtXm o nome da Conta.
 	* @return O nome da Conta.
 	*/
 	public String getNome() {
 		return( this.nome );
 	}
 	/**
-	* @brief Obtém o tipo da Conta.
+	* @brief ObtXm o tipo da Conta.
 	* @return O Tipo da Conta (D ou C).
 	*/
 	public Character getTipo() {
 		return( this.tipo );
 	}
 	/**
-	* @brief Seta o código da Conta.
-	* @param pCodConta O código da Conta.
+	* @brief Seta o cXdigo da Conta.
+	* @param pCodConta O cXdigo da Conta.
 	*/
 	public void setCodConta( Integer pCodConta ) {
 		this.codConta = pCodConta;

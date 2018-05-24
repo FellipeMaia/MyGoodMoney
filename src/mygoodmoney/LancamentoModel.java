@@ -44,7 +44,7 @@ public class LancamentoModel extends AbstractTableModel {
 		switch( column ) {
 			case COL_DATA:      return( "Data" );
 			case COL_TIPO:      return( "Tipo" );
-			case COL_DESCRICAO: return( "Descrição" );
+			case COL_DESCRICAO: return( "DescriXXo" );
 			case COL_VALOR:     return( "Valor" );
 			case COL_PAGO:      return( "Pg/Rc" );
 			default:            return( "" );

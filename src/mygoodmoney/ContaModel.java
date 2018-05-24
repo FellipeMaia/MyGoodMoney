@@ -1,6 +1,6 @@
 /**
 * @file ContaModel.java
-* @brief Contém métodos de acesso e tratamento para a tabela de contas.
+* @brief ContXm mXtodos de acesso e tratamento para a tabela de contas.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */

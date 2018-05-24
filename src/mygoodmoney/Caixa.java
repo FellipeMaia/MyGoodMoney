@@ -1,6 +1,6 @@
 /**
 * @file Caixa.java
-* @brief Contém métodos de acesso ao objeto Caixa.
+* @brief ContXm mXtodos de acesso ao objeto Caixa.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -30,10 +30,10 @@ import java.util.Objects;
 * @class Caixa
 */
 public class Caixa {
-	private Integer	  codCaixa;	   /**< O código do Caixa */
+	private Integer	  codCaixa;	   /**< O cXdigo do Caixa */
 	private String	  nome;		   /**< O nome do Caixa */
 	private Double	  saldo;	   /**< O Saldo do Caixa */
-	private Character limite;	   /**< S se possuir limite ou N se não */
+	private Character limite;	   /**< S se possuir limite ou N se nXo */
 	private Double	  valorLimite; /**< Valor do limite */
 	/**
 	 * @brief Contrutor da classe Caixa
@@ -46,21 +46,21 @@ public class Caixa {
 		this.valorLimite = 0D;
 	}
 	/**
-	 * @brief Obtém o código do Caixa.
-	 * @return O código do Caixa.
+	 * @brief ObtXm o cXdigo do Caixa.
+	 * @return O cXdigo do Caixa.
 	 */
 	public Integer getCodCaixa() {
 		return( this.codCaixa );
 	}
 	/**
-	 * @brief Obtém o nome do Caixa.
+	 * @brief ObtXm o nome do Caixa.
 	 * @return O nome do Caixa.
 	 */
 	public String getNome() {
 		return( this.nome );
 	}
 	/**
-	 * @brief Obtém o saldo do Caixa.
+	 * @brief ObtXm o saldo do Caixa.
 	 * @return O saldo do caixa.
 	 */
 	public Double getSaldo() {
@@ -68,21 +68,21 @@ public class Caixa {
 	}
 	/**
 	 * @brief Verifica se um caixa usa limite.
-	 * @return S se sim, N caso contrário.
+	 * @return S se sim, N caso contrXrio.
 	 */
 	public Character getLimite() {
 		return( this.limite );
 	}
 	/**
-	 * @brief Obtém o valor do limite de um caixa.
+	 * @brief ObtXm o valor do limite de um caixa.
 	 * @return O valor do limite.
 	 */
 	public Double getValorLimite() {
 		return( this.valorLimite );
 	}
 	/**
-	 * @brief Seta o código do Caixa.
-	 * @param pCodCaixa O código do Caixa.
+	 * @brief Seta o cXdigo do Caixa.
+	 * @param pCodCaixa O cXdigo do Caixa.
 	 */
 	public void setCodCaixa( Integer pCodCaixa ) {
 		this.codCaixa = pCodCaixa;
@@ -103,7 +103,7 @@ public class Caixa {
 	}
 	/**
 	 * @brief Seta se um caixa usa limite.
-	 * @param pLimite S para definir Sim ou N caso contrário.
+	 * @param pLimite S para definir Sim ou N caso contrXrio.
 	 */
 	public void setLimite( Character pLimite ) {
 		this.limite = pLimite;

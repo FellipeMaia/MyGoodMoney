@@ -1,6 +1,6 @@
 /**
 * @file CaixaDAO.java
-* @brief Contém métodos de acesso a entidade Caixa do banco de dados.
+* @brief ContXm mXtodos de acesso a entidade Caixa do banco de dados.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -76,7 +76,7 @@ public class CaixaDAO {
 			e.printStackTrace();
 			if( e.getErrorCode() == 1 ) {
 				// 1 = SQLITE_ERROR = Error or missing database
-				System.out.println( "SQL: Banco de dados não encontrado! Criando.." );
+				System.out.println( "SQL: Banco de dados nXo encontrado! Criando.." );
 				ConnectionHolder.criarTabelas();
 			}
 			return( caixasList );
@@ -84,7 +84,7 @@ public class CaixaDAO {
 	}
 	/**
 	* @brief Exclui um caixa do banco de dados.
-	* @param pCaixa Um caixa a ser excluído.
+	* @param pCaixa Um caixa a ser excluXdo.
 	*/
 	public void excluir( Caixa pCaixa ) {
 		try {
@@ -107,8 +107,8 @@ public class CaixaDAO {
 		}
 	}
 	/**
-	* @brief Altera todos os campos de um Caixa baseado no código do Caixa.
-	* @param pCaixa Um Caixa já preenchido a ser alteado.
+	* @brief Altera todos os campos de um Caixa baseado no cXdigo do Caixa.
+	* @param pCaixa Um Caixa jX preenchido a ser alteado.
 	*/
 	public void alterar( Caixa pCaixa ) {
 		try {
@@ -164,9 +164,9 @@ public class CaixaDAO {
 		}
 	}
 	/**
-	* @brief Obtém um Caixa.
-	* @param pCodCaixa O código do Caixa.
-	* @return Um Caixa válido, se encontrado, ou um Caixa vazio se não.
+	* @brief ObtXm um Caixa.
+	* @param pCodCaixa O cXdigo do Caixa.
+	* @return Um Caixa vXlido, se encontrado, ou um Caixa vazio se nXo.
 	*/
 	public Caixa selectRegistro( Integer pCodCaixa ) {
 		Caixa caixa = new Caixa();
@@ -214,8 +214,8 @@ public class CaixaDAO {
 	}
 	/**
 	* @brief Subtrai um valor do saldo de um Caixa.
-	* @param pCodCaixa O Código do caixa.
-	* @param pValor O valor a ser subtraído.
+	* @param pCodCaixa O CXdigo do caixa.
+	* @param pValor O valor a ser subtraXdo.
 	*/
 	public void subtrairDoSaldo( int pCodCaixa, double pValor ) {
 		try {
@@ -238,7 +238,7 @@ public class CaixaDAO {
 	}
 	/**
 	* @brief Adiciona um valor do saldo de um Caixa.
-	* @param pCodCaixa O Código do caixa.
+	* @param pCodCaixa O CXdigo do caixa.
 	* @param pValor O valor a ser adicionado.
 	*/
 	public void adicionarAoSaldo( int pCodCaixa, double pValor ) {
@@ -262,8 +262,8 @@ public class CaixaDAO {
 	}
 	/**
 	* @param pCodCaixa
-	* @brief Obtém o saldo de um Caixa.
-	* @return O saldo do caixa se encontrado ou Double.NaN se não encontrado.
+	* @brief ObtXm o saldo de um Caixa.
+	* @return O saldo do caixa se encontrado ou Double.NaN se nXo encontrado.
 	*/
 	public double selectSaldo( Integer pCodCaixa ) {
 		try
@@ -313,12 +313,12 @@ public class CaixaDAO {
 		}
 	}
 	/**
-	* @brief Obtém o valor total de saída de um Caixa.
+	* @brief ObtXm o valor total de saXda de um Caixa.
 	* @param pCodCaixa O nome de um Caixa.
 	* @param pDataIni A data inicial da consulta.
 	* @param pDataFim A data final da consulta.
-	* @param pProvisao Um boolean que se true, considera as provisões.
-	* @return O valor total de saídas do caixa, se encontrado, ou 0 se não encontrado.
+	* @param pProvisao Um boolean que se true, considera as provisXes.
+	* @return O valor total de saXdas do caixa, se encontrado, ou 0 se nXo encontrado.
 	*/
 	public double selectTotalSaida( Integer pCodCaixa, int pDataIni, int pDataFim, boolean pProvisao ) {
 		try {
@@ -389,12 +389,12 @@ public class CaixaDAO {
 		}
 	}
 	/**
-	* @brief Obtém o total de entradas de um Caixa.
+	* @brief ObtXm o total de entradas de um Caixa.
 	* @param pCodCaixa O nome de um Caixa.
 	* @param pDataIni A data inicial da consulta.
 	* @param pDataFim A data final da consulta.
-	* @param pProvisao Um boolean que se for true, considera provisões.
-	* @return O total de entrada do caixa, se encontrado, ou 0 se não encontrado.
+	* @param pProvisao Um boolean que se for true, considera provisXes.
+	* @return O total de entrada do caixa, se encontrado, ou 0 se nXo encontrado.
 	*/
 	public double selectTotalEntrada( Integer pCodCaixa, int pDataIni, int pDataFim, boolean pProvisao ) {
 		try {
@@ -465,11 +465,11 @@ public class CaixaDAO {
 		}
 	}
 	/**
-	* @brief Obtém o total de entrada provisionada de um Caixa em um período.
+	* @brief ObtXm o total de entrada provisionada de um Caixa em um perXodo.
 	* @param pCodCaixa O nome do Caixa.
-	* @param pDataIni A data inicial do período de consulta.
-	* @param pDataFim A data final do período de consulta.
-	* @return O valor total das entradas provisionadas no período, se encontrado, ou 0.
+	* @param pDataIni A data inicial do perXodo de consulta.
+	* @param pDataFim A data final do perXodo de consulta.
+	* @return O valor total das entradas provisionadas no perXodo, se encontrado, ou 0.
 	*/
 	public double selectTotalEntradaProvisionada( Integer pCodCaixa, int pDataIni, int pDataFim ) {
 		try {
@@ -528,11 +528,11 @@ public class CaixaDAO {
 		}
 	}
 	/**
-	* @brief Obtém o total de saída provisionada de um Caixa em um período.
+	* @brief ObtXm o total de saXda provisionada de um Caixa em um perXodo.
 	* @param pCodCaixa O nome do Caixa.
-	* @param pDataIni A data inicial do período de consulta.
-	* @param pDataFim A data final do período de consulta.
-	* @return O valor total das entradas provisionadas no período, se encontrado, ou 0.
+	* @param pDataIni A data inicial do perXodo de consulta.
+	* @param pDataFim A data final do perXodo de consulta.
+	* @return O valor total das entradas provisionadas no perXodo, se encontrado, ou 0.
 	*/
 	public double selectTotalSaidaProvisionada( Integer pCodCaixa, int pDataIni, int pDataFim ) {
 		try {

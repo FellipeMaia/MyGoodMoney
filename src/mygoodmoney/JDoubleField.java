@@ -1,6 +1,6 @@
 /**
 * @file JDoubleField.java
-* @brief Contém a classe e métodos da classe JDoubleField, um JTextField formatado.
+* @brief ContXm a classe e mXtodos da classe JDoubleField, um JTextField formatado.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -94,9 +94,9 @@ public class JDoubleField extends JTextField {
 		}
 	}
 	/**
-	* @brief Verifica se o valor recebido no campo é valido.
+	* @brief Verifica se o valor recebido no campo X valido.
 	* @param psValor O valor recebido.
-	* @return true se sim, ou false se não.
+	* @return true se sim, ou false se nXo.
 	*/
 	private boolean valorValido( String psValor ) {
 		try {
@@ -111,7 +111,7 @@ public class JDoubleField extends JTextField {
 		}
 	}
 	/**
-	* @brief Obtém o valor do campo.
+	* @brief ObtXm o valor do campo.
 	* @return O valor do campo.
 	*/
 	public Double getValue() {

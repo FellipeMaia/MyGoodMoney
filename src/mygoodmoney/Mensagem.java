@@ -1,6 +1,6 @@
 /**
 * @file Mensagem.java
-* @brief Contém métodos estáticos de mensagens (diálogos) diversos.
+* @brief ContXm mXtodos estXticos de mensagens (diXlogos) diversos.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -36,20 +36,20 @@ public class Mensagem {
 	/**
 	 * @brief Exibe uma mensagem do tipo JOptionPane.INFORMATION_MESSAGE.
 	 * @param pMensagem A mensagem a ser exibida.
-	 * @param pComponent O component vinculado ao diálogo.
+	 * @param pComponent O component vinculado ao diXlogo.
 	 */
 	public static void info( final String pMensagem, final Component pComponent ) {
 		JOptionPane.showMessageDialog(
 			pComponent,
 			pMensagem,
-			"Informação",
+			"InformaXXo",
 			JOptionPane.INFORMATION_MESSAGE
 		);
 	}
 	/**
 	 * @brief Exibe uma mensagem to tipo JOptionPane.ERROR_MESSAGE.
 	 * @param pMensagem A mensagem a ser exibida.
-	 * @param pComponent O component vinculado ao diálogo.
+	 * @param pComponent O component vinculado ao diXlogo.
 	 */
 	public static void erro( final String pMensagem, final Component pComponent ) {
 		JOptionPane.showMessageDialog(
@@ -60,10 +60,10 @@ public class Mensagem {
 		);
 	}
 	/**
-	 * @brief Exibe uma mensagem do tipo confirmação.
+	 * @brief Exibe uma mensagem do tipo confirmaXXo.
 	 * @param pMensagem A mensagem a ser exibida.
-	 * @param pComponent O component vinculado ao diálogo.
-	 * @return true se resposta igual a JOptionPane.YES_OPTION ou false se não.
+	 * @param pComponent O component vinculado ao diXlogo.
+	 * @return true se resposta igual a JOptionPane.YES_OPTION ou false se nXo.
 	 */
 	public static boolean confirmacao( final String pMensagem, final Component pComponent ) {
 		//Mensagem.setFont();
@@ -71,7 +71,7 @@ public class Mensagem {
 		JOptionPane.showConfirmDialog(
 			pComponent,
 			pMensagem,
-			"Confirmação",
+			"ConfirmaXXo",
 			JOptionPane.YES_NO_OPTION
 		);
 
@@ -80,7 +80,7 @@ public class Mensagem {
 	/**
 	 * @brief Exibe uma mensagem do tipo JOptionPane.WARNING_MESSAGE.
 	 * @param pMensagem A mensagem a ser exibida.
-	 * @param pComponent O component vinculado ao diálogo.
+	 * @param pComponent O component vinculado ao diXlogo.
 	 */
 	public static void aviso( final String pMensagem, final Component pComponent ) {
 		JOptionPane.showMessageDialog(

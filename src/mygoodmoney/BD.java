@@ -1,6 +1,6 @@
 /**
 * @file BD.java
-* @brief Contém métodos de acesso ao banco de dados.
+* @brief ContXm mXtodos de acesso ao banco de dados.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -62,7 +62,7 @@ public class BD {
 			Class.forName( "org.sqlite.JDBC" );
 			System.out.println( "Driver: " + getDatabaseURL() );
 			this.connection = DriverManager.getConnection( getDatabaseURL(), "", "" );
-			System.out.println( "Conexão estabelecida!" );
+			System.out.println( "ConexXo estabelecida!" );
 		}
 		catch( SQLException ex ) {
 			ex.printStackTrace();
@@ -77,7 +77,7 @@ public class BD {
 	}
 
 	/**
-	 * @brief Fecha a conexão com o banco de dados.
+	 * @brief Fecha a conexXo com o banco de dados.
 	 */
 	public void fecharConexao() {
 		try {
@@ -90,7 +90,7 @@ public class BD {
 
 	/**
 	 * @brief Cria o banco de dados
-	 * @param psCaminhoCompleto Contém o caminho absoluto para o banco de dados mais o nome do arquivo.
+	 * @param psCaminhoCompleto ContXm o caminho absoluto para o banco de dados mais o nome do arquivo.
 	 * @throws ClassNotFoundException
 	 */
 	public void criarBancoDeDados( String psCaminhoCompleto ) throws ClassNotFoundException {

@@ -1,6 +1,6 @@
 /**
 * @file JIntegerField.java
-* @brief Contém a classe e métodos da classe JIntegerField, um JTextField formatado.
+* @brief ContXm a classe e mXtodos da classe JIntegerField, um JTextField formatado.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -95,9 +95,9 @@ public class JIntegerField extends JTextField {
 		}
 	}
 	/**
-	 * @brief Verifica se o valor recebido no campo é válido.
+	 * @brief Verifica se o valor recebido no campo X vXlido.
 	 * @param pValor O valor recebido.
-	 * @return true se sim, ou false se não.
+	 * @return true se sim, ou false se nXo.
 	 */
 	private boolean valorValido( String pValor ) {
 		try {
@@ -117,7 +117,7 @@ public class JIntegerField extends JTextField {
 		}
 	}
 	/**
-	 * @brief Obtém o valor do campo.
+	 * @brief ObtXm o valor do campo.
 	 * @return O valor do campo.
 	 */
 	public int getValue() {

@@ -1,6 +1,6 @@
 /**
 * @file ConnectionHolder.java
-* @brief Contém métodos para conexão com banco de dados.
+* @brief ContXm mXtodos para conexXo com banco de dados.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -32,14 +32,14 @@ public class ConnectionHolder {
 	}
 	public static Connection getConnection() {
 		if( instance == null ) {
-			System.out.println( "Requisitando conexão.." );
+			System.out.println( "Requisitando conexXo.." );
 			instance = new BD();
 		}
 		return( instance.getConnection() );
 	}
 	public static void criarTabelas() {
 		if( instance == null ) {
-			System.out.println( "Requisitando conexão.." );
+			System.out.println( "Requisitando conexXo.." );
 			instance = new BD();
 		}
 		try {

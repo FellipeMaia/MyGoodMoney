@@ -1,6 +1,6 @@
 /**
  * @file LancamentoDAO.java
- * @brief Contém métodos de acesso a entidade Conta do banco de dados.
+ * @brief ContXm mXtodos de acesso a entidade Conta do banco de dados.
  * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
  * @license Este projeto encontra-se sob a licensa GNU.
  */
@@ -38,8 +38,8 @@ public class LancamentoDAO {
 	}
 
 	/**
-	 * @brief Altera todos os campos de um Lancamento baseado no código do Lancamento.
-	 * @param pLancamento Um Lancamento já preenchido a ser alterado.
+	 * @brief Altera todos os campos de um Lancamento baseado no cXdigo do Lancamento.
+	 * @param pLancamento Um Lancamento jX preenchido a ser alterado.
 	 */
 	public void alterar( Lancamento pLancamento ) {
 		try {
@@ -72,9 +72,9 @@ public class LancamentoDAO {
 		}
 	}
 	/**
-	 * @brief Obtém todos os Lancamentos de um período.
-	 * @param pDataIni A data inicial do período de consulta.
-	 * @param pDataFim A data final do período de consulta.
+	 * @brief ObtXm todos os Lancamentos de um perXodo.
+	 * @param pDataIni A data inicial do perXodo de consulta.
+	 * @param pDataFim A data final do perXodo de consulta.
 	 * @return Uma lista de Lancamentos se houver, ou uma lista vazia.
 	 */
 	public ArrayList<Lancamento> selectListaRegistrosPeriodo( int pDataIni, int pDataFim ) {
@@ -175,7 +175,7 @@ public class LancamentoDAO {
 	}
 	/**
 	 * @brief Exluir um Lancamento do banco de dados.
-	 * @param pLancamento Um Lancamento a ser excluído.
+	 * @param pLancamento Um Lancamento a ser excluXdo.
 	 */
 	public void excluir( Lancamento pLancamento ) {
 		try {
@@ -200,11 +200,11 @@ public class LancamentoDAO {
 		}
 	}
 	/**
-	 * @brief Obtém o valor total de movimento por período e tipo de conta.
+	 * @brief ObtXm o valor total de movimento por perXodo e tipo de conta.
 	 * @param pConta O tipo de uma Conta 'C' ou 'D'.
-	 * @param pDataIni A data inicial do período de consulta.
-	 * @param pDataFim A data final do período de consulta.
-	 * @param pProvisao Um boolean que se true, considera as provisões.
+	 * @param pDataIni A data inicial do perXodo de consulta.
+	 * @param pDataFim A data final do perXodo de consulta.
+	 * @param pProvisao Um boolean que se true, considera as provisXes.
 	 * @return O valor total para aquele tipo de conta, se maior do que 0, ou 0.
 	 */
 	public double selectTotalMovimentoPeriodo( Conta pConta, int pDataIni, int pDataFim, boolean pProvisao ) {
@@ -268,9 +268,9 @@ public class LancamentoDAO {
 		}
 	}
 	/**
-	 * @brief Obtém um Lancamento específico.
-	 * @param pCodLancamento A data de emissão ou quitação formatada do Lancamento.
-	 * @return Um Lancamento válido, se encontrado, ou Lancamento vazio se não;
+	 * @brief ObtXm um Lancamento especXfico.
+	 * @param pCodLancamento A data de emissXo ou quitaXXo formatada do Lancamento.
+	 * @return Um Lancamento vXlido, se encontrado, ou Lancamento vazio se nXo;
 	 */
 	public Lancamento selectRegistro( Integer pCodLancamento ) {
 		Lancamento lancamento = new Lancamento();
@@ -349,12 +349,12 @@ public class LancamentoDAO {
 		}
 	}
 	/**
-	 * @brief Obtém os Lancamentos para inserir no gráfico do painel Home.
-	 * @param pCodCaixa O código do Caixa a ser consultado.
-	 * @param pDataIni A data inicial do período a ser consultado.
-	 * @param pDataFim A data final do período a ser consultado.
-	 * @param pProvisao Um boolean, que se true, considera as provisões.
-	 * @return Uma lista com o nome de uma Conta e o valor total do período.
+	 * @brief ObtXm os Lancamentos para inserir no grXfico do painel Home.
+	 * @param pCodCaixa O cXdigo do Caixa a ser consultado.
+	 * @param pDataIni A data inicial do perXodo a ser consultado.
+	 * @param pDataFim A data final do perXodo a ser consultado.
+	 * @param pProvisao Um boolean, que se true, considera as provisXes.
+	 * @return Uma lista com o nome de uma Conta e o valor total do perXodo.
 	 */
 	public ArrayList<Object[]> selectLancamentosGrafico( Integer pCodCaixa, int pDataIni, int pDataFim, boolean pProvisao ) {
 		ArrayList<Object[]> alObject = new ArrayList<>();

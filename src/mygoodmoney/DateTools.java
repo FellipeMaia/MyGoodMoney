@@ -1,6 +1,6 @@
 /**
 * @file DateTools.java
-* @brief Contém métodos auxiliares para tratamentos de Data.
+* @brief ContXm mXtodos auxiliares para tratamentos de Data.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -39,7 +39,7 @@ public class DateTools {
 	public static final DateFormat formatterBR = new SimpleDateFormat( "dd/MM/yyyy" ); /**< Formato para data do Brasil */
 	public static final DateFormat formatterUS = new SimpleDateFormat( "yyyy/MM/dd" ); /**< Formato para data do banco de dados */
 	/**
-	* @brief Obtém o ano atual.
+	* @brief ObtXm o ano atual.
 	* @return O ano atual.
 	*/
 	public static String getSAnoAtual() {
@@ -109,7 +109,7 @@ public class DateTools {
 	/**
 	* @brief Formata uma data inteira (yyyyMMdd) para o formato do Brasil.
 	* @param pData A data a ser formatada.
-	* @return A data formatada ou "00/00/00" se data inválida.
+	* @return A data formatada ou "00/00/00" se data invXlida.
 	*/
 	public static String formatDataIntToStringBR( int pData ) {
 		if( pData == 0 ) {
@@ -135,9 +135,9 @@ public class DateTools {
 		return( Integer.parseInt( pData ) );
 	}
 	/**
-	* @brief Soma ou subtrai um mês em uma java.util.Date.
+	* @brief Soma ou subtrai um mXs em uma java.util.Date.
 	* @param pData A data a base.
-	* @param pOperacao A operação a ser efetuada ('+' ou '-').
+	* @param pOperacao A operaXXo a ser efetuada ('+' ou '-').
 	* @return A data resultante.
 	*/
 	public static Date somarSubtrairUmMes( Date pData, char pOperacao ) {
@@ -177,9 +177,9 @@ public class DateTools {
 		}
 	}
 	/**
-	* @brief Obtém o último dia de um mês.
-	* @param pData A data contendo o mês a ser obtido o dia.
-	* @return O último dia do mês.
+	* @brief ObtXm o Xltimo dia de um mXs.
+	* @param pData A data contendo o mXs a ser obtido o dia.
+	* @return O Xltimo dia do mXs.
 	*/
 	public static String getUltimaDataMes( String pData ) {
 		switch( pData.substring( 3,5 ) ) {
@@ -210,10 +210,10 @@ public class DateTools {
 		}
 	}
 	/**
-	* @brief Cálculo das parcelas vincendas a partir de um vencimento,
+	* @brief CXlculo das parcelas vincendas a partir de um vencimento,
 	* @param pVencBase O primeiro vencimento, a ser usado como base.
-	* @param pNumDeParcelas O número total de parcelas, incluindo a parcela base.
-	* @param pPeriodo O período de repetição (dias, semanas, meses).
+	* @param pNumDeParcelas O nXmero total de parcelas, incluindo a parcela base.
+	* @param pPeriodo O perXodo de repetiXXo (dias, semanas, meses).
 	* @return Uma lista contendo os vencimentos calculados.
 	*/
 	public static ArrayList<Integer> calcularVencimentos( int pVencBase, int pNumDeParcelas, int pPeriodo ) {
@@ -225,17 +225,17 @@ public class DateTools {
 		return( vencList );
 	}
 	/**
-	* @brief Obtém o mês de uma data inteira (yyyyMMdd).
-	* @param pData A data a ser obtida o mês.
-	* @return O mês da data informada.
+	* @brief ObtXm o mXs de uma data inteira (yyyyMMdd).
+	* @param pData A data a ser obtida o mXs.
+	* @return O mXs da data informada.
 	*/
 	public static int getMesFromDataInt( int pData ) {
 		String sMes = ( "" + pData ).substring( 4, 6 );
 		return( Integer.parseInt( sMes ) );
 	}
 	/**
-	* @brief Obtém o dia de uma data inteira (yyyyMMdd).
-	* @param pData A data a ser obtida o mês.
+	* @brief ObtXm o dia de uma data inteira (yyyyMMdd).
+	* @param pData A data a ser obtida o mXs.
 	* @return O dia da data informada.
 	*/
 	public static int getDiaFromDataInt( int pData ) {
@@ -243,8 +243,8 @@ public class DateTools {
 		return( Integer.parseInt( dia ) );
 	}
 	/**
-	* @brief Obtém o ano de uma data inteira (yyyyMMdd).
-	* @param pData A data a ser obtida o mês.
+	* @brief ObtXm o ano de uma data inteira (yyyyMMdd).
+	* @param pData A data a ser obtida o mXs.
 	* @return O ano da data informada.
 	*/
 	public static int getAnoFromDataInt( int pData ) {
@@ -252,10 +252,10 @@ public class DateTools {
 		return( Integer.parseInt( ano ) );
 	}
 	/**
-	* @brief Soma um número de dias a uma data.
-	* @param pDataBase A data base qual será somada os dias.
-	* @param pNumDias O número de dias a ser somado.
-	* @return A data resultante da soma, se a data for válida, ou data base.
+	* @brief Soma um nXmero de dias a uma data.
+	* @param pDataBase A data base qual serX somada os dias.
+	* @param pNumDias O nXmero de dias a ser somado.
+	* @return A data resultante da soma, se a data for vXlida, ou data base.
 	*/
 	public static int somarDiasData( int pDataBase, int pNumDias ) {
 		if( pNumDias == 0 ) {

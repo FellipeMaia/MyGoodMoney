@@ -1,6 +1,6 @@
 /**
 * @file ContaDAO.java
-* @brief Contém métodos de acesso a entidade Conta do banco de dados.
+* @brief ContXm mXtodos de acesso a entidade Conta do banco de dados.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -78,7 +78,7 @@ public class ContaDAO {
 			System.out.println( "SQLException: " + ex.getLocalizedMessage() );
 			if( ex.getErrorCode() == 1 ) {
 				// 1 = SQLITE_ERROR = Error or missing database
-				System.out.println( "SQL: Banco de dados não encontrado! Criando.." );
+				System.out.println( "SQL: Banco de dados nXo encontrado! Criando.." );
 				ConnectionHolder.criarTabelas();
 			}
 			return( contasList );
@@ -108,7 +108,7 @@ public class ContaDAO {
 	}
 	/**
 	* @brief Exclui uma conta do banco de dados.
-	* @param pConta Uma conta a ser excluída.
+	* @param pConta Uma conta a ser excluXda.
 	*/
 	public void excluir( Conta pConta ) {
 		try {
@@ -131,12 +131,12 @@ public class ContaDAO {
 		}
 	}
 	/**
-	* @brief Obtém o valor total de um período para uma Conta específica.
-	* @param pConta O código de uma Conta.
-	* @param pDataIni A data inicial do período de consulta.
-	* @param pDataFim A data final do período de consulta.
-	* @param pProvisao Um boolean que se true, considera provisões.
-	* @return O valor total da Conta, se encontrado, ou 0 se não encontrado.
+	* @brief ObtXm o valor total de um perXodo para uma Conta especXfica.
+	* @param pConta O cXdigo de uma Conta.
+	* @param pDataIni A data inicial do perXodo de consulta.
+	* @param pDataFim A data final do perXodo de consulta.
+	* @param pProvisao Um boolean que se true, considera provisXes.
+	* @return O valor total da Conta, se encontrado, ou 0 se nXo encontrado.
 	*/
 	public double selectTotalPeriodo( Conta pConta, Integer pDataIni, Integer pDataFim, boolean pProvisao ) {
 		try {
@@ -196,8 +196,8 @@ public class ContaDAO {
 		}
 	}
 	/**
-	* @brief Altera todos os campos de uma Conta baseado no código da Conta.
-	* @param pConta A Conta já prenchida a ser alterada.
+	* @brief Altera todos os campos de uma Conta baseado no cXdigo da Conta.
+	* @param pConta A Conta jX prenchida a ser alterada.
 	*/
 	public void alterar( Conta pConta ) {
 		try {
@@ -223,12 +223,12 @@ public class ContaDAO {
 		}
 	}
 	/**
-	* @brief Obtém um extrato de uma Conta em um período.
-	* @param pConta O código da Conta a ser obtido o extrato.
-	* @param pDataIni A data inicial do período de consulta.
-	* @param pDataFim A data final do período de consulta.
-	* @param pProvisao Um boolean que se true, considera as provisões.
-	* @return Uma lista contendo a data de vencimento, data de quitação, descrição e valor, ou lista vazia.
+	* @brief ObtXm um extrato de uma Conta em um perXodo.
+	* @param pConta O cXdigo da Conta a ser obtido o extrato.
+	* @param pDataIni A data inicial do perXodo de consulta.
+	* @param pDataFim A data final do perXodo de consulta.
+	* @param pProvisao Um boolean que se true, considera as provisXes.
+	* @return Uma lista contendo a data de vencimento, data de quitaXXo, descriXXo e valor, ou lista vazia.
 	*/
 	public ArrayList<String[]> selectListaExtratoPeriodo( Conta pConta, Caixa pCaixa, Integer pDataIni, Integer pDataFim, boolean pProvisao ) {
 		ArrayList<String[]> extratoList = new ArrayList<>();

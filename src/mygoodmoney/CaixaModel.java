@@ -1,6 +1,6 @@
 /**
 * @file CaixaModel.java
-* @brief Contém métodos de acesso e tratamento para a tabela de caixas.
+* @brief ContXm mXtodos de acesso e tratamento para a tabela de caixas.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */

@@ -1,6 +1,6 @@
 /**
 * @file EnumPeriodo.java
-* @brief Contém as constantes para cada período.
+* @brief ContXm as constantes para cada perXodo.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -36,30 +36,30 @@ public enum EnumPeriodo {
 	private final String sDescricao;
 	/**
 	* @brief Construtor do EnumPeriodo.
-	* @param piDias O número de dias no período.
-	* @param psDescricao A descrição do período.
+	* @param piDias O nXmero de dias no perXodo.
+	* @param psDescricao A descriXXo do perXodo.
 	*/
 	private EnumPeriodo( int piDias, String psDescricao ) {
 		this.iDias = piDias;
 		this.sDescricao = psDescricao;
 	}
 	/**
-	* @brief Obtúm o número de dias do enum.
-	* @return O número de dias.
+	* @brief ObtXm o nXmero de dias do enum.
+	* @return O nXmero de dias.
 	*/
 	public int getIDias() {
 		return( this.iDias );
 	}
 	/**
-	* @brief Obtém a descrição do enum.
-	* @return A descrição do enum.
+	* @brief ObtXm a descriXXo do enum.
+	* @return A descriXXo do enum.
 	*/
 	public String getSDescricao() {
 		return( this.sDescricao );
 	}
 	/**
 	* @brief Converte o enum para String.
-	* @return A descrição do enum.
+	* @return A descriXXo do enum.
 	*/
 	@Override
 	public String toString() {

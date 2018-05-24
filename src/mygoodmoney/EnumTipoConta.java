@@ -1,6 +1,6 @@
 /**
 * @file EnumTipoConta.java
-* @brief Contém as constantes para os tipos de contas.
+* @brief ContXm as constantes para os tipos de contas.
 * @copyright 2014 Ricardo Montania. Todos os Direitos Reservados.
 * @license Este projeto encontra-se sob a licensa GNU.
 */
@@ -28,37 +28,37 @@ package mygoodmoney;
 * @enum EnumTipoConta
 */
 public enum EnumTipoConta {
-	CREDITO('C',"Crédito"),	 /**< Define 'C' para CREDITO */
-	DEBITO('D',"Débito");	 /**< Define 'D' para DEBITO */
+	CREDITO('C',"CrXdito"),	 /**< Define 'C' para CREDITO */
+	DEBITO('D',"DXbito");	 /**< Define 'D' para DEBITO */
 	private final char	 codigo;
 	private final String descricao;
 	/**
 	* @brief Construtor do enum EnumTipoConta.
-	* @param pCodigo O código do enum.
-	* @param pDescricao A descrição do enum.
+	* @param pCodigo O cXdigo do enum.
+	* @param pDescricao A descriXXo do enum.
 	*/
 	private EnumTipoConta( char pCodigo, String pDescricao ) {
 		this.codigo	   = pCodigo;
 		this.descricao = pDescricao;
 	}
 	/**
-	* @brief Obtém o código do enum.
-	* @return O código do enum.
+	* @brief ObtXm o cXdigo do enum.
+	* @return O cXdigo do enum.
 	*/
 	public char getCodigo() {
 		return( this.codigo );
 	}
 	/**
-	* @brief Obtém a descrição do enum.
-	* @return A descrição do enum.
+	* @brief ObtXm a descriXXo do enum.
+	* @return A descriXXo do enum.
 	*/
 	public String getDescricao() {
 		return( this.descricao );
 	}
 	/**
-	* @brief Busca um enum por código.
-	* @param pCodEnum O código do ennum.
-	* @return O enum se encontrado, ou null se não.
+	* @brief Busca um enum por cXdigo.
+	* @param pCodEnum O cXdigo do ennum.
+	* @return O enum se encontrado, ou null se nXo.
 	*/
 	public static EnumTipoConta getPorCodigo( char pCodEnum ) {
 		for( EnumTipoConta valor : EnumTipoConta.values() ) {
@@ -69,9 +69,9 @@ public enum EnumTipoConta {
 		return( null );
 	}
 	/**
-	* @brief Busca um enum por descrição.
-	* @param pDescricaoEnum A descrição do ennum.
-	* @return O enum se encontrado, ou null se não.
+	* @brief Busca um enum por descriXXo.
+	* @param pDescricaoEnum A descriXXo do ennum.
+	* @return O enum se encontrado, ou null se nXo.
 	*/
 	public static EnumTipoConta getPorDescricao( String pDescricaoEnum ) {
 		for( EnumTipoConta valor : EnumTipoConta.values() ) {
@@ -83,7 +83,7 @@ public enum EnumTipoConta {
 	}
 	/**
 	* @brief Converte o enum para String.
-	* @return A descrição do enum.
+	* @return A descriXXo do enum.
 	*/
 	@Override
 	public String toString() {
