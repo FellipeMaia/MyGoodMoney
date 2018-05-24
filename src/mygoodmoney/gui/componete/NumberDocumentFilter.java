@@ -1,4 +1,4 @@
-package mygoodmoney;
+package mygoodmoney.gui.componete;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;

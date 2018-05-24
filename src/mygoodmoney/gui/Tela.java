@@ -50,7 +50,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.DefaultTableCellRenderer;
 import mygoodmoney.factory.DateTools;
-import mygoodmoney.FrConsole;
 import mygoodmoney.factory.ValueTools;
 import mygoodmoney.gui.img.Imagem;
 import org.jfree.chart.ChartPanel;
@@ -58,7 +57,6 @@ import org.jfree.chart.JFreeChart;
 
 public class Tela extends JFrame {
 	private String comando; /**< ContXm o comando a ser executado, disparado por eventos */
-	private FrConsole console;
         
 	private JPanel pnlSuperior;
 	private JLabel lblPeriodo;

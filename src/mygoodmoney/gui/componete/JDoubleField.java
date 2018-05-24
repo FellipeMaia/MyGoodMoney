@@ -35,7 +35,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.DocumentFilter;
-import mygoodmoney.NumberDocumentFilter;
 
 /**
 * @class JDoubleField
